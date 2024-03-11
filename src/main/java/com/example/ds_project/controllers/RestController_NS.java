@@ -1,10 +1,10 @@
 package com.example.ds_project.controllers;
 
 import com.example.ds_project.NamingServer;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 import java.net.Inet4Address;
+import java.util.Map;
 
 @RestController
 public class RestController_NS
@@ -22,6 +22,32 @@ public class RestController_NS
         return namingServer.getLocationIP(fileName);
     }
 
+    /**
+     * Adds a node via the naming server with it's ip address
+     * @param request the JSON request body with "ip" as ip address
+     */
+    @PostMapping("/project/addNode")
+    public void AddNode(@RequestBody Map<String, Object> request)
+    {
+        Inet4Address ipAddress = (Inet4Address) request.get("ip");
+        namingServer.addNodeIP(ipAddress);
+    }
+
+    /**
+     * Removes a node via the naming server with it's ip address
+     * @param request the JSON request body with "ip" as ip address
+     */
+    @PostMapping("/project/removeNode")
+    public void RemoveNode(@RequestBody Map<String, Object> request)
+    {
+        Inet4Address ipAddress = (Inet4Address) request.get("ip");
+        namingServer.addNodeIP(ipAddress);
+    }
+
+    /**
+     * Sets the naming server for the rest controller
+     * @param namingServer the naming server
+     */
     public void setNamingServer(NamingServer namingServer)
     {
         this.namingServer = namingServer;
