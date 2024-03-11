@@ -4,12 +4,13 @@ import com.example.ds_project.NamingServer;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.net.Inet4Address;
 
 @RestController
 public class RestController_NS
 {
+    NamingServer namingServer;
+
     /**
      * Asks the naming server for the location of a file
      * @param fileName the name of the file
@@ -18,7 +19,11 @@ public class RestController_NS
     @GetMapping("/project/searchFile")
     public Inet4Address SearchFile(@RequestParam String fileName)
     {
-        NamingServer ns = new NamingServer(); // TEMP
-        return ns.getLocationIP(fileName);
+        return namingServer.getLocationIP(fileName);
+    }
+
+    public void setNamingServer(NamingServer namingServer)
+    {
+        this.namingServer = namingServer;
     }
 }
