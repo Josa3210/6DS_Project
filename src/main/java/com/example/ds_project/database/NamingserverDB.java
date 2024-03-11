@@ -13,7 +13,7 @@ import java.util.Map;
  * This class is responsible for saving a map to a JSON file.
  */
 @Component
-public class namingserver_DB {
+public class NamingserverDB {
 
     @Value("${map.file.path}") // Path to the JSON file (configured in application.properties)
     private String filePath;
