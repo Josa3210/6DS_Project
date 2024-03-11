@@ -3,7 +3,7 @@ package com.example.ds_project;
 import java.net.Inet4Address;
 import java.util.HashMap;
 
-public interface I_namingserver {
+public interface I_NamingServer {
     /**
      * Get the IP address of the node containing a specific file
      *
