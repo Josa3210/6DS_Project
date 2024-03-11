@@ -12,11 +12,12 @@ import java.util.Map;
 public class NamingserverDB_test {
 
     public static void main(String[] args) {
-        ConfigurableApplicationContext context = SpringApplication.run(MapSaverTest.class, args);
+        ConfigurableApplicationContext context = SpringApplication.run(NamingserverDB_test.class, args);
 
         // Create a sample map with node data
         Map<Integer, Inet4Address> nodeMap = new HashMap<>();
         try {
+
             Inet4Address node1 = (Inet4Address) Inet4Address.getByName("192.168.0.1");
             Inet4Address node2 = (Inet4Address) Inet4Address.getByName("192.168.0.2");
 
@@ -24,12 +25,16 @@ public class NamingserverDB_test {
             nodeMap.put(12345, node1);
             nodeMap.put(54321, node2);
 
-            // Retrieve the mapSaver bean from the Spring context
-            NamingserverDB namingserverDb = context.getBean(namingserverDB.class);
+            // Retrieve the namingserverDB bean from the Spring context
+            NamingserverDB namingserverDb = context.getBean(NamingserverDB.class);
 
             // Save the map to a JSON file
-            mapSaver.saveMapToFile(nodeMap);
-        } catch (UnknownHostException e) {
+            namingserverDb.saveMapToFile(nodeMap);
+
+        }
+
+        catch (UnknownHostException e) {
+
             System.err.println("Error creating Inet4Address: " + e.getMessage());
         }
     }
