@@ -1,10 +1,12 @@
 package com.example.ds_project;
 
+import com.example.ds_project.database.NamingserverDB;
+
 import java.net.Inet4Address;
 import java.util.HashMap;
 
 public class NamingServer implements I_NamingServer {
-    NamingServerDB database;
+    NamingserverDB database;
     
     public NamingServer(){
 
