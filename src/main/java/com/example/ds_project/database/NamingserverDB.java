@@ -13,7 +13,7 @@ import java.util.Map;
  * This class is responsible for saving a map to a JSON file.
  */
 @Component
-public class NamingserverDB {
+public class NamingserverDB implements I_NamingserverDB {
 
     @Value("${map.file.path}") // Path to the JSON file (configured in application.properties)
     private String filePath;
@@ -47,6 +47,26 @@ public class NamingserverDB {
         } catch (IOException e) {
             System.err.println("Error saving map to file: " + e.getMessage());
         }
+    }
+
+    @Override
+    public void load() {
+
+    }
+
+    @Override
+    public void save() {
+
+    }
+
+    @Override
+    public Inet4Address get(Integer hash) {
+        return null;
+    }
+
+    @Override
+    public void put(Integer hash, Inet4Address ip) {
+
     }
 }
 
