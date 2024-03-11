@@ -41,7 +41,7 @@ public class RestController_NS
     public void RemoveNode(@RequestBody Map<String, Object> request)
     {
         Inet4Address ipAddress = (Inet4Address) request.get("ip");
-        namingServer.addNodeIP(ipAddress);
+        namingServer.removeNodeIP(ipAddress);
     }
 
     /**
