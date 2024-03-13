@@ -4,18 +4,31 @@ import com.example.ds_project.database.I_NamingserverDB;
 import com.example.ds_project.database.NamingserverDB;
 
 import java.net.Inet4Address;
-import java.util.HashMap;
+import java.util.Set;
+
+import static java.util.Collections.max;
 
 public class NamingServer implements I_NamingServer {
+    /**
+     * Database containing the IP's of the different nodes {@see I_NamingserverDB}
+     */
     I_NamingserverDB database;
-    HashMap<Inet4Address, Integer> nodeDB;
 
     public NamingServer() {
         String filepath = "Data/DB/namingServer";
-        database = new NamingserverDB(); // <-- insert filepath
-        nodeDB = new HashMap<>();
+        database = new NamingserverDB(filepath);
+        this.database.load();
     }
 
+    /**
+     * This method computes a hash value for a given string by iterating through
+     * each character and applying a polynomial rolling hash function. The hash
+     * value is calculated as (sum of character values * p_pow) % m, where p is a
+     * prime number, m is a large prime number, and p_pow is the current power of p.
+     *
+     * @param s the input string for which the hash value needs to be computed
+     * @return the computed hash value for the input string
+     */
     static int computeHash(String s) {
         int p = 59;
         int m = 10000009;
@@ -33,27 +46,71 @@ public class NamingServer implements I_NamingServer {
         return hash_value;
     }
 
+    /**
+     * This method retrieves the IP address associated with the location of a given
+     * filename by computing a hash value for the filename and comparing it with the
+     * keys in the database. It then calculates the closest distance to the hash value
+     * and returns the corresponding IP address.
+     *
+     * @param filename the name of the file for which location IP is requested
+     * @return the IP address of the location associated with the filename
+     */
     @Override
     public Inet4Address getLocationIP(String filename) {
         int hash = computeHash(filename);
+        Set<Integer> keys = this.database.getKeys();
+
+        // Setup variables
+        double smallestDist = Double.POSITIVE_INFINITY;
+        int node = 0;
+
+        // Calculate distance
+        for (int key : keys) {
+            double dist = key - hash;
+            if (dist < smallestDist) {
+                smallestDist = dist;
+                node = key;
+            }
+        }
+
+        if (node < hash) {
+            node = max(keys);
+        }
+
         return this.database.get(hash);
     }
 
-    @Override
-    public HashMap<Integer, Inet4Address> loadMap(String filePath) {
-        return null;
-    }
-
+    /**
+     * This method adds a new node with the given node name and IP address to the database.
+     * It computes a hash value for the node name, stores the IP address in the database,
+     * and saves the updated database.
+     *
+     * @param nodeName  the name of the node to be added
+     * @param ipaddress the IP address of the node to be added
+     */
     @Override
     public void addNodeIP(String nodeName, Inet4Address ipaddress) {
         int hash = computeHash(nodeName);
-        database.put(hash, ipaddress);
+        this.database.put(hash, ipaddress);
+        this.database.save();
 
         // Reallocate resources
     }
 
+    /**
+     * This method removes a node with the given node name and IP address from the database.
+     * It computes a hash value for the node name, removes the corresponding entry from the
+     * database, and saves the updated database.
+     *
+     * @param nodeName  the name of the node to be removed
+     * @param ipaddress the IP address of the node to be removed
+     */
     @Override
-    public void removeNodeIP(Inet4Address ipaddress) {
+    public void removeNodeIP(String nodeName, Inet4Address ipaddress) {
+        int hash = computeHash(nodeName);
+        this.database.remove(hash);
+        this.database.save();
 
+        // Reallocate resources
     }
 }

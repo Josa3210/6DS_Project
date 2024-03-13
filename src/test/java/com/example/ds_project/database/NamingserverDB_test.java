@@ -29,8 +29,7 @@ public class NamingserverDB_test {
             NamingserverDB namingserverDb = context.getBean(NamingserverDB.class);
 
             // Save the map to a JSON file
-            namingserverDb.saveMapToFile(nodeMap);
-
+            namingserverDb.save();
         }
 
         catch (UnknownHostException e) {

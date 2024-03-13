@@ -2,6 +2,7 @@ package com.example.ds_project;
 
 import java.net.Inet4Address;
 import java.util.HashMap;
+import java.util.Set;
 
 public interface I_NamingServer {
     /**
@@ -12,17 +13,6 @@ public interface I_NamingServer {
      */
     Inet4Address getLocationIP(String filename);
 
-
-    /**
-     * Load the map with the resources to IP
-     *
-     * @param filePath: path where the map is stored
-     * @return the hashMap {@see HashMap}
-     */
-    HashMap<Integer, Inet4Address> loadMap(String filePath);
-
-    //
-
     /**
      * Add a node to the namingServer
      *
@@ -30,12 +20,11 @@ public interface I_NamingServer {
      */
     void addNodeIP(String nodeName, Inet4Address ipaddress);
 
-
     /**
      * Remove a node from the namingServer
      *
      * @param ipaddress: the ipaddress of the node to remove
      */
-    void removeNodeIP(Inet4Address ipaddress);
+    void removeNodeIP(String nodeName, Inet4Address ipaddress);
 
 }
