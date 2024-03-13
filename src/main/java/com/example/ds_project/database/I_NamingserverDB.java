@@ -2,6 +2,7 @@ package com.example.ds_project.database;
 
 import java.net.Inet4Address;
 import java.util.HashMap;
+import java.util.Set;
 
 public interface I_NamingserverDB {
     //String filePath;
@@ -17,4 +18,6 @@ public interface I_NamingserverDB {
 
     // Put address with key hash
     void put(Integer hash, Inet4Address ip);
+
+    Set<Integer> getKey();
 }

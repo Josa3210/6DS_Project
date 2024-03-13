@@ -5,7 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.IOException;
 import java.net.Inet4Address;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Set;
 
 /**
  * This class represents a naming server database responsible for managing the mapping
@@ -25,7 +27,6 @@ public class NamingserverDB implements I_NamingserverDB {
     public NamingserverDB(String filePath) {
 
         this.filePath = filePath;
-
         System.out.println("Database will be saved in: " + filePath);
 
     }
@@ -109,7 +110,24 @@ public class NamingserverDB implements I_NamingserverDB {
             System.err.println("Map is not initialized. Please load the map first.");
         }
     }
+
+
+    /**
+     * Retrieves the set of keys from the nodeMap.
+     *
+     * @return A Set of Integer keys from the nodeMap, or an empty Set if nodeMap is not initialized.
+     */
+    public Set<Integer> getKey() {
+        if (nodeMap != null) {
+            return nodeMap.keySet(); // Assuming nodeMap is a Map<Integer, Something>
+        } else {
+            System.err.println("Map is not initialized. Please load the map first.");
+            return Collections.emptySet(); // Or return null if appropriate
+        }
+    }
+
 }
+
 
 
 
