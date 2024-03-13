@@ -19,5 +19,7 @@ public interface I_NamingserverDB {
     // Put address with key hash
     void put(Integer hash, Inet4Address ip);
 
-    Set<Integer> getKey();
+    Set<Integer> getKeys();
+
+    void remove(int hash);
 }
