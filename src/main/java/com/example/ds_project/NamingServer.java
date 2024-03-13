@@ -5,15 +5,17 @@ import com.example.ds_project.database.NamingserverDB;
 
 import java.net.Inet4Address;
 import java.util.HashMap;
+import java.util.Set;
+
+import static java.util.Collections.max;
 
 public class NamingServer implements I_NamingServer {
     I_NamingserverDB database;
-    HashMap<Inet4Address, Integer> nodeDB;
 
     public NamingServer() {
         String filepath = "Data/DB/namingServer";
-        database = new NamingserverDB(); // <-- insert filepath
-        nodeDB = new HashMap<>();
+        database = new NamingserverDB(filepath); // <-- insert filepath
+        this.database.load();
     }
 
     static int computeHash(String s) {
@@ -36,24 +38,43 @@ public class NamingServer implements I_NamingServer {
     @Override
     public Inet4Address getLocationIP(String filename) {
         int hash = computeHash(filename);
-        return this.database.get(hash);
-    }
+        Set<Integer> keys = this.database.getKey();
 
-    @Override
-    public HashMap<Integer, Inet4Address> loadMap(String filePath) {
-        return null;
+        // Setup variables
+        double smallestDist = Double.POSITIVE_INFINITY;
+        int node = 0;
+
+        // Calculate distance
+        for (int key : keys) {
+            double dist = key - hash;
+            if (dist < smallestDist) {
+                smallestDist = dist;
+                node = key;
+            }
+        }
+
+        if (node < hash) {
+            node = max(keys);
+        }
+
+        return this.database.get(hash);
     }
 
     @Override
     public void addNodeIP(String nodeName, Inet4Address ipaddress) {
         int hash = computeHash(nodeName);
-        database.put(hash, ipaddress);
+        this.database.put(hash, ipaddress);
+        this.database.save();
 
         // Reallocate resources
     }
 
     @Override
-    public void removeNodeIP(Inet4Address ipaddress) {
-
+    public void removeNodeIP(String nodeName, Inet4Address ipaddress) {
+        int hash = computeHash(nodeName);
+        this.database.remove(hash);
+        this.database.save();
+        
+        // Reallocate resources
     }
 }

@@ -2,6 +2,7 @@ package com.example.ds_project;
 
 import java.net.Inet4Address;
 import java.util.HashMap;
+import java.util.Set;
 
 public interface I_NamingServer {
     /**
@@ -11,15 +12,6 @@ public interface I_NamingServer {
      * @return the ip address of the node that contains the resource {@see Inet4Address}
      */
     Inet4Address getLocationIP(String filename);
-
-
-    /**
-     * Load the map with the resources to IP
-     *
-     * @param filePath: path where the map is stored
-     * @return the hashMap {@see HashMap}
-     */
-    HashMap<Integer, Inet4Address> loadMap(String filePath);
 
     //
 
@@ -36,6 +28,6 @@ public interface I_NamingServer {
      *
      * @param ipaddress: the ipaddress of the node to remove
      */
-    void removeNodeIP(Inet4Address ipaddress);
+    void removeNodeIP(String nodeName, Inet4Address ipaddress);
 
 }
