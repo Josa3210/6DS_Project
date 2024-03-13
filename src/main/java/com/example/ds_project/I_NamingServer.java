@@ -28,7 +28,7 @@ public interface I_NamingServer {
      *
      * @param ipaddress: the ipaddress of the new node
      */
-    void addNodeIP(Inet4Address ipaddress);
+    void addNodeIP(String nodeName, Inet4Address ipaddress);
 
 
     /**
