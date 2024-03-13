@@ -13,15 +13,12 @@ public interface I_NamingServer {
      */
     Inet4Address getLocationIP(String filename);
 
-    //
-
     /**
      * Add a node to the namingServer
      *
      * @param ipaddress: the ipaddress of the new node
      */
     void addNodeIP(String nodeName, Inet4Address ipaddress);
-
 
     /**
      * Remove a node from the namingServer

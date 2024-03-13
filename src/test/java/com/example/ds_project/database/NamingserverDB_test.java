@@ -30,7 +30,6 @@ public class NamingserverDB_test {
 
             // Save the map to a JSON file
             namingserverDb.save();
-hahah la
         }
 
         catch (UnknownHostException e) {
