@@ -2,7 +2,6 @@ package com.example.ds_project.controllers;
 
 import com.example.ds_project.NamingServer;
 import org.springframework.web.bind.annotation.*;
-
 import java.net.Inet4Address;
 import java.util.Map;
 
@@ -30,7 +29,8 @@ public class RestController_NS
     public void AddNode(@RequestBody Map<String, Object> request)
     {
         Inet4Address ipAddress = (Inet4Address) request.get("ip");
-        namingServer.addNodeIP(ipAddress);
+        String nodeName = (String) request.get("name");
+        namingServer.addNodeIP(nodeName, ipAddress);
     }
 
     /**
@@ -41,7 +41,8 @@ public class RestController_NS
     public void RemoveNode(@RequestBody Map<String, Object> request)
     {
         Inet4Address ipAddress = (Inet4Address) request.get("ip");
-        namingServer.removeNodeIP(ipAddress);
+        String nodeName = (String) request.get("name");
+        namingServer.removeNodeIP(nodeName, ipAddress);
     }
 
     /**
