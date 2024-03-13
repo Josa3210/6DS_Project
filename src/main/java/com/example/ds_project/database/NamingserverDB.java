@@ -15,6 +15,7 @@ import java.util.Set;
  */
 public class NamingserverDB implements I_NamingserverDB {
 
+
     private final String filePath;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private HashMap<Integer, Inet4Address> nodeMap; // Inet4Address = key,
@@ -28,7 +29,6 @@ public class NamingserverDB implements I_NamingserverDB {
 
         this.filePath = filePath;
         System.out.println("Database will be saved in: " + filePath);
-
     }
 
     /**
@@ -44,17 +44,16 @@ public class NamingserverDB implements I_NamingserverDB {
             {
                 // Read the JSON file and convert it to HashMap
                 nodeMap = objectMapper.readValue(file, HashMap.class);
-
                 System.out.println("Map loaded from file: " + filePath);
             }
             else {
 
                 System.out.println("File does not exist. Initializing an empty map.");
-
                 nodeMap = new HashMap<>();
             }
 
         } catch (IOException e) {
+
             System.err.println("Error loading map from file: " + e.getMessage());
             nodeMap = new HashMap<>();
         }
@@ -91,8 +90,10 @@ public class NamingserverDB implements I_NamingserverDB {
     public Inet4Address get(Integer hash) {
         if (nodeMap != null) {
             return nodeMap.get(hash);
+
         } else {
             System.err.println("Hashmap is not initialized. Please load the hashmap first.");
+
             return null;
         }
     }
@@ -105,8 +106,11 @@ public class NamingserverDB implements I_NamingserverDB {
      */
     public void put(Integer hash, Inet4Address ip4) {
         if (nodeMap != null) {
+
             nodeMap.put(hash, ip4);
+
         } else {
+
             System.err.println("Map is not initialized. Please load the map first.");
         }
     }
@@ -117,12 +121,24 @@ public class NamingserverDB implements I_NamingserverDB {
      *
      * @return A Set of Integer keys from the nodeMap, or an empty Set if nodeMap is not initialized.
      */
-    public Set<Integer> getKey() {
+    public Set<Integer> getKeys() {
         if (nodeMap != null) {
             return nodeMap.keySet(); // Assuming nodeMap is a Map<Integer, Something>
         } else {
             System.err.println("Map is not initialized. Please load the map first.");
             return Collections.emptySet(); // Or return null if appropriate
+        }
+    }
+
+    /**
+     * Removes an entry from the database0
+     */
+    public void remove(int hash) {
+        if (nodeMap != null) {
+            nodeMap.remove(hash);
+            System.out.println("Entry with key " + hash + " removed from the database.");
+        } else {
+            System.err.println("Database is not initialized. Please load the database first.");
         }
     }
 
