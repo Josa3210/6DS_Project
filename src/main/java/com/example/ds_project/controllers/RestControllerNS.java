@@ -45,6 +45,12 @@ public class RestControllerNS
         namingServer.removeNodeIP(nodeName, ipAddress);
     }
 
+    @GetMapping("/test")
+    public String TestConnection(@RequestParam String testString)
+    {
+        return ("Test Communication : " + testString);
+    }
+
     /**
      * Sets the naming server for the rest controller
      * @param namingServer the naming server
