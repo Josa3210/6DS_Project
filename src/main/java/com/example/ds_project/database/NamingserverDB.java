@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.Inet4Address;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
@@ -31,17 +33,11 @@ public class NamingserverDB implements I_NamingserverDB {
         {
             String currentPath = new java.io.File(".").getCanonicalPath();
             String filepath = currentPath + "/Data/DB/namingServer";
+            Path path = Paths.get(filepath);
 
             System.out.println(filepath);
 
-            File directory = new File(filepath);
-
-            if(!directory.exists())
-            {
-                boolean successful = directory.mkdir();
-                if(!successful)
-                    System.out.println("NOT SUCCESSFUL");
-            }
+            Files.createDirectories(path);
 
             this.filePath = filepath;
 
