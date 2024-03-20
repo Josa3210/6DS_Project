@@ -20,6 +20,7 @@ public class NamingserverDB implements I_NamingserverDB {
 
 
     private String filePath;
+    private final String fileName = "hashmap.txt";
     private final ObjectMapper objectMapper = new ObjectMapper();
     private HashMap<Integer, Inet4Address> nodeMap; // Inet4Address = key,
 
@@ -58,7 +59,7 @@ public class NamingserverDB implements I_NamingserverDB {
 
     public void load() {
         try {
-            File file = new File(filePath);
+            File file = new File(filePath + "/" + fileName);
 
             if (file.exists()) // if there exists a file for the give filepath ..
             {
@@ -89,10 +90,10 @@ public class NamingserverDB implements I_NamingserverDB {
             String jsonMap = objectMapper.writeValueAsString(nodeMap);
 
             // Write the JSON string to the file
-            File file = new File(filePath);
+            File file = new File(filePath + "/" + fileName);
             objectMapper.writeValue(file, jsonMap);
 
-            System.out.println("Map saved to file: " + filePath);
+            System.out.println("Map saved to file: "  + filePath + "/" + fileName);
 
         } catch (IOException e) {
             System.err.println("Error saving map to file: " + e.getMessage());
