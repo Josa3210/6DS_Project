@@ -155,6 +155,7 @@ public class NamingserverDB implements I_NamingserverDB {
      * Removes an entry from the database0
      */
     public void remove(int hash) {
+        // TODO Check if node is in nodeMAP!
         if (nodeMap != null) {
             nodeMap.remove(hash);
             System.out.println("Entry with key " + hash + " removed from the database.");
