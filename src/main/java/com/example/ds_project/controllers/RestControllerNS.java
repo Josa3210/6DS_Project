@@ -4,6 +4,8 @@ import com.example.ds_project.NamingServer;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Map;
 
 @RestController
@@ -27,8 +29,8 @@ public class RestControllerNS {
      * @param request the JSON request body with "ip" as ip address
      */
     @PostMapping("/project/addNode")
-    public void AddNode(@RequestBody Map<String, Object> request) {
-        Inet4Address ipAddress = (Inet4Address) request.get("ip");
+    public void AddNode(@RequestBody Map<String, Object> request) throws UnknownHostException {
+        Inet4Address ipAddress = (Inet4Address) InetAddress.getByName((String) request.get("ip"));
         String nodeName = (String) request.get("name");
         namingServer.addNodeIP(nodeName, ipAddress);
     }
@@ -48,7 +50,7 @@ public class RestControllerNS {
     @GetMapping("/test")
     public String TestConnection(@RequestParam String testString)
     {
-        return ("Test Communication : " + testString);
+        return ("Test Communication : " + testString +"\n");
     }
 
     /**
