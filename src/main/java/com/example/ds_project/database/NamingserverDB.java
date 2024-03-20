@@ -30,7 +30,7 @@ public class NamingserverDB implements I_NamingserverDB {
         try
         {
             String currentPath = new java.io.File(".").getCanonicalPath();
-            String filepath = currentPath + "Data/DB/namingServer";
+            String filepath = currentPath + "/Data/DB/namingServer";
 
             File directory = new File(filepath);
 
