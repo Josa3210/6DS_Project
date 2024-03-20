@@ -18,7 +18,7 @@ public class NamingServer implements I_NamingServer {
     public NamingServer()
     {
         database = new NamingserverDB();
-        //this.database.load();
+        this.database.load();
     }
 
     /**
