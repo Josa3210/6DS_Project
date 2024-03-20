@@ -32,6 +32,8 @@ public class NamingserverDB implements I_NamingserverDB {
             String currentPath = new java.io.File(".").getCanonicalPath();
             String filepath = currentPath + "/Data/DB/namingServer";
 
+            System.out.println(filepath);
+
             File directory = new File(filepath);
 
             if(!directory.exists())
