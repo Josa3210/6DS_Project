@@ -119,6 +119,22 @@ public class NamingserverDB implements I_NamingserverDB {
         }
     }
 
+
+    /**
+     * Retrieves the set of keys from the nodeMap.
+     *
+     * @return A Set of Integer keys from the nodeMap, or an empty Set if nodeMap is not initialized.
+     */
+    public Set<Integer> getKeys() {
+        if (nodeMap != null) {
+            return nodeMap.keySet(); // Assuming nodeMap is a Map<Integer, Something>
+        } else {
+            System.err.println("Hashmap is not initialized. Please load the map first.");
+            return Collections.emptySet(); // Or return null if appropriate
+        }
+    }
+
+
     /**
      * Adds a new entry to the database with the given hash and IPv4 address.
      *
@@ -136,30 +152,24 @@ public class NamingserverDB implements I_NamingserverDB {
         }
     }
 
-
-    /**
-     * Retrieves the set of keys from the nodeMap.
-     *
-     * @return A Set of Integer keys from the nodeMap, or an empty Set if nodeMap is not initialized.
-     */
-    public Set<Integer> getKeys() {
-        if (nodeMap != null) {
-            return nodeMap.keySet(); // Assuming nodeMap is a Map<Integer, Something>
-        } else {
-            System.err.println("Map is not initialized. Please load the map first.");
-            return Collections.emptySet(); // Or return null if appropriate
-        }
-    }
-
     /**
      * Removes an entry from the database0
      */
     public void remove(int hash) {
         // TODO Check if node is in nodeMAP!
+
+
         if (nodeMap != null) {
-            nodeMap.remove(hash);
-            System.out.println("Entry with key " + hash + " removed from the database.");
-        } else {
+            if(nodeMap.containsKey(hash)) {
+                nodeMap.remove(hash);
+                System.out.println("Entry with key " + hash + " removed from the database.");
+            }
+            else{
+            System.out.println("Entry has already been removed");
+            }
+        }
+
+        else {
             System.err.println("Database is not initialized. Please load the database first.");
         }
     }
