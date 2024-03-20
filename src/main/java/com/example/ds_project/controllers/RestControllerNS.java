@@ -22,6 +22,7 @@ public class RestControllerNS {
      */
     @GetMapping("/project/searchFile")
     public Inet4Address SearchFile(@RequestParam String fileName) {
+        System.out.println( namingServer.getLocationIP(fileName));
         return namingServer.getLocationIP(fileName);
     }
 
