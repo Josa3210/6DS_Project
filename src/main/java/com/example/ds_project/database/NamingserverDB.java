@@ -38,7 +38,9 @@ public class NamingserverDB implements I_NamingserverDB {
 
             if(!directory.exists())
             {
-                directory.mkdir();
+                boolean successful = directory.mkdir();
+                if(!successful)
+                    System.out.println("NOT SUCCESSFUL");
             }
 
             this.filePath = filepath;
