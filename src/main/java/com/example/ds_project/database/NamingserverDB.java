@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.IOException;
 import java.net.Inet4Address;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
@@ -16,19 +17,38 @@ import java.util.Set;
 public class NamingserverDB implements I_NamingserverDB {
 
 
-    private final String filePath;
+    private String filePath;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private HashMap<Integer, Inet4Address> nodeMap; // Inet4Address = key,
 
     /**
      * Constructor to initialize the file path for the database.
      *
-     * @param filePath the path to the JSON file where the database will be saved.
      */
-    public NamingserverDB(String filePath) {
+    public NamingserverDB()
+    {
+        try
+        {
+            String currentPath = new java.io.File(".").getCanonicalPath();
+            String filepath = currentPath + "Data/DB/namingServer";
 
-        this.filePath = filePath;
-        System.out.println("Database will be saved in: " + filePath);
+            File directory = new File(filepath);
+
+            if(!directory.exists())
+            {
+                directory.mkdir();
+            }
+
+            this.filePath = filepath;
+
+            System.out.println("Database will be saved in: " + filePath);
+
+        }
+        catch(IOException e)
+        {
+            System.out.println(e);
+        }
+
     }
 
     /**

@@ -3,6 +3,7 @@ package com.example.ds_project;
 import com.example.ds_project.database.I_NamingserverDB;
 import com.example.ds_project.database.NamingserverDB;
 
+import java.io.IOException;
 import java.net.Inet4Address;
 import java.util.Set;
 
@@ -14,9 +15,9 @@ public class NamingServer implements I_NamingServer {
      */
     I_NamingserverDB database;
 
-    public NamingServer() {
-        String filepath = "Data/DB/namingServer";
-        database = new NamingserverDB(filepath);
+    public NamingServer()
+    {
+        database = new NamingserverDB();
         this.database.load();
     }
 

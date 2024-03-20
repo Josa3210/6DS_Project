@@ -3,6 +3,7 @@ package com.example.ds_project.controllers;
 import com.example.ds_project.NamingServer;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -11,6 +12,7 @@ import java.util.Map;
 @RestController
 public class RestControllerNS {
     NamingServer namingServer = new NamingServer();
+
 
     /**
      * Asks the naming server for the location of a file
