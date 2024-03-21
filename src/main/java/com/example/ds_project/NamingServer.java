@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.Inet4Address;
 import java.util.Set;
 
+import static java.lang.Math.abs;
 import static java.util.Collections.max;
 
 public class NamingServer implements I_NamingServer {
@@ -66,8 +67,8 @@ public class NamingServer implements I_NamingServer {
         int node = 0;
 
         // Calculate distance
-        for (int key : keys) {
-            double dist = key - hash;
+        for (Integer key : keys) {
+            double dist = abs(key - hash);
             if (dist < smallestDist) {
                 smallestDist = dist;
                 node = key;
@@ -78,7 +79,7 @@ public class NamingServer implements I_NamingServer {
             node = max(keys);
         }
 
-        return this.database.get(hash);
+        return this.database.get(node);
     }
 
     /**
@@ -93,7 +94,6 @@ public class NamingServer implements I_NamingServer {
     public void addNodeIP(String nodeName, Inet4Address ipaddress) {
         int hash = computeHash(nodeName);
         this.database.put(hash, ipaddress);
-        this.database.save();
 
         // Reallocate resources
     }
@@ -110,7 +110,6 @@ public class NamingServer implements I_NamingServer {
     public void removeNodeIP(String nodeName, Inet4Address ipaddress) {
         int hash = computeHash(nodeName);
         this.database.remove(hash);
-        this.database.save();
 
         // Reallocate resources
     }

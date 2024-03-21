@@ -19,19 +19,16 @@ import java.util.Set;
 public class NamingserverDB implements I_NamingserverDB {
 
 
-    private String filePath;
-    private final String fileName = "hashmap.txt";
+    private final String fileName = "hashmap.json";
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private HashMap<Integer, Inet4Address> nodeMap; // Inet4Address = key,
+    private String filePath;
+    private HashMap<Integer, Inet4Address> nodeMap;
 
     /**
      * Constructor to initialize the file path for the database.
-     *
      */
-    public NamingserverDB()
-    {
-        try
-        {
+    public NamingserverDB() {
+        try {
             String currentPath = new java.io.File(".").getCanonicalPath();
             String filepath = currentPath + "/Data/DB/namingServer";
             Path path = Paths.get(filepath);
@@ -44,9 +41,7 @@ public class NamingserverDB implements I_NamingserverDB {
 
             System.out.println("Database will be saved in: " + filePath);
 
-        }
-        catch(IOException e)
-        {
+        } catch (IOException e) {
             System.out.println(e);
         }
 
@@ -66,8 +61,7 @@ public class NamingserverDB implements I_NamingserverDB {
                 // Read the JSON file and convert it to HashMap
                 nodeMap = objectMapper.readValue(file, HashMap.class);
                 System.out.println("Map loaded from file: " + filePath);
-            }
-            else {
+            } else {
 
                 System.out.println("File does not exist. Initializing an empty map.");
                 nodeMap = new HashMap<>();
@@ -84,16 +78,12 @@ public class NamingserverDB implements I_NamingserverDB {
      * Saves the mapping from the database to the JSON file.
      */
     public void save() {
-
         try {
-            // Convert the HashMap (nodeMap) to a JSON string
-            String jsonMap = objectMapper.writeValueAsString(nodeMap);
-
             // Write the JSON string to the file
             File file = new File(filePath + "/" + fileName);
-            objectMapper.writeValue(file, jsonMap);
+            objectMapper.writeValue(file, nodeMap);
 
-            System.out.println("Map saved to file: "  + filePath + "/" + fileName);
+            System.out.println("Map saved to file: " + filePath + "/" + fileName);
 
         } catch (IOException e) {
             System.err.println("Error saving map to file: " + e.getMessage());
@@ -110,11 +100,15 @@ public class NamingserverDB implements I_NamingserverDB {
 
     public Inet4Address get(Integer hash) {
         if (nodeMap != null) {
-            return nodeMap.get(hash);
-
+            Inet4Address address = nodeMap.get(hash);
+            if (address == null) {
+                System.err.println("Given key: hash. Result: null");
+                return null;
+            } else {
+                return address;
+            }
         } else {
             System.err.println("Hashmap is not initialized. Please load the hashmap first.");
-
             return null;
         }
     }
@@ -143,11 +137,9 @@ public class NamingserverDB implements I_NamingserverDB {
      */
     public void put(Integer hash, Inet4Address ip4) {
         if (nodeMap != null) {
-
             nodeMap.put(hash, ip4);
-
+            this.save();
         } else {
-
             System.err.println("Map is not initialized. Please load the map first.");
         }
     }
@@ -156,20 +148,15 @@ public class NamingserverDB implements I_NamingserverDB {
      * Removes an entry from the database0
      */
     public void remove(int hash) {
-        // TODO Check if node is in nodeMAP!
-
-
         if (nodeMap != null) {
-            if(nodeMap.containsKey(hash)) {
+            if (nodeMap.containsKey(hash)) {
                 nodeMap.remove(hash);
                 System.out.println("Entry with key " + hash + " removed from the database.");
+                this.save();
+            } else {
+                System.out.println("Entry has already been removed");
             }
-            else{
-            System.out.println("Entry has already been removed");
-            }
-        }
-
-        else {
+        } else {
             System.err.println("Database is not initialized. Please load the database first.");
         }
     }
