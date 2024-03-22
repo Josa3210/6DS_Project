@@ -11,6 +11,7 @@ import java.util.Map;
 
 @RestController
 public class RestControllerNS {
+
     NamingServer namingServer = new NamingServer();
 
 
@@ -20,6 +21,7 @@ public class RestControllerNS {
      * @param fileName the name of the file
      * @return the IP-address of the file location
      */
+
     @GetMapping("/project/searchFile")
     public Inet4Address SearchFile(@RequestParam String fileName) {
         Inet4Address address = namingServer.getLocationIP(fileName);
@@ -34,7 +36,8 @@ public class RestControllerNS {
      */
     @PostMapping("/project/addNode")
     public void AddNode(@RequestBody Map<String, Object> request) throws UnknownHostException {
-        Inet4Address ipAddress = (Inet4Address) InetAddress.getByName((String) request.get("ip"));
+        String ipAddressString = (String) request.get("ip");
+        Inet4Address ipAddress = (Inet4Address) InetAddress.getByName(ipAddressString);
         String nodeName = (String) request.get("name");
         namingServer.addNodeIP(nodeName, ipAddress);
     }
@@ -46,6 +49,13 @@ public class RestControllerNS {
      */
     @PostMapping("/project/removeNode")
     public void RemoveNode(@RequestBody Map<String, Object> request) throws UnknownHostException {
+        Inet4Address ipAddress = (Inet4Address) InetAddress.getByName((String) request.get("ip"));
+        String nodeName = (String) request.get("name");
+        namingServer.removeNodeIP(nodeName, ipAddress);
+    }
+
+    @GetMapping("/project/getIp")
+    public void GetNode(@RequestBody Map<String, Object> request) throws UnknownHostException {
         Inet4Address ipAddress = (Inet4Address) InetAddress.getByName((String) request.get("ip"));
         String nodeName = (String) request.get("name");
         namingServer.removeNodeIP(nodeName, ipAddress);
