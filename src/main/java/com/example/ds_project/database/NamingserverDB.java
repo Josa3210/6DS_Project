@@ -60,7 +60,7 @@ public class NamingserverDB implements I_NamingserverDB {
             {
                 // Read the JSON file and convert it to HashMap
                 nodeMap = objectMapper.readValue(file, HashMap.class);
-                System.out.println("Map loaded from file: " + filePath);
+                +System.out.println("Map loaded from file: " + filePath);
             } else {
 
                 System.out.println("File does not exist. Initializing an empty map.");
