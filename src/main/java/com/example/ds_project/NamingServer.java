@@ -59,6 +59,7 @@ public class NamingServer implements I_NamingServer {
      */
     @Override
     public Inet4Address getLocationIP(String filename) {
+
         int hash = computeHash(filename);
         Set<Integer> keys = this.database.getKeys();
 
