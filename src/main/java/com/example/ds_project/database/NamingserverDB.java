@@ -1,15 +1,20 @@
 package com.example.ds_project.database;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -52,30 +57,47 @@ public class NamingserverDB implements I_NamingserverDB {
      * If the file does not exist, initializes an empty map.
      */
 
+
+
     public void load() {
         try {
             File file = new File(filePath + "/" + fileName);
 
-            if (file.exists()) // if there exists a file for the give filepath ..
-            {
+            if (file.exists()) {
                 // Read the JSON file and convert it to HashMap
-                nodeMap = objectMapper.readValue(file, HashMap.class);
+                HashMap<String, String> stringKeyMap = objectMapper.readValue(file, new TypeReference<HashMap<String, String>>() {});
+
+                // Convert keys from String to Integer and values from String to Inet4Address
+                nodeMap = new HashMap<>();
+                for (Map.Entry<String, String> entry : stringKeyMap.entrySet()) {
+                    try {
+                        Integer key = Integer.parseInt(entry.getKey());
+                        InetAddress inetAddress = InetAddress.getByName(entry.getValue());
+                        if (inetAddress instanceof Inet4Address) {
+                            nodeMap.put(key, (Inet4Address) inetAddress);
+                        } else {
+                            System.err.println("Error: " + entry.getValue() + " is not a valid IPv4 address.");
+                        }
+                    } catch (NumberFormatException | UnknownHostException e) {
+                        System.err.println("Error parsing key-value pair: " + entry.getKey() + " - " + entry.getValue());
+                    }
+                }
+
                 System.out.println("Map loaded from file: " + filePath);
             } else {
-
                 // Create a new file if it doesn't exist
                 if (file.createNewFile()) {
                     System.out.println("File does not exist. Initializing an empty hashmap: " + fileName);
                     nodeMap = new HashMap<>();
-                    }
+                }
             }
-
         } catch (IOException e) {
-
             System.err.println("Error loading hashmap from file: " + e.getMessage());
             nodeMap = new HashMap<>();
         }
     }
+
+
 
     /**
      * Saves the mapping from the database to the JSON file.
