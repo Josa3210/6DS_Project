@@ -1,14 +1,14 @@
-package com.example.ds_project.database;
+package com.example.ds_project.namingServer.database;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.Inet4Address;
-import java.net.InetAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -56,16 +56,14 @@ public class NamingserverDB implements I_NamingserverDB {
      * Loads the mapping from the JSON file into the database.
      * If the file does not exist, initializes an empty map.
      */
-
-
-
     public void load() {
         try {
             File file = new File(filePath + "/" + fileName);
 
             if (file.exists()) {
                 // Read the JSON file and convert it to HashMap
-                HashMap<String, String> stringKeyMap = objectMapper.readValue(file, new TypeReference<HashMap<String, String>>() {});
+                HashMap<String, String> stringKeyMap = objectMapper.readValue(file, new TypeReference<HashMap<String, String>>() {
+                });
 
                 // Convert keys from String to Integer and values from String to Inet4Address
                 nodeMap = new HashMap<>();
@@ -96,7 +94,6 @@ public class NamingserverDB implements I_NamingserverDB {
             nodeMap = new HashMap<>();
         }
     }
-
 
 
     /**

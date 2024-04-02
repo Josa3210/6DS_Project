@@ -1,23 +1,24 @@
-package com.example.ds_project;
+package com.example.ds_project.namingServer;
 
-import com.example.ds_project.database.I_NamingserverDB;
-import com.example.ds_project.database.NamingserverDB;
+import com.example.ds_project.namingServer.database.I_NamingserverDB;
+import com.example.ds_project.namingServer.database.NamingserverDB;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.io.IOException;
 import java.net.Inet4Address;
 import java.util.Set;
 
 import static java.lang.Math.abs;
 import static java.util.Collections.max;
 
+@SpringBootApplication
 public class NamingServer implements I_NamingServer {
     /**
      * Database containing the IP's of the different nodes {@see I_NamingserverDB}
      */
     I_NamingserverDB database;
 
-    public NamingServer()
-    {
+    public NamingServer() {
         database = new NamingserverDB();
         this.database.load();
     }
@@ -46,6 +47,10 @@ public class NamingServer implements I_NamingServer {
             p_pow = (p_pow * p) % m;
         }
         return hash_value;
+    }
+
+    public static void main(String[] args) {
+        SpringApplication.run(NamingServer.class, args);
     }
 
     /**

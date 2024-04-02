@@ -1,9 +1,8 @@
-package com.example.ds_project.controllers;
+package com.example.ds_project.namingServer.controllers;
 
-import com.example.ds_project.NamingServer;
+import com.example.ds_project.namingServer.NamingServer;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
