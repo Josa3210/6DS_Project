@@ -27,4 +27,12 @@ public interface I_NamingServer {
      */
     void removeNodeIP(String nodeName, Inet4Address ipaddress);
 
+    /**
+     * Returns a hash (in the form of an integer) of any given string
+     *
+     * @param s: string with undetermined size
+     * @return an integer hash
+     */
+    int computeHash(String s);
+
 }

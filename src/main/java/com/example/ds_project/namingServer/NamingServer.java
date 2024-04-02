@@ -32,7 +32,7 @@ public class NamingServer implements I_NamingServer {
      * @param s the input string for which the hash value needs to be computed
      * @return the computed hash value for the input string
      */
-    static int computeHash(String s) {
+    public int computeHash(String s) {
         int p = 59;
         int m = 10000009;
         int hash_value = 0;
