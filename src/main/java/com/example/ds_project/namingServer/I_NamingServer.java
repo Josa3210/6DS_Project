@@ -35,4 +35,14 @@ public interface I_NamingServer {
      */
     int computeHash(String s);
 
+    /**
+     * Sends the number of nodes in the network
+     */
+    void sendNumNodes();
+
+    /**
+     * Return the nextID and previousID of the given ID
+     */
+    void giveLinkIds(int nodeID);
+
 }

@@ -49,6 +49,16 @@ public class NamingServer implements I_NamingServer {
         return hash_value;
     }
 
+    @Override
+    public void sendNumNodes() {
+        
+    }
+
+    @Override
+    public void giveLinkIds(int nodeID) {
+
+    }
+
     public static void main(String[] args) {
         SpringApplication.run(NamingServer.class, args);
     }
