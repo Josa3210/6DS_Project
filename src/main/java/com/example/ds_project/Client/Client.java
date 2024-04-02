@@ -7,14 +7,27 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import java.net.Inet4Address;
 
 @SpringBootApplication
-public class Client implements I_Client{
+public class Client implements I_Client {
     public static void main(String[] args) {
         SpringApplication.run(NamingServer.class, args);
     }
 
     @Override
     public int computeHash(String s) {
-        return 0;
+        int p = 59;
+        int m = 10000009;
+        int hash_value = 0;
+        int p_pow = 1;
+
+        for (char c : s.toCharArray()) {
+            if (Character.isDigit(c)) {
+                hash_value = (hash_value + Integer.parseInt(String.valueOf(c)) * p_pow) % m;
+            } else {
+                hash_value = (hash_value + (c - 'a' + 1) * p_pow) % m;
+            }
+            p_pow = (p_pow * p) % m;
+        }
+        return hash_value;
     }
 
     @Override
