@@ -1,4 +1,4 @@
-package com.example.ds_project;
+package com.example.ds_project.namingServer;
 
 import java.net.Inet4Address;
 import java.util.HashMap;
@@ -26,5 +26,13 @@ public interface I_NamingServer {
      * @param ipaddress: the ipaddress of the node to remove
      */
     void removeNodeIP(String nodeName, Inet4Address ipaddress);
+
+    /**
+     * Returns a hash (in the form of an integer) of any given string
+     *
+     * @param s: string with undetermined size
+     * @return an integer hash
+     */
+    int computeHash(String s);
 
 }

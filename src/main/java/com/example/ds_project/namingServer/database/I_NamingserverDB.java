@@ -1,7 +1,6 @@
-package com.example.ds_project.database;
+package com.example.ds_project.namingServer.database;
 
 import java.net.Inet4Address;
-import java.util.HashMap;
 import java.util.Set;
 
 public interface I_NamingserverDB {
