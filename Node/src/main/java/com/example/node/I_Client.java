@@ -83,9 +83,10 @@ public interface I_Client {
      * Check for connection with other host
      *
      * @param hostIP IP of the host to reach
+     * @param arg
      * @return
      */
-    void ping(Inet4Address hostIP);
+    void ping(Inet4Address hostIP, String arg);
 
     /**
      * Reaction to a failure during communication with another node.
