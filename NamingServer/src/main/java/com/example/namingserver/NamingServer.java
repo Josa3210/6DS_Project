@@ -4,6 +4,7 @@ import com.example.namingserver.database.I_NamingserverDB;
 import com.example.namingserver.database.NamingserverDB;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.stereotype.Component;
 
 import java.net.Inet4Address;
 import java.util.Set;
@@ -11,7 +12,7 @@ import java.util.Set;
 import static java.lang.Math.abs;
 import static java.util.Collections.max;
 
-@SpringBootApplication
+@Component
 public class NamingServer implements I_NamingServer {
     /**
      * Database containing the IP's of the different nodes {@see I_NamingserverDB}
@@ -57,10 +58,6 @@ public class NamingServer implements I_NamingServer {
     @Override
     public void giveLinkIds(int nodeID) {
 
-    }
-
-    public static void main(String[] args) {
-        SpringApplication.run(NamingServer.class, args);
     }
 
     /**
