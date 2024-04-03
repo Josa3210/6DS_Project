@@ -1,5 +1,6 @@
 package com.example.ds_project.Client;
 
+import com.example.ds_project.Client.CLI.CLIDaemon;
 import com.example.ds_project.namingServer.NamingServer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -10,6 +11,9 @@ import java.net.Inet4Address;
 public class Client implements I_Client {
     public static void main(String[] args) {
         SpringApplication.run(NamingServer.class, args);
+        Client client = new Client();
+        CLIDaemon cli = new CLIDaemon(client);
+        cli.run();
     }
 
     @Override
@@ -129,7 +133,7 @@ public class Client implements I_Client {
      */
     @Override
     public void ping(Inet4Address hostIP) {
-        
+        System.out.println("Pinging " + hostIP);
     }
 
     /**
