@@ -34,7 +34,7 @@ public class NamingserverDB implements I_NamingserverDB {
      */
     public NamingserverDB() {
         try {
-            String currentPath = new java.io.File(".").getCanonicalPath();
+            String currentPath = new java.io.File("").getCanonicalPath();
             String filepath = currentPath + "/Data/DB/namingServer";
             Path path = Paths.get(filepath);
 
@@ -87,6 +87,8 @@ public class NamingserverDB implements I_NamingserverDB {
                 if (file.createNewFile()) {
                     System.out.println("File does not exist. Initializing an empty hashmap: " + fileName);
                     nodeMap = new HashMap<>();
+                    // Save the empty hashmap
+                    save();
                 }
             }
         } catch (IOException e) {
