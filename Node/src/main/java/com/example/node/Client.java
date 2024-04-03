@@ -1,24 +1,18 @@
 package com.example.node;
 
-
-import jakarta.annotation.PostConstruct;
-import org.springframework.web.client.RestClient;
+import com.example.node.CLI.CLIDaemon;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.net.Inet4Address;
 
+@SpringBootApplication
 public class Client implements I_Client {
-    RestClient restClient;
-    int currentID, nextID, prevID;
-    private final String hostname;
-
-    public Client(String hostname) {
-        this.hostname = hostname;
-        this.restClient = RestClient.create();
-    }
-
-    @PostConstruct
-    public void init() {
-        this.currentID = computeHash(hostname);
+    public static void main(String[] args) {
+        SpringApplication.run(Client.class, args);
+        I_Client client = new Client();
+        CLIDaemon cli = new CLIDaemon(client);
+        cli.run();
     }
 
     @Override
@@ -134,16 +128,11 @@ public class Client implements I_Client {
      * Check for connection with other host
      *
      * @param hostIP IP of the host to reach
-     * @param port
      * @return
      */
     @Override
-    public void ping(Inet4Address hostIP, String port) {
-
-        String uri = "http:/" + hostIP + ":" + port + "/test" + "?testString=test";
-        System.out.println("Pinging " + uri);
-        String answer = restClient.get().uri(uri).retrieve().body(String.class);
-        System.out.println(answer);
+    public void ping(Inet4Address hostIP) {
+        System.out.println("Pinging " + hostIP);
     }
 
     /**

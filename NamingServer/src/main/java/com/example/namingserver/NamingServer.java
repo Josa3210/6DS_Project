@@ -1,24 +1,15 @@
-package com.example.ds_project.namingServer;
+package com.example.namingserver;
 
-
-import com.hazelcast.config.*;
-import com.hazelcast.core.Hazelcast;
-import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.map.IMap;
-import com.hazelcast.shaded.org.json.JSONObject;
-
-import com.example.ds_project.namingServer.database.I_NamingserverDB;
-import com.example.ds_project.namingServer.database.NamingserverDB;
+import com.example.namingserver.database.I_NamingserverDB;
+import com.example.namingserver.database.NamingserverDB;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.io.FileNotFoundException;
 import java.net.Inet4Address;
 import java.util.Set;
 
 import static java.lang.Math.abs;
 import static java.util.Collections.max;
-
 
 @SpringBootApplication
 public class NamingServer implements I_NamingServer {
@@ -26,42 +17,10 @@ public class NamingServer implements I_NamingServer {
      * Database containing the IP's of the different nodes {@see I_NamingserverDB}
      */
     I_NamingserverDB database;
-    private static String multicast_address = "224.0.1.1";
-    private static Config config;
-    private static HazelcastInstance hazelcastInstance;
-
-
 
     public NamingServer() {
-        hazelcastInstance =  Hazelcast.newHazelcastInstance();
         database = new NamingserverDB();
         this.database.load();
-    }
-
-    /**
-     * this method sets up a Hazelcast instance with clustering enabled, specific network configurations including
-     * port settings and multicast for node discovery, enables the REST API and management center console,
-     * and finally creates a Hazelcast instance with these settings.
-     *
-     * @throws FileNotFoundException
-     */
-
-    private static void CreateConfig() throws FileNotFoundException {
-
-        config = new Config();
-        config.getJetConfig().setEnabled(true);
-        config.setClusterName("testCluster");
-        NetworkConfig networkConfig = config.getNetworkConfig();
-        networkConfig.setPort(5701);
-        networkConfig.setPortAutoIncrement(true); // Allows automatic increment of port numbers if necessary.
-        networkConfig.addOutboundPortDefinition("5900-5915");
-        networkConfig.getRestApiConfig().setEnabled(true); // Enables the REST API for the network configuration.
-        JoinConfig joinConfig = networkConfig.getJoin();
-        joinConfig.getMulticastConfig().setEnabled(true); // Enables multicast for node discovery
-        joinConfig.getMulticastConfig().setMulticastGroup("224.2.2.5"); // Sets the multicast group address.
-        joinConfig.getMulticastConfig().setMulticastPort(54321);
-        config.getManagementCenterConfig().setConsoleEnabled(true); // Enables the management center console.
-        hazelcastInstance =  Hazelcast.newHazelcastInstance(config); // Creates a new Hazelcast instance with the provided configuration.
     }
 
     /**
@@ -92,14 +51,16 @@ public class NamingServer implements I_NamingServer {
 
     @Override
     public void sendNumNodes() {
-        // Get the number of nodes in the cluster (network)
-        int numNodes = hazelcastInstance.getCluster().getMembers().size();
+
     }
 
     @Override
     public void giveLinkIds(int nodeID) {
 
+    }
 
+    public static void main(String[] args) {
+        SpringApplication.run(NamingServer.class, args);
     }
 
     /**
@@ -167,16 +128,5 @@ public class NamingServer implements I_NamingServer {
         this.database.remove(hash);
 
         // Reallocate resources
-    }
-
-
-    public static void main(String[] args) throws FileNotFoundException {
-
-        NamingServer.CreateConfig();
-        IMap<String, String> map2 = hazelcastInstance.getMap("myMap2");
-        map2.put("1", "Kobe");
-        map2.put("2","MJ");
-        map2.put("3", "Steph");
-
     }
 }
