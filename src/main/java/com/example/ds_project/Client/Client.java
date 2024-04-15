@@ -7,7 +7,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import java.net.Inet4Address;
 
 @SpringBootApplication
-public class Client implements I_Client {
+public class Client implements I_Client
+{
+
     public static void main(String[] args) {
         SpringApplication.run(NamingServer.class, args);
     }
@@ -40,14 +42,34 @@ public class Client implements I_Client {
 
     }
 
-    @Override
-    public void shutDown() {
+    public int[] requestLinkIds()
+    {
+        // String url = namingServerBaseUrl + "/ns/giveLinkID";
+        // give JSON with node ID
+        // return restTemplate.getForObject(url, int[].class);
+        return null;
+    }
 
+    @Override
+    public void shutDown()
+    {
+        int[] linkIds = requestLinkIds();
+        int prevID = linkIds[0];
+        int nextID = linkIds[1];
+
+        // Send the previous ID to the next node
+        sendLinkID(nextNodeIP, prevID);
+
+        // Send the next ID to the previous node
+        sendLinkID(prevNodeIP, nextID);
+
+        // Remove from the naming server
+        removeFromNS();
     }
 
     @Override
     public void sendLinkID(Inet4Address nodeIP, int startID, int otherID) {
-
+        // eigenlijk Update callen van de andere node
     }
 
     @Override
