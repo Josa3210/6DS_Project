@@ -95,6 +95,10 @@ public class NamingServer implements I_NamingServer {
         return this.database.get(node);
     }
 
+    public Inet4Address getIp(int id) {
+        return this.database.get(id);
+    }
+
     /**
      * This method adds a new node with the given node name and IP address to the database.
      * It computes a hash value for the node name, stores the IP address in the database,
