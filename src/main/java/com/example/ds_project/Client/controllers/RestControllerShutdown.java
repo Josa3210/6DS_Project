@@ -14,10 +14,11 @@ public class RestControllerShutdown
     private final Client client = new Client();
 
     @PostMapping("/shutdown/updateID")
-    public void updateNextID(@RequestBody Map<String, Object> request)
+    public void updateID(@RequestBody Map<String, Object> request)
     {
-        int nodeID = Integer.parseInt((String) request.get("ID"));
+        int prevID = Integer.parseInt((String) request.get("prevID"));
+        int nextID = Integer.parseInt((String) request.get("nextID"));
 
-        client.receiveLinkID();
+        client.receiveLinkID(prevID, nextID);
     }
 }

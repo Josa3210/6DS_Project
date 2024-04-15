@@ -49,14 +49,18 @@ public class NamingServer implements I_NamingServer {
         return hash_value;
     }
 
+    public Inet4Address getIp(int id) {
+        return this.database.get(id);
+    }
+
     @Override
     public void sendNumNodes() {
         
     }
 
     @Override
-    public void giveLinkIds(int nodeID) {
-
+    public int[] giveLinkIds(int nodeID) {
+        return null;
     }
 
     public static void main(String[] args) {
