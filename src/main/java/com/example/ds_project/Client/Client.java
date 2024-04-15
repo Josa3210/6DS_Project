@@ -13,8 +13,8 @@ import java.util.Map;
 @SpringBootApplication
 public class Client implements I_Client
 {
-    Inet4Address currentIP;
-    int currentID;
+    int currentID = computeHash("node1");
+    Inet4Address currentIP = requestLinkIPs(currentID);
     int nextID, prevID;
     Inet4Address namingServerIP;
 
@@ -50,25 +50,29 @@ public class Client implements I_Client
 
     }
 
+    @Override
     public int[] requestLinkIds()
     {
-        String getUrl = "http://"+namingServerIP+"/ns/giveLinkID";
+        String getUrl = "http://"+ namingServerIP +"/ns/giveLinkID";
         RestTemplate restTemplate = new RestTemplate();
 
         // Make the GET request
         ResponseEntity<int[]> responseEntity = restTemplate.getForEntity(getUrl, int[].class);
 
-        // Extract the response body
-        int[] linkIds = responseEntity.getBody();
-
         // Return the link IDs
-        return linkIds;
+        return responseEntity.getBody();
     }
 
-    public Inet4Address[] requesLinkIPs(int[] linkID)
+    @Override
+    public Inet4Address requestLinkIPs(int linkID)
     {
-        // namingServer.getIP(linkID[0])
-        return null;
+        String getUrl = "http://"+ namingServerIP +"/ns/getIP";
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        Inet4Address ip = restTemplate.getForObject(getUrl, Inet4Address.class);
+
+        return ip;
     }
 
     @Override
@@ -78,9 +82,8 @@ public class Client implements I_Client
         int prevID = linkIds[0];
         int nextID = linkIds[1];
 
-        Inet4Address[] linkIPs = requesLinkIPs(linkIds);
-        Inet4Address nextNodeIP = linkIPs[0];
-        Inet4Address prevNodeIP = linkIPs[1];
+        Inet4Address nextNodeIP = requestLinkIPs(nextID);
+        Inet4Address prevNodeIP = requestLinkIPs(prevID);
 
         // Send the previous ID to the next node
         sendLinkID(nextNodeIP, prevID, currentID);
@@ -117,16 +120,11 @@ public class Client implements I_Client
         else {System.err.println("Update failed with status code: " + statusCode);}
     }
 
+    @Override
     public void receiveLinkID(int prevID, int nextID)
     {
-        if(prevID == currentID)
-        {
-            this.nextID = nextID;
-        }
-        else if (nextID == currentID)
-        {
-            this.prevID = prevID;
-        }
+        this.nextID = prevID == currentID ? nextID : currentID;
+        this.prevID = nextID == currentID ? prevID : currentID;
     }
 
     @Override

@@ -53,13 +53,6 @@ public class RestControllerNS {
         namingServer.removeNodeIP(nodeName, ipAddress);
     }
 
-    @GetMapping("/project/getIp")
-    public void GetNode(@RequestBody Map<String, Object> request) throws UnknownHostException {
-        Inet4Address ipAddress = (Inet4Address) InetAddress.getByName((String) request.get("ip"));
-        String nodeName = (String) request.get("name");
-        namingServer.removeNodeIP(nodeName, ipAddress);
-    }
-
     @GetMapping("/test")
     public String TestConnection(@RequestParam String testString)
     {
@@ -71,6 +64,13 @@ public class RestControllerNS {
     {
         int nodeID = (Integer) request.get("nodeID");
         return namingServer.giveLinkIds(nodeID);
+    }
+
+    @GetMapping("/project/getIp")
+    public Inet4Address GetNode(@RequestParam String id)
+    {
+        int nodeID = Integer.parseInt(id);
+        return namingServer.getIp(nodeID);
     }
 
     /**
