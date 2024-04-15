@@ -91,7 +91,7 @@ public interface I_Client {
     /**
      * Reaction to a failure during communication with another node.
      *
-     * @param failedID
+     * @param failedNode
      */
-    void removeFromNetwork(int failedID);
+    void removeFromNetwork(String failedNode);
 }

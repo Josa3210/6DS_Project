@@ -8,6 +8,8 @@ import org.springframework.web.client.RestClient;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Client implements I_Client {
     private final String hostname;
@@ -15,10 +17,12 @@ public class Client implements I_Client {
     int currentID, nextID, prevID;
     private Inet4Address namingServerIP;
     private Integer namingServerPort;
+    Map<String, Inet4Address> ipMap;
 
     public Client(String hostname) {
         this.hostname = hostname;
         this.restClient = RestClient.create();
+        this.ipMap = new HashMap<>();
     }
 
     @PostConstruct
@@ -153,14 +157,14 @@ public class Client implements I_Client {
     /**
      * Reaction to a failure during communication with another node.
      *
-     * @param failedID
+     * @param failedNode
      */
     @Override
-    public void removeFromNetwork(int failedID) {
+    public void removeFromNetwork(String failedNode) {
         int nextID = 1;
         int prevID = 2;
         // Get linkID's from NS (now with examples because function in NS is not yet made)
-        // nextID, prevID = APIGetLinkIDs(hostIP)
+        // nextID, prevID = APIGetLinkIDs(failedIP)
 
         // Get IP addresses of the link IDs
         ResponseEntity<String> response;
@@ -179,7 +183,7 @@ public class Client implements I_Client {
         sendLinkID(prevIP, prevID, nextID);
 
         // Remove failed node from network
-        restClient.post().uri("http:/" + this.namingServerIP + ":" + this.namingServerPort + "/project/removeNode").body(failedID).retrieve().toBodilessEntity();
+        restClient.post().uri("http:/" + this.namingServerIP + ":" + this.namingServerPort + "/project/removeNode").body(failedNode).retrieve().toBodilessEntity();
 
     }
 }
