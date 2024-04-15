@@ -1,18 +1,57 @@
 package com.example.node;
 
-import com.example.node.CLI.CLIDaemon;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import com.hazelcast.config.*;
+import com.hazelcast.core.Hazelcast;
+import com.hazelcast.core.HazelcastInstance;
+import jakarta.annotation.PostConstruct;
+import org.springframework.web.client.RestClient;
 
+import java.io.FileNotFoundException;
 import java.net.Inet4Address;
 
-@SpringBootApplication
 public class Client implements I_Client {
-    public static void main(String[] args) {
-        SpringApplication.run(Client.class, args);
-        I_Client client = new Client();
-        CLIDaemon cli = new CLIDaemon(client);
-        cli.run();
+
+    RestClient restClient;
+    int currentID, nextID, prevID;
+    private String hostname;
+    private static Config config;
+    private static String multicast_address = "224.2.2.5";
+    private static HazelcastInstance hazelcastInstance;
+
+    public Client(String hostname) {
+        try{
+        Client.CreateConfig();
+        this.hostname = hostname;
+        this.restClient = RestClient.create();
+        }
+
+        catch (FileNotFoundException e){
+        System.err.println(e.getMessage());
+    }
+
+    }
+
+    private static void CreateConfig() throws FileNotFoundException {
+
+        config = new Config();
+        config.getJetConfig().setEnabled(true);
+        config.setClusterName("testCluster");
+        NetworkConfig networkConfig = config.getNetworkConfig();
+        networkConfig.setPort(5701);
+        networkConfig.setPortAutoIncrement(true); // Allows automatic increment of port numbers if necessary.
+        networkConfig.addOutboundPortDefinition("5900-5915");
+        networkConfig.getRestApiConfig().setEnabled(true); // Enables the REST API for the network configuration.
+        JoinConfig joinConfig = networkConfig.getJoin();
+        joinConfig.getMulticastConfig().setEnabled(true); // Enables multicast for node discovery
+        joinConfig.getMulticastConfig().setMulticastGroup(multicast_address); // Sets the multicast group address.
+        joinConfig.getMulticastConfig().setMulticastPort(54321);
+        config.getManagementCenterConfig().setConsoleEnabled(true); // Enables the management center console.
+        hazelcastInstance =  Hazelcast.newHazelcastInstance(config); // Creates a new Hazelcast instance with the provided configuration.
+    }
+
+    @PostConstruct
+    public void init() {
+        this.currentID = computeHash(hostname);
     }
 
     @Override
@@ -128,11 +167,16 @@ public class Client implements I_Client {
      * Check for connection with other host
      *
      * @param hostIP IP of the host to reach
+     * @param port
      * @return
      */
     @Override
-    public void ping(Inet4Address hostIP) {
-        System.out.println("Pinging " + hostIP);
+    public void ping(Inet4Address hostIP, String port) {
+
+        String uri = "http:/" + hostIP + ":" + port + "/test" + "?testString=test";
+        System.out.println("Pinging " + uri);
+        String answer = restClient.get().uri(uri).retrieve().body(String.class);
+        System.out.println(answer);
     }
 
     /**

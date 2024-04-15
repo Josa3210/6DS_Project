@@ -5,36 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="24625506-5042-49f6-9116-6172614facb2" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Node/src/main/java/com/example/node/CLI/CLIDaemon.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Node/src/main/java/com/example/node/CLI/Command.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Node/src/main/java/com/example/node/CLI/CommandParser.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Node/src/main/java/com/example/node/Client.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Node/src/main/java/com/example/node/I_Client.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Node/src/main/java/com/example/node/controllers/RestControllerDiscAndBoot.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Node/src/main/java/com/example/node/controllers/RestControllerFailure.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Node/src/main/java/com/example/node/controllers/RestControllerShutdown.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.mvn/wrapper/maven-wrapper.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ToDo.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mvnw" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mvnw.cmd" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/ds_project/Client/CLI/CLIDaemon.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/ds_project/Client/CLI/Command.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/ds_project/Client/CLI/CommandParser.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/ds_project/Client/Client.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/ds_project/Client/I_Client.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/ds_project/Client/controllers/RestControllerDiscAndBoot.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/ds_project/Client/controllers/RestControllerFailure.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/ds_project/Client/controllers/RestControllerShutdown.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/ds_project/namingServer/I_NamingServer.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/ds_project/namingServer/NamingServer.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/ds_project/namingServer/controllers/RestControllerNS.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/ds_project/namingServer/database/I_NamingserverDB.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/ds_project/namingServer/database/NamingserverDB.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/example/ds_project/ApplicationTests.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/NamingServer/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/NamingServer/src/main/resources/application.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -57,6 +28,9 @@
       </map>
     </option>
   </component>
+  <component name="KubernetesApiProvider"><![CDATA[{
+  "isMigrated": true
+}]]></component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
@@ -68,6 +42,9 @@
       </MavenGeneralSettings>
     </option>
   </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 3
+}]]></component>
   <component name="ProjectId" id="2dX9PqRcp17FhJrpEOOyF4X5QLA" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -84,8 +61,9 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
     "extract.method.default.visibility": "private",
+    "git-widget-placeholder": "dev",
     "jdk.selected.JAVA_MODULE": "temurin-17",
-    "last_opened_file_path": "D:/_Opslag/Java/Distributed_Systems/6DS_Project/Node/src/main/java/com/example/node",
+    "last_opened_file_path": "C:/Data/Java/6DS_Project/Node",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -232,6 +210,9 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="LAST_COMMIT_MESSAGE" value="" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
