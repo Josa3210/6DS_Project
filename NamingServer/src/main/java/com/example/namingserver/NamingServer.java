@@ -39,7 +39,7 @@ public class NamingServer implements I_NamingServer {
      * Database containing the IP's of the different nodes {@see I_NamingserverDB}
      */
     I_NamingserverDB database;
-
+    private InetAddress ip;
 
     public NamingServer() {
 
@@ -80,8 +80,11 @@ public class NamingServer implements I_NamingServer {
             event_listener = new ClusterMemberShipListener();
             NamingServer.CreateConfig();
             mapIP = hazelcastInstance.getMap("mapIP");
+            this.ip = InetAddress.getLocalHost();
         } catch (FileNotFoundException e) {
             System.err.println(e.getMessage());
+        } catch (UnknownHostException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -236,6 +239,8 @@ public class NamingServer implements I_NamingServer {
     }
 
     private void welcomeClient(Inet4Address clientIP) {
+        if (clientIP.equals(this.ip)) return;
+        
         String postUrl = "http://" + clientIP + ":8080" + "/welcome";
 
         RestTemplate restTemplate = new RestTemplate();
