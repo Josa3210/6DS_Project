@@ -9,8 +9,6 @@ import com.hazelcast.shaded.org.json.JSONObject;
 
 import com.example.namingserver.database.I_NamingserverDB;
 import com.example.namingserver.database.NamingserverDB;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.stereotype.Component;
 
 import java.io.FileNotFoundException;
@@ -159,16 +157,20 @@ public class NamingServer implements I_NamingServer {
         // Reallocate resources
     }
 
+    @Override
+    public Inet4Address getIP(int nodeID) {
+        return this.database.get(nodeID);
+    }
+
     /**
      * This method removes a node with the given node name and IP address from the database.
      * It computes a hash value for the node name, removes the corresponding entry from the
      * database, and saves the updated database.
      *
      * @param nodeName  the name of the node to be removed
-     * @param ipaddress the IP address of the node to be removed
      */
     @Override
-    public void removeNodeIP(String nodeName, Inet4Address ipaddress) {
+    public void removeNodeIP(String nodeName) {
         int hash = computeHash(nodeName);
         this.database.remove(hash);
 
