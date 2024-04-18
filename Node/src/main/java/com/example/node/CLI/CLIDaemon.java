@@ -1,19 +1,22 @@
 package com.example.node.CLI;
 
 
-
 import com.example.node.I_Client;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
+@Component
 public class CLIDaemon {
     Scanner scanner;
     CommandParser commandParser;
     I_Client client;
 
+    @Autowired
     public CLIDaemon(I_Client client) {
         this.scanner = new Scanner(System.in);
         this.commandParser = new CommandParser();
