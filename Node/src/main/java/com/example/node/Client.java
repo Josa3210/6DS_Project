@@ -23,6 +23,7 @@ public class Client implements I_Client {
     private static ClusterMemberShipListener event_listener;
     RestClient restClient;
     int currentID, nextID, prevID;
+    Config config;
     Map<String, Inet4Address> ipMap;
     Inet4Address currentIP;
     private Inet4Address namingServerIP;
@@ -32,7 +33,7 @@ public class Client implements I_Client {
     public Client(String hostname) {
         try {
             event_listener = new ClusterMemberShipListener();
-            Client.CreateConfig();
+            this.config = createConfig();
             this.hostname = hostname;
             this.restClient = RestClient.create();
             this.currentIP = (Inet4Address) InetAddress.getLocalHost();
@@ -44,7 +45,7 @@ public class Client implements I_Client {
 
     }
 
-    private static void CreateConfig() throws FileNotFoundException {
+    private Config createConfig() throws FileNotFoundException {
 
         Config config = new Config();
         config.getJetConfig().setEnabled(true);
@@ -60,7 +61,7 @@ public class Client implements I_Client {
         joinConfig.getMulticastConfig().setMulticastPort(54321);
         config.getManagementCenterConfig().setConsoleEnabled(true); // Enables the management center console.
         config.addListenerConfig(new ListenerConfig(event_listener));
-        HazelcastInstance hazelcastInstance = Hazelcast.newHazelcastInstance(config); // Creates a new Hazelcast instance with the provided configuration.
+        return config;
     }
 
     @Override
@@ -73,6 +74,7 @@ public class Client implements I_Client {
 
     @PostConstruct
     public void init() {
+        habari();
         this.currentID = computeHash(hostname);
         this.nextID = Integer.MAX_VALUE;
         this.prevID = Integer.MIN_VALUE;
@@ -113,6 +115,10 @@ public class Client implements I_Client {
      */
     @Override
     public void habari() {
+        // Joins multicast group
+        HazelcastInstance hazelcastInstance = Hazelcast.newHazelcastInstance(this.config); // Creates a new Hazelcast instance with the provided configuration.
+
+        // Request number of nodes
 
     }
 

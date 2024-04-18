@@ -11,6 +11,7 @@ import com.hazelcast.shaded.org.json.JSONObject;
 
 import com.example.namingserver.database.I_NamingserverDB;
 import com.example.namingserver.database.NamingserverDB;
+import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 
 import java.io.FileNotFoundException;
@@ -37,6 +38,11 @@ public class NamingServer implements I_NamingServer {
 
 
     public NamingServer() {
+
+    }
+
+    @PostConstruct
+    public void init(){
         try {
             database = new NamingserverDB();
             this.database.load();
@@ -178,7 +184,7 @@ public class NamingServer implements I_NamingServer {
     @Override
     public void sendNumNodes() {
         // Get the number of nodes in the cluster (network)
-        int numNodes = hazelcastInstance.getCluster().getMembers().size();
+        int numNodes = hazelcastInstance.getCluster().getMembers().size() - 2;
     }
 
     @Override

@@ -28,7 +28,7 @@ public class CLIDaemon {
         Command command;
         String[] args;
         while (true) {
-            print(">");
+            System.out.print("> ");
             inputString = getInput();
             if (inputString.equals("exit")) {
                 return;
