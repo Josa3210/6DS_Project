@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Map;
 
 @RestController
@@ -31,9 +33,14 @@ public class RestControllerDiscAndBoot {
 
     @PostMapping("/welcome")
     public void welcome(@RequestBody Map<String, Object> request) {
-        int nrNodes = (int) request.get("nrNodes");
-        Inet4Address ipAddress = (Inet4Address) request.get("Ip");
-        int port = (int) request.get("port");
+        int nrNodes =  Integer.parseInt((String) request.get("nrNodes"));
+        Inet4Address ipAddress = null;
+        try {
+            ipAddress = (Inet4Address) InetAddress.getByName((String) request.get("ip"));
+        } catch (UnknownHostException e) {
+            throw new RuntimeException(e);
+        }
+        int port = Integer.parseInt((String) request.get("port"));
 
         client.setupClient(nrNodes, ipAddress, port);
     }

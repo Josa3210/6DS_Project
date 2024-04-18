@@ -241,7 +241,7 @@ public class NamingServer implements I_NamingServer {
     private void welcomeClient(Inet4Address clientIP) {
         if (clientIP.equals(this.ip)) return;
 
-        String postUrl = "http:/" + clientIP + ":8080" + "/welcome";
+        String postUrl = "http:/" + clientIP + ":9090" + "/welcome";
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
