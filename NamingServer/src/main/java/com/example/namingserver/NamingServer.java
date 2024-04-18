@@ -41,11 +41,11 @@ public class NamingServer implements I_NamingServer {
 
     public NamingServer() {
         try {
+            database = new NamingserverDB();
+            this.database.load();
             event_listener = new ClusterMemberShipListener();
             NamingServer.CreateConfig();
             mapIP = hazelcastInstance.getMap("mapIP");
-            database = new NamingserverDB();
-            this.database.load();
         }
         catch (FileNotFoundException e){
             System.err.println(e.getMessage());
