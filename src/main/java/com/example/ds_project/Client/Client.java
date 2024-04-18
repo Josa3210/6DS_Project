@@ -58,7 +58,7 @@ public class Client implements I_Client
     @Override
     public int[] requestLinkIds()
     {
-        String getUrl = "http://" + namingServerIP + "/ns/giveLinkID";
+        String getUrl = "http://" + namingServerIP + ":8080/ns/giveLinkID";
 
         RestTemplate restTemplate = new RestTemplate();
 
@@ -75,7 +75,7 @@ public class Client implements I_Client
     @Override
     public Inet4Address requestLinkIPs(int linkID)
     {
-        String getUrl = "http://" + namingServerIP + "/ns/getIP";
+        String getUrl = "http://" + namingServerIP + ":8080/ns/getIP";
 
         RestTemplate restTemplate = new RestTemplate();
 
@@ -116,7 +116,7 @@ public class Client implements I_Client
     @Override
     public void sendLinkID(Inet4Address nodeIP, int startID, int otherID)
     {
-        String postUrl = "http://" + nodeIP + "/shutdown/updateID";
+        String postUrl = "http://" + nodeIP + ":8080/shutdown/updateID";
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -157,7 +157,7 @@ public class Client implements I_Client
     @Override
     public void removeFromNS(Inet4Address nsIP, Inet4Address nodeIP)
     {
-        String postUrl = "http://" + nsIP + "/project/removeNode";
+        String postUrl = "http://" + nsIP +  ":8080/ns/removeNode";
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
