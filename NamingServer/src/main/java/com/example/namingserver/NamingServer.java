@@ -75,12 +75,12 @@ public class NamingServer implements I_NamingServer {
     @PostConstruct
     public void init() {
         try {
+            this.ip = InetAddress.getLocalHost();
             database = new NamingserverDB();
             this.database.load();
             event_listener = new ClusterMemberShipListener();
             NamingServer.CreateConfig();
             mapIP = hazelcastInstance.getMap("mapIP");
-            this.ip = InetAddress.getLocalHost();
         } catch (FileNotFoundException e) {
             System.err.println(e.getMessage());
         } catch (UnknownHostException e) {
@@ -239,7 +239,7 @@ public class NamingServer implements I_NamingServer {
     }
 
     private void welcomeClient(Inet4Address clientIP) {
-        System.out.println(String.valueOf(clientIP) + String.valueOf(this.ip));
+        System.out.println(String.valueOf(clientIP) + " " + String.valueOf(this.ip));
         if (clientIP.equals(this.ip)) return;
 
         String postUrl = "http://" + clientIP + ":8080" + "/welcome";
