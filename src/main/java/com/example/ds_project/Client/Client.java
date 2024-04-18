@@ -155,8 +155,30 @@ public class Client implements I_Client
     }
 
     @Override
-    public void removeFromNS(Inet4Address nsIP, Inet4Address nodeIP) {
+    public void removeFromNS(Inet4Address nsIP, Inet4Address nodeIP)
+    {
+        String postUrl = "http://" + nsIP + "/project/removeNode";
 
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        // Create the request body
+        Map<String, Object> requestBody = new HashMap<>();
+
+        requestBody.put("failedNode", nodeIP);
+
+        // Create the request entity with headers and body
+        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
+
+        // Send the POST request
+        ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
+        HttpStatusCode statusCode = responseEntity.getStatusCode();
+        if (statusCode == HttpStatus.OK) {
+            System.out.println("Update successful");
+        } else {
+            System.err.println("Update failed with status code: " + statusCode);
+        }
     }
 
     @Override
