@@ -4,6 +4,8 @@ import java.net.Inet4Address;
 
 public interface I_Client {
 
+    void printLinkIds();
+
     int computeHash(String s);
 
     /*Discovery + Bootstrap*/

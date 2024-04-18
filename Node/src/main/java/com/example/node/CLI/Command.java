@@ -1,7 +1,7 @@
 package com.example.node.CLI;
 
 public enum Command {
-    NONE(0), PING(2), SHUTDOWN(0);
+    NONE(0), PING(2), SHUTDOWN(0), GETLINKIDS(0);
 
     private String[] args;
     private int nrArgs;

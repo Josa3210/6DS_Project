@@ -46,6 +46,7 @@ public class CLIDaemon {
                     }
                 }
                 case SHUTDOWN -> client.shutDown();
+                case GETLINKIDS -> client.printLinkIds();
             }
         }
     }

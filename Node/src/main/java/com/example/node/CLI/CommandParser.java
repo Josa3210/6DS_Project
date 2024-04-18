@@ -21,6 +21,8 @@ public class CommandParser {
                 command.setArgs(Arrays.copyOfRange(args, 1, args.length));
             case "shutdown":
 
+            case "getLinkIds":
+                command = Command.GETLINKIDS;
         }
         return command;
     }

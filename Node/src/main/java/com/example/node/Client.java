@@ -20,15 +20,14 @@ import java.util.Map;
 public class Client implements I_Client {
 
     private static final String multicast_address = "224.2.2.5";
+    private static ClusterMemberShipListener event_listener;
     RestClient restClient;
     int currentID, nextID, prevID;
     Map<String, Inet4Address> ipMap;
-    private Inet4Address namingServerIP;
     Inet4Address currentIP;
+    private Inet4Address namingServerIP;
     private Integer namingServerPort;
     private String hostname;
-
-    private static ClusterMemberShipListener event_listener;
 
     public Client(String hostname) {
         try {
@@ -44,21 +43,6 @@ public class Client implements I_Client {
         }
 
     }
-
-    public class ClusterMemberShipListener implements MembershipListener {
-        public void memberAdded(MembershipEvent membershipEvent) {
-            String s = membershipEvent.getMember().getSocketAddress().toString();
-            s = s.substring(s.indexOf("/")+1, s.indexOf(":"));
-            int hash = computeHash(s);
-            karibu(hash);
-        }
-        public void memberRemoved(MembershipEvent membershipEvent) {
-            String s = membershipEvent.getMember().getSocketAddress().toString();
-            s = s.substring(s.indexOf("/")+1, s.indexOf(":"));
-
-        }
-    }
-
 
     private static void CreateConfig() throws FileNotFoundException {
 
@@ -77,6 +61,14 @@ public class Client implements I_Client {
         config.getManagementCenterConfig().setConsoleEnabled(true); // Enables the management center console.
         config.addListenerConfig(new ListenerConfig(event_listener));
         HazelcastInstance hazelcastInstance = Hazelcast.newHazelcastInstance(config); // Creates a new Hazelcast instance with the provided configuration.
+    }
+
+    @Override
+    public void printLinkIds() {
+        System.out.println("Link ids");
+        System.out.println("currentID: " + String.valueOf(this.currentID));
+        System.out.println("NextID: " + String.valueOf(this.nextID));
+        System.out.println("PreviousID: " + String.valueOf(this.prevID));
     }
 
     @PostConstruct
@@ -104,8 +96,6 @@ public class Client implements I_Client {
         return hash_value;
     }
 
-    /*Discovery + Bootstrap*/
-
     /**
      * Send message to every other node when joining the network
      * "Habari" is "Hello" in Swahili
@@ -126,6 +116,8 @@ public class Client implements I_Client {
 
     }
 
+    /*Discovery + Bootstrap*/
+
     /**
      * Reply to "Habari" of other node
      * "Karibu" is "Welcome" in Swahili
@@ -140,16 +132,12 @@ public class Client implements I_Client {
      */
     @Override
     public void karibu(int hash) {
-        if((this.currentID < hash) && (hash < this.nextID)){
+        if ((this.currentID < hash) && (hash < this.nextID)) {
             this.nextID = hash;
         } else if ((this.prevID < hash) && (hash < this.currentID)) {
             this.prevID = hash;
         }
     }
-
-    // Use "receiveLinkID" and "sendLinkID" from Shutdown
-
-    /*Shutdown*/
 
     @Override
     public int[] requestLinkIds() {
@@ -162,6 +150,10 @@ public class Client implements I_Client {
         // Return the link IDs
         return responseEntity.getBody();
     }
+
+    // Use "receiveLinkID" and "sendLinkID" from Shutdown
+
+    /*Shutdown*/
 
     @Override
     public Inet4Address requestLinkIPs(int linkID) {
@@ -240,8 +232,6 @@ public class Client implements I_Client {
 
     }
 
-    /*Failure*/
-
     /**
      * Check for connection with other host
      *
@@ -256,6 +246,8 @@ public class Client implements I_Client {
         String answer = restClient.get().uri(uri).retrieve().body(String.class);
         System.out.println(answer);
     }
+
+    /*Failure*/
 
     /**
      * Reaction to a failure during communication with another node.
@@ -288,5 +280,20 @@ public class Client implements I_Client {
         // Remove failed node from network
         restClient.post().uri("http:/" + this.namingServerIP + ":" + this.namingServerPort + "/project/removeNode").body(failedNode).retrieve().toBodilessEntity();
 
+    }
+
+    public class ClusterMemberShipListener implements MembershipListener {
+        public void memberAdded(MembershipEvent membershipEvent) {
+            String s = membershipEvent.getMember().getSocketAddress().toString();
+            s = s.substring(s.indexOf("/") + 1, s.indexOf(":"));
+            int hash = computeHash(s);
+            karibu(hash);
+        }
+
+        public void memberRemoved(MembershipEvent membershipEvent) {
+            String s = membershipEvent.getMember().getSocketAddress().toString();
+            s = s.substring(s.indexOf("/") + 1, s.indexOf(":"));
+
+        }
     }
 }
