@@ -35,8 +35,10 @@ public interface I_NamingServer {
 
     /**
      * Sends the number of nodes in the network
+     *
+     * @return
      */
-    void sendNumNodes();
+    int sendNumNodes();
 
     /**
      * Return the nextID and previousID of the given ID

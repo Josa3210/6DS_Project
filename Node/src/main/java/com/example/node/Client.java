@@ -70,6 +70,7 @@ public class Client implements I_Client {
         System.out.println("currentID: " + String.valueOf(this.currentID));
         System.out.println("NextID: " + String.valueOf(this.nextID));
         System.out.println("PreviousID: " + String.valueOf(this.prevID));
+        System.out.println("IP + port NS: " + this.namingServerIP + ":" + this.namingServerPort);
     }
 
     @PostConstruct
@@ -117,9 +118,20 @@ public class Client implements I_Client {
     public void habari() {
         // Joins multicast group
         HazelcastInstance hazelcastInstance = Hazelcast.newHazelcastInstance(this.config); // Creates a new Hazelcast instance with the provided configuration.
+    }
 
-        // Request number of nodes
 
+    public void setupClient(int nrNodes, Inet4Address namingServerIP, int namingServerPort){
+        this.namingServerIP = namingServerIP;
+        this.namingServerPort = namingServerPort;
+        if (nrNodes == 1){
+            nextID = currentID;
+            prevID = currentID;
+        } else {
+            int[] ids = requestLinkIds();
+            this.prevID = ids[0];
+            this.nextID = ids[1];
+        }
     }
 
     /*Discovery + Bootstrap*/

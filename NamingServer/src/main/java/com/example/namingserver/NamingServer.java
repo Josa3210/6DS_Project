@@ -6,18 +6,22 @@ import com.hazelcast.config.*;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.map.IMap;
-import com.hazelcast.shaded.org.json.JSONObject;
 
 
 import com.example.namingserver.database.I_NamingserverDB;
 import com.example.namingserver.database.NamingserverDB;
 import jakarta.annotation.PostConstruct;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.FileNotFoundException;
 import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import static java.lang.Math.abs;
@@ -39,19 +43,6 @@ public class NamingServer implements I_NamingServer {
 
     public NamingServer() {
 
-    }
-
-    @PostConstruct
-    public void init(){
-        try {
-            database = new NamingserverDB();
-            this.database.load();
-            event_listener = new ClusterMemberShipListener();
-            NamingServer.CreateConfig();
-            mapIP = hazelcastInstance.getMap("mapIP");
-        } catch (FileNotFoundException e) {
-            System.err.println(e.getMessage());
-        }
     }
 
     /**
@@ -79,6 +70,19 @@ public class NamingServer implements I_NamingServer {
         config.getManagementCenterConfig().setConsoleEnabled(true); // Enables the management center console.
         config.addListenerConfig(new ListenerConfig(event_listener));
         hazelcastInstance = Hazelcast.newHazelcastInstance(config); // Creates a new Hazelcast instance with the provided configuration.
+    }
+
+    @PostConstruct
+    public void init() {
+        try {
+            database = new NamingserverDB();
+            this.database.load();
+            event_listener = new ClusterMemberShipListener();
+            NamingServer.CreateConfig();
+            mapIP = hazelcastInstance.getMap("mapIP");
+        } catch (FileNotFoundException e) {
+            System.err.println(e.getMessage());
+        }
     }
 
     /**
@@ -182,9 +186,9 @@ public class NamingServer implements I_NamingServer {
     }
 
     @Override
-    public void sendNumNodes() {
+    public int sendNumNodes() {
         // Get the number of nodes in the cluster (network)
-        int numNodes = hazelcastInstance.getCluster().getMembers().size() - 2;
+        return hazelcastInstance.getCluster().getMembers().size() - 1;
     }
 
     @Override
@@ -231,6 +235,38 @@ public class NamingServer implements I_NamingServer {
         return new int[]{prevID, nextID};
     }
 
+    private void welcomeClient(Inet4Address clientIP) {
+        String postUrl = "http://" + clientIP + ":8080" + "/welcome";
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        // Create the request body
+        Map<String, Object> requestBody = new HashMap<>();
+
+        try {
+            requestBody.put("nrNodes", sendNumNodes());
+            requestBody.put("ip", InetAddress.getLocalHost());
+            requestBody.put("port", 9090);
+        } catch (UnknownHostException e) {
+            throw new RuntimeException(e);
+        }
+
+        // Create the request entity with headers and body
+        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
+
+        // Send the POST request
+        ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
+        HttpStatusCode statusCode = responseEntity.getStatusCode();
+        if (statusCode == HttpStatus.OK) {
+            System.out.println("Update successful");
+        } else {
+            System.err.println("Update failed with status code: " + statusCode);
+        }
+
+    }
+
     public class ClusterMemberShipListener implements MembershipListener {
         public void memberAdded(MembershipEvent membershipEvent) {
             String s = membershipEvent.getMember().getSocketAddress().toString();
@@ -239,6 +275,7 @@ public class NamingServer implements I_NamingServer {
             try {
                 Inet4Address ip_address = (Inet4Address) Inet4Address.getByName(s);
                 database.put(hash, ip_address);
+                welcomeClient(ip_address);
             } catch (UnknownHostException e) {
                 throw new RuntimeException(e);
             }

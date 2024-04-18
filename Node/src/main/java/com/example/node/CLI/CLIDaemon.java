@@ -1,6 +1,7 @@
 package com.example.node.CLI;
 
 
+import com.example.node.Client;
 import com.example.node.I_Client;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,10 +15,10 @@ import java.util.Scanner;
 public class CLIDaemon {
     Scanner scanner;
     CommandParser commandParser;
-    I_Client client;
+    Client client;
 
     @Autowired
-    public CLIDaemon(I_Client client) {
+    public CLIDaemon(Client client) {
         this.scanner = new Scanner(System.in);
         this.commandParser = new CommandParser();
         this.client = client;
