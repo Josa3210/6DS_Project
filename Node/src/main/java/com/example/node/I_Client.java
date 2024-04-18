@@ -57,6 +57,9 @@ public interface I_Client {
      */
     void sendLinkID(Inet4Address nodeIP, int startID, int otherID);
 
+    Inet4Address requestLinkIPs(int linkID);
+    int[] requestLinkIds();
+
     /**
      * Receive the nextID or previousID from other node.
      * <p>
@@ -64,7 +67,7 @@ public interface I_Client {
      * If otherID == currentID than startID = prevID
      * </p>
      */
-    void receiveLinkID();
+    void receiveLinkID(int prevID, int nextID);
 
     /**
      * Remove node with nodeIP from namingServer
