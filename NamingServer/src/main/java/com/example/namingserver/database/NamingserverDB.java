@@ -59,12 +59,10 @@ public class NamingserverDB implements I_NamingserverDB {
     public void load() {
         try {
             File file = new File(filePath + "/" + fileName);
-
             if (file.exists()) {
                 // Read the JSON file and convert it to HashMap
                 HashMap<String, String> stringKeyMap = objectMapper.readValue(file, new TypeReference<HashMap<String, String>>() {
                 });
-
                 // Convert keys from String to Integer and values from String to Inet4Address
                 nodeMap = new HashMap<>();
                 for (Map.Entry<String, String> entry : stringKeyMap.entrySet()) {

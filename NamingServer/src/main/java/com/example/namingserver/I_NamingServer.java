@@ -18,12 +18,12 @@ public interface I_NamingServer {
      */
     void addNodeIP(String nodeName, Inet4Address ipaddress);
 
+    Inet4Address getIP(int nodeID);
+
     /**
      * Remove a node from the namingServer
-     *
-     * @param ipaddress: the ipaddress of the node to remove
      */
-    void removeNodeIP(String nodeName, Inet4Address ipaddress);
+    void removeNodeIP(String nodeName);
 
     /**
      * Returns a hash (in the form of an integer) of any given string
@@ -41,6 +41,5 @@ public interface I_NamingServer {
     /**
      * Return the nextID and previousID of the given ID
      */
-    void giveLinkIds(int nodeID);
-
+    int[] giveLinkIds(int nodeID);
 }

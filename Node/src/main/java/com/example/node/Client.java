@@ -1,61 +1,42 @@
 package com.example.node;
 
-import com.hazelcast.cluster.Member;
-import com.hazelcast.cluster.MembershipEvent;
-import com.hazelcast.cluster.MembershipListener;
 import com.hazelcast.config.*;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import jakarta.annotation.PostConstruct;
+import org.springframework.http.*;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.FileNotFoundException;
 import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.EventListener;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Client implements I_Client {
 
+    private static Config config;
+    private static final String multicast_address = "224.2.2.5";
+    private static HazelcastInstance hazelcastInstance;
     RestClient restClient;
     int currentID, nextID, prevID;
+    Map<String, Inet4Address> ipMap;
+    private Inet4Address namingServerIP;
+    Inet4Address currentIP = requestLinkIPs(currentID);
+    private Integer namingServerPort;
     private String hostname;
-    private static Config config;
-    private static String multicast_address = "224.2.2.5";
-    private static HazelcastInstance hazelcastInstance;
-    private static String IPaddress;
-
-    private static MembershipListener event_listener;
 
     public Client(String hostname) {
-        try{
-        event_listener = new ClusterMemberShipListener();
-        Client.CreateConfig();
-        this.hostname = hostname;
-        this.IPaddress = Inet4Address.getLocalHost().getHostAddress();
-        hazelcastInstance.getMap("mapIP").put(IPaddress, this.hostname);
-        this.restClient = RestClient.create();
+        try {
+            Client.CreateConfig();
+            this.hostname = hostname;
+            this.restClient = RestClient.create();
+        } catch (FileNotFoundException e) {
+            System.err.println(e.getMessage());
         }
 
-        catch (FileNotFoundException e){
-        System.err.println(e.getMessage());
-    } catch (UnknownHostException e) {
-            throw new RuntimeException(e);
-        }
-
-    }
-
-    public class ClusterMemberShipListener implements MembershipListener {
-        public void memberAdded(MembershipEvent membershipEvent) {
-            String s = membershipEvent.getMember().getSocketAddress().toString();
-            s = s.substring(s.indexOf("/")+1, s.indexOf(":"));
-            System.err.println(computeHash(s));
-            System.err.println(s);
-        }
-        public void memberRemoved(MembershipEvent membershipEvent) {
-            String s = membershipEvent.getMember().getSocketAddress().toString();
-            s = s.substring(s.indexOf("/")+1, s.indexOf(":"));
-            System.err.println(s);
-        }
     }
 
     private static void CreateConfig() throws FileNotFoundException {
@@ -73,8 +54,7 @@ public class Client implements I_Client {
         joinConfig.getMulticastConfig().setMulticastGroup(multicast_address); // Sets the multicast group address.
         joinConfig.getMulticastConfig().setMulticastPort(54321);
         config.getManagementCenterConfig().setConsoleEnabled(true); // Enables the management center console.
-        config.addListenerConfig(new ListenerConfig(event_listener));
-        hazelcastInstance =  Hazelcast.newHazelcastInstance(config); // Creates a new Hazelcast instance with the provided configuration.
+        hazelcastInstance = Hazelcast.newHazelcastInstance(config); // Creates a new Hazelcast instance with the provided configuration.
     }
 
     @PostConstruct
@@ -143,36 +123,79 @@ public class Client implements I_Client {
 
     /*Shutdown*/
 
-    /**
-     * Shutdown the client with informing the other nodes + NS
-     */
+    @Override
+    public int[] requestLinkIds() {
+        String getUrl = "http://" + namingServerIP + "/ns/giveLinkID";
+        RestTemplate restTemplate = new RestTemplate();
+
+        // Make the GET request
+        ResponseEntity<int[]> responseEntity = restTemplate.getForEntity(getUrl, int[].class);
+
+        // Return the link IDs
+        return responseEntity.getBody();
+    }
+
+    @Override
+    public Inet4Address requestLinkIPs(int linkID) {
+        String getUrl = "http://" + namingServerIP + "/ns/getIP";
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        Inet4Address ip = restTemplate.getForObject(getUrl, Inet4Address.class);
+
+        return ip;
+    }
+
     @Override
     public void shutDown() {
+        int[] linkIds = requestLinkIds();
+        int prevID = linkIds[0];
+        int nextID = linkIds[1];
 
+        Inet4Address nextNodeIP = requestLinkIPs(nextID);
+        Inet4Address prevNodeIP = requestLinkIPs(prevID);
+
+        // Send the previous ID to the next node
+        sendLinkID(nextNodeIP, prevID, currentID);
+
+        // Send the next ID to the previous node
+        sendLinkID(prevNodeIP, currentID, nextID);
+
+        // Remove from the naming server
+        removeFromNS(namingServerIP, currentIP);
     }
 
-    /**
-     * Send the nextID or previousID to the other host.
-     * <p>
-     * If startID == nodeID than otherID = nextID
-     * If otherID == nodeID than startID = prevID
-     * </p>
-     */
     @Override
     public void sendLinkID(Inet4Address nodeIP, int startID, int otherID) {
+        String postUrl = "http://" + nodeIP + "/shutdown/updateID";
 
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        // Create the request body
+        Map<String, Object> requestBody = new HashMap<>();
+
+        requestBody.put("prevID", startID);
+        requestBody.put("nextID", otherID);
+
+        // Create the request entity with headers and body
+        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
+
+        // Send the POST request
+        ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
+        HttpStatusCode statusCode = responseEntity.getStatusCode();
+        if (statusCode == HttpStatus.OK) {
+            System.out.println("Update successful");
+        } else {
+            System.err.println("Update failed with status code: " + statusCode);
+        }
     }
 
-    /**
-     * Receive the nextID or previousID from other node.
-     * <p>
-     * If startID == currentID than otherID = nextID
-     * If otherID == currentID than startID = prevID
-     * </p>
-     */
     @Override
-    public void receiveLinkID() {
-
+    public void receiveLinkID(int prevID, int nextID) {
+        this.nextID = prevID == currentID ? nextID : currentID;
+        this.prevID = nextID == currentID ? prevID : currentID;
     }
 
     /**
@@ -195,8 +218,7 @@ public class Client implements I_Client {
      * Check for connection with other host
      *
      * @param hostIP IP of the host to reach
-     * @param port
-     * @return
+     * @param port   port to ping to
      */
     @Override
     public void ping(Inet4Address hostIP, String port) {
@@ -210,10 +232,33 @@ public class Client implements I_Client {
     /**
      * Reaction to a failure during communication with another node.
      *
-     * @param hostIP
+     * @param failedNode
      */
     @Override
-    public void removeFromNetwork(Inet4Address hostIP) {
+    public void removeFromNetwork(String failedNode) {
+        int nextID = 1;
+        int prevID = 2;
+        // Get linkID's from NS (now with examples because function in NS is not yet made)
+        // nextID, prevID = APIGetLinkIDs(failedIP)
+
+        // Get IP addresses of the link IDs
+        ResponseEntity<String> response;
+        Inet4Address nextIP, prevIP;
+        try {
+            response = restClient.post().uri("http:/" + this.namingServerIP + ":" + this.namingServerPort + "/project/getIP").body(nextID).retrieve().toEntity(String.class);
+            nextIP = (Inet4Address) InetAddress.getByName(response.getBody());
+
+            response = restClient.post().uri("http:/" + this.namingServerIP + ":" + this.namingServerPort + "/project/getIP").body(nextID).retrieve().toEntity(String.class);
+            prevIP = (Inet4Address) InetAddress.getByName(response.getBody());
+        } catch (UnknownHostException e) {
+            throw new RuntimeException(e);
+        }
+        // Send prevID to nextIP and nextID to prevID
+        sendLinkID(nextIP, prevID, nextID);
+        sendLinkID(prevIP, prevID, nextID);
+
+        // Remove failed node from network
+        restClient.post().uri("http:/" + this.namingServerIP + ":" + this.namingServerPort + "/project/removeNode").body(failedNode).retrieve().toBodilessEntity();
 
     }
 }

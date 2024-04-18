@@ -5,12 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="24625506-5042-49f6-9116-6172614facb2" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/NamingServer/src/main/java/com/example/namingserver/NamingServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/NamingServer/src/main/java/com/example/namingserver/NamingServer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Node/src/main/java/com/example/node/CLI/CLIDaemon.java" beforeDir="false" afterPath="$PROJECT_DIR$/Node/src/main/java/com/example/node/CLI/CLIDaemon.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/NamingServer/src/main/java/com/example/namingserver/I_NamingServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/NamingServer/src/main/java/com/example/namingserver/I_NamingServer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/NamingServer/src/main/java/com/example/namingserver/controllers/RestControllerNS.java" beforeDir="false" afterPath="$PROJECT_DIR$/NamingServer/src/main/java/com/example/namingserver/controllers/RestControllerNS.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Node/src/main/java/com/example/node/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/Node/src/main/java/com/example/node/Client.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Node/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/Node/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Node/src/main/java/com/example/node/controllers/RestControllerFailure.java" beforeDir="false" afterPath="$PROJECT_DIR$/Node/src/main/java/com/example/node/controllers/RestControllerFailure.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Node/src/main/java/com/example/node/controllers/RestControllerShutdown.java" beforeDir="false" afterPath="$PROJECT_DIR$/Node/src/main/java/com/example/node/controllers/RestControllerShutdown.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/ds_project/Client/Client.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/META-INF/MANIFEST.MF" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,11 +34,7 @@
         <entry key="$PROJECT_DIR$" value="dev" />
       </map>
     </option>
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="KubernetesApiProvider">{
-  &quot;isMigrated&quot;: true
-}</component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
@@ -44,70 +42,66 @@
     <option name="generalSettings">
       <MavenGeneralSettings>
         <option name="mavenHome" value="Use Maven wrapper" />
+        <option name="useMavenConfig" value="true" />
       </MavenGeneralSettings>
     </option>
   </component>
-  <component name="ProjectColorInfo">{
-  &quot;associatedIndex&quot;: 3
-}</component>
   <component name="ProjectId" id="2dX9PqRcp17FhJrpEOOyF4X5QLA" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
-    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
-    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
-    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
-    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;extract.method.default.visibility&quot;: &quot;private&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;dev&quot;,
-    &quot;jdk.selected.JAVA_MODULE&quot;: &quot;temurin-17&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Data/Java/6DS_Project/Node&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
-    &quot;run.configurations.included.in.services&quot;: &quot;true&quot;,
-    &quot;spring.configuration.checksum&quot;: &quot;f1077542cde4fb4c3239e7b43fea04ac&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "extract.method.default.visibility": "private",
+    "jdk.selected.JAVA_MODULE": "temurin-17",
+    "last_opened_file_path": "D:/_Opslag/Java/Distributed_Systems/6DS_Project/src/main/java/com/example/ds_project/Client/Client.java",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "spring.configuration.checksum": "13ec53d5febec2d87a9a28d74f1dabe2",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
-      &quot;JAVA&quot;
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "JAVA"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\_Opslag\Java\Distributed_Systems\" />
       <recent name="D:\_Opslag\Java\Distributed_Systems\6DS_Project\" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\_Opslag\Java\Distributed_Systems\6DS_Project\Node\src\main\java\com\example\node" />
       <recent name="D:\_Opslag\Java\Distributed_Systems\6DS_Project" />
+    </key>
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="com.example.node" />
     </key>
   </component>
   <component name="RunDashboard">
     <option name="configurationTypes">
       <set>
-        <option value="MicronautRunConfigurationType" />
-        <option value="QuarkusRunConfigurationType" />
         <option value="SpringBootApplicationConfigurationType" />
       </set>
     </option>
   </component>
-  <component name="RunManager" selected="Spring Boot.Client (1)">
+  <component name="RunManager" selected="Spring Boot.ClientApplication">
     <configuration name="Scratch (1)" type="Java Scratch" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="Scratch" />
       <option name="SCRATCH_FILE_URL" value="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_3.java" />
@@ -115,14 +109,7 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Application" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
-      <module name="6DS_Project" />
-      <option name="SPRING_BOOT_MAIN_CLASS" value="com.example.ds_project.namingServer.Application" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="Client (1)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
+    <configuration name="Client" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true">
       <module name="Node" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="com.example.node.Client" />
       <extension name="coverage">
@@ -135,12 +122,12 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Client" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
-      <module name="6DS_Project" />
-      <option name="SPRING_BOOT_MAIN_CLASS" value="com.example.ds_project.Client.Client" />
+    <configuration name="ClientApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
+      <module name="Node" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.example.node.ClientApplication" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.example.ds_project.Client.*" />
+          <option name="PATTERN" value="com.example.node.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -148,14 +135,7 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="ClientApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
-      <module name="DS_project (2)" />
-      <option name="SPRING_BOOT_MAIN_CLASS" value="com.example.node.ClientApplication" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="NamingServer (1)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
+    <configuration name="NamingServer" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true">
       <module name="NamingServer" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="com.example.namingserver.NamingServer" />
       <extension name="coverage">
@@ -168,12 +148,12 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="NamingServer" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
-      <module name="6DS_Project" />
-      <option name="SPRING_BOOT_MAIN_CLASS" value="com.example.ds_project.namingServer.NamingServer" />
+    <configuration name="NamingServerApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
+      <module name="NamingServer" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.example.namingserver.NamingServerApplication" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.example.ds_project.namingServer.*" />
+          <option name="PATTERN" value="com.example.namingserver.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -181,36 +161,15 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="NamingServerApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
-      <module name="DS_project (1)" />
-      <option name="SPRING_BOOT_MAIN_CLASS" value="com.example.namingserver.NamingServerApplication" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="NodeApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
-      <module name="Node" />
-      <option name="SPRING_BOOT_MAIN_CLASS" value="com.example.node.NodeApplication" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Spring Boot.Client (1)" />
-        <item itemvalue="Spring Boot.NamingServer (1)" />
-        <item itemvalue="Spring Boot.Client" />
+        <item itemvalue="Spring Boot.ClientApplication" />
+        <item itemvalue="Spring Boot.NamingServerApplication" />
         <item itemvalue="Spring Boot.NamingServer" />
+        <item itemvalue="Spring Boot.Client" />
         <item itemvalue="Java Scratch.Scratch (1)" />
       </list>
     </recent_temporary>
-  </component>
-  <component name="SharedIndexes">
-    <attachedChunks>
-      <set>
-        <option value="jdk-17.0.10-temurin-17.0.10-4caba194b151-a600c99e" />
-      </set>
-    </attachedChunks>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -236,16 +195,14 @@
       <workItem from="1712132163338" duration="6178000" />
       <workItem from="1712138363252" duration="1545000" />
       <workItem from="1712139974998" duration="299000" />
-      <workItem from="1713253852279" duration="68000" />
-      <workItem from="1713422389440" duration="329000" />
+      <workItem from="1712561782404" duration="1948000" />
+      <workItem from="1713162848322" duration="5863000" />
+      <workItem from="1713422511583" duration="2269000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
-  </component>
-  <component name="VcsManagerConfiguration">
-    <option name="LAST_COMMIT_MESSAGE" value="" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
