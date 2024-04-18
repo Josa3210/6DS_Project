@@ -1,5 +1,7 @@
 package com.example.node;
 
+import com.hazelcast.cluster.MembershipEvent;
+import com.hazelcast.cluster.MembershipListener;
 import com.hazelcast.config.*;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
@@ -28,8 +30,11 @@ public class Client implements I_Client {
     private Integer namingServerPort;
     private String hostname;
 
+    private static ClusterMemberShipListener event_listener;
+
     public Client(String hostname) {
         try {
+            event_listener = new ClusterMemberShipListener();
             Client.CreateConfig();
             this.hostname = hostname;
             this.restClient = RestClient.create();
@@ -38,6 +43,21 @@ public class Client implements I_Client {
         }
 
     }
+
+    public class ClusterMemberShipListener implements MembershipListener {
+        public void memberAdded(MembershipEvent membershipEvent) {
+            String s = membershipEvent.getMember().getSocketAddress().toString();
+            s = s.substring(s.indexOf("/")+1, s.indexOf(":"));
+            int hash = computeHash(s);
+            karibu(hash);
+        }
+        public void memberRemoved(MembershipEvent membershipEvent) {
+            String s = membershipEvent.getMember().getSocketAddress().toString();
+            s = s.substring(s.indexOf("/")+1, s.indexOf(":"));
+
+        }
+    }
+
 
     private static void CreateConfig() throws FileNotFoundException {
 
@@ -54,12 +74,15 @@ public class Client implements I_Client {
         joinConfig.getMulticastConfig().setMulticastGroup(multicast_address); // Sets the multicast group address.
         joinConfig.getMulticastConfig().setMulticastPort(54321);
         config.getManagementCenterConfig().setConsoleEnabled(true); // Enables the management center console.
+        config.addListenerConfig(new ListenerConfig(event_listener));
         hazelcastInstance = Hazelcast.newHazelcastInstance(config); // Creates a new Hazelcast instance with the provided configuration.
     }
 
     @PostConstruct
     public void init() {
         this.currentID = computeHash(hostname);
+        this.nextID = Integer.MAX_VALUE;
+        this.prevID = Integer.MIN_VALUE;
     }
 
     @Override
@@ -115,8 +138,12 @@ public class Client implements I_Client {
      * <p>
      */
     @Override
-    public void karibu() {
-
+    public void karibu(int hash) {
+        if((this.currentID < hash) && (hash < this.nextID)){
+            this.nextID = hash;
+        } else if ((this.prevID < hash) && (hash < this.currentID)) {
+            this.prevID = hash;
+        }
     }
 
     // Use "receiveLinkID" and "sendLinkID" from Shutdown

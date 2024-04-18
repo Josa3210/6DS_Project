@@ -37,7 +37,7 @@ public interface I_Client {
      * </p>
      * <p>
      */
-    void karibu();
+    void karibu(int hash);
 
     // Use "receiveLinkID" and "sendLinkID" from Shutdown
 

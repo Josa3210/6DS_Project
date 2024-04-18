@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.FileNotFoundException;
 import java.net.Inet4Address;
+import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.Set;
 
@@ -55,14 +56,24 @@ public class NamingServer implements I_NamingServer {
         public void memberAdded(MembershipEvent membershipEvent) {
             String s = membershipEvent.getMember().getSocketAddress().toString();
             s = s.substring(s.indexOf("/")+1, s.indexOf(":"));
-            System.err.println(computeHash(s));
-            System.err.println(s);
+            int hash = computeHash(s);
+            try {
+                Inet4Address ip_address = (Inet4Address) Inet4Address.getByName(s);
+                database.put(hash, ip_address);
+            } catch (UnknownHostException e) {
+                throw new RuntimeException(e);
+            }
         }
         public void memberRemoved(MembershipEvent membershipEvent) {
             String s = membershipEvent.getMember().getSocketAddress().toString();
             s = s.substring(s.indexOf("/")+1, s.indexOf(":"));
-            System.err.println(computeHash(s));
-            System.err.println(s);
+            int hash = computeHash(s);
+            try {
+                Inet4Address ip_address = (Inet4Address) Inet4Address.getByName(s);
+                database.put(hash, ip_address);
+            } catch (UnknownHostException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -91,6 +102,74 @@ public class NamingServer implements I_NamingServer {
         config.getManagementCenterConfig().setConsoleEnabled(true); // Enables the management center console.
         config.addListenerConfig(new ListenerConfig(event_listener));
         hazelcastInstance =  Hazelcast.newHazelcastInstance(config); // Creates a new Hazelcast instance with the provided configuration.
+    }
+    /**
+     * This method retrieves the IP address associated with the location of a given
+     * filename by computing a hash value for the filename and comparing it with the
+     * keys in the database. It then calculates the closest distance to the hash value
+     * and returns the corresponding IP address.
+     *
+     * @param filename the name of the file for which location IP is requested
+     * @return the IP address of the location associated with the filename
+     */
+    @Override
+    public Inet4Address getLocationIP(String filename) {
+        int hash = computeHash(filename);
+        Set<Integer> keys = this.database.getKeys();
+
+        // Setup variables
+        double smallestDist = Double.POSITIVE_INFINITY;
+        int node = 0;
+
+        // Calculate distance
+        for (Integer key : keys) {
+            double dist = abs(key - hash);
+            if (dist < smallestDist) {
+                smallestDist = dist;
+                node = key;
+            }
+        }
+
+        if (node < hash) {
+            node = max(keys);
+        }
+
+        return this.database.get(node);
+    }
+
+    /**
+     * This method adds a new node with the given node name and IP address to the database.
+     * It computes a hash value for the node name, stores the IP address in the database,
+     * and saves the updated database.
+     *
+     * @param nodeName  the name of the node to be added
+     * @param ipaddress the IP address of the node to be added
+     */
+    @Override
+    public void addNodeIP(String nodeName, Inet4Address ipaddress) {
+        int hash = computeHash(nodeName);
+        this.database.put(hash, ipaddress);
+
+        // Reallocate resources
+    }
+
+    @Override
+    public Inet4Address getIP(int nodeID) {
+        return this.database.get(nodeID);
+    }
+    /**
+     * This method removes a node with the given node name and IP address from the database.
+     * It computes a hash value for the node name, removes the corresponding entry from the
+     * database, and saves the updated database.
+     *
+     * @param nodeName  the name of the node to be removed
+     */
+    @Override
+    public void removeNodeIP(String nodeName) {
+        int hash = computeHash(nodeName);
+        this.database.remove(hash);
+
+        // Reallocate resources
     }
 
     /**
@@ -174,81 +253,5 @@ public class NamingServer implements I_NamingServer {
         return new int[]{prevID, nextID};
     }
 
-    }
-
-    /**
-     * This method retrieves the IP address associated with the location of a given
-     * filename by computing a hash value for the filename and comparing it with the
-     * keys in the database. It then calculates the closest distance to the hash value
-     * and returns the corresponding IP address.
-     *
-     * @param filename the name of the file for which location IP is requested
-     * @return the IP address of the location associated with the filename
-     */
-    @Override
-    public Inet4Address getLocationIP(String filename) {
-
-        int hash = computeHash(filename);
-        Set<Integer> keys = this.database.getKeys();
-
-        // Setup variables
-        double smallestDist = Double.POSITIVE_INFINITY;
-        int node = 0;
-
-        // Calculate distance
-        for (Integer key : keys) {
-            double dist = abs(key - hash);
-            if (dist < smallestDist) {
-                smallestDist = dist;
-                node = key;
-            }
-        }
-
-        if (node < hash) {
-            node = max(keys);
-        }
-
-        return this.database.get(node);
-    }
-
-    /**
-     * This method adds a new node with the given node name and IP address to the database.
-     * It computes a hash value for the node name, stores the IP address in the database,
-     * and saves the updated database.
-     *
-     * @param nodeName  the name of the node to be added
-     * @param ipaddress the IP address of the node to be added
-     */
-    @Override
-    public void addNodeIP(String nodeName, Inet4Address ipaddress) {
-        int hash = computeHash(nodeName);
-        this.database.put(hash, ipaddress);
-
-        // Reallocate resources
-    }
-
-    @Override
-    public Inet4Address getIP(int nodeID) {
-        return this.database.get(nodeID);
-    }
-
-    /**
-     * This method removes a node with the given node name and IP address from the database.
-     * It computes a hash value for the node name, removes the corresponding entry from the
-     * database, and saves the updated database.
-     *
-     * @param nodeName  the name of the node to be removed
-     */
-    @Override
-    public void removeNodeIP(String nodeName) {
-        int hash = computeHash(nodeName);
-        this.database.remove(hash);
-
-        // Reallocate resources
-    }
-
-
-    public static void main(String[] args) throws FileNotFoundException {
-
-    }
 }
+
