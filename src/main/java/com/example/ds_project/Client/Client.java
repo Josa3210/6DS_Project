@@ -164,21 +164,20 @@ public class Client implements I_Client
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         // Create the request body
-        Map<String, Object> requestBody = new HashMap<>();
-
-        requestBody.put("failedNode", nodeIP);
+        Map<String, Object> requestBody = new HashMap<>()
+        {{
+            put("failedNode", nodeIP);
+        }};
 
         // Create the request entity with headers and body
         HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
 
         // Send the POST request
         ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
+
         HttpStatusCode statusCode = responseEntity.getStatusCode();
-        if (statusCode == HttpStatus.OK) {
-            System.out.println("Update successful");
-        } else {
-            System.err.println("Update failed with status code: " + statusCode);
-        }
+        if (statusCode == HttpStatus.OK) {System.out.println("Update successful");}
+        else {System.err.println("Update failed with status code: " + statusCode);}
     }
 
     @Override
