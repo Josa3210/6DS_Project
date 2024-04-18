@@ -25,18 +25,15 @@ import static java.util.Collections.max;
 @Component
 
 public class NamingServer implements I_NamingServer {
+    private static String multicast_address = "224.2.2.5";
+    private static Config config;
+    private static HazelcastInstance hazelcastInstance;
+    private static IMap<String, String> mapIP;
+    private static ClusterMemberShipListener event_listener;
     /**
      * Database containing the IP's of the different nodes {@see I_NamingserverDB}
      */
     I_NamingserverDB database;
-    private static String multicast_address = "224.2.2.5";
-    private static Config config;
-    private static HazelcastInstance hazelcastInstance;
-
-    private static IMap<String, String> mapIP;
-
-    private static ClusterMemberShipListener event_listener;
-
 
 
     public NamingServer() {
@@ -46,34 +43,8 @@ public class NamingServer implements I_NamingServer {
             event_listener = new ClusterMemberShipListener();
             NamingServer.CreateConfig();
             mapIP = hazelcastInstance.getMap("mapIP");
-        }
-        catch (FileNotFoundException e){
+        } catch (FileNotFoundException e) {
             System.err.println(e.getMessage());
-        }
-    }
-
-    public class ClusterMemberShipListener implements MembershipListener {
-        public void memberAdded(MembershipEvent membershipEvent) {
-            String s = membershipEvent.getMember().getSocketAddress().toString();
-            s = s.substring(s.indexOf("/")+1, s.indexOf(":"));
-            int hash = computeHash(s);
-            try {
-                Inet4Address ip_address = (Inet4Address) Inet4Address.getByName(s);
-                database.put(hash, ip_address);
-            } catch (UnknownHostException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        public void memberRemoved(MembershipEvent membershipEvent) {
-            String s = membershipEvent.getMember().getSocketAddress().toString();
-            s = s.substring(s.indexOf("/")+1, s.indexOf(":"));
-            int hash = computeHash(s);
-            try {
-                Inet4Address ip_address = (Inet4Address) Inet4Address.getByName(s);
-                database.put(hash, ip_address);
-            } catch (UnknownHostException e) {
-                throw new RuntimeException(e);
-            }
         }
     }
 
@@ -101,8 +72,9 @@ public class NamingServer implements I_NamingServer {
         joinConfig.getMulticastConfig().setMulticastPort(54321);
         config.getManagementCenterConfig().setConsoleEnabled(true); // Enables the management center console.
         config.addListenerConfig(new ListenerConfig(event_listener));
-        hazelcastInstance =  Hazelcast.newHazelcastInstance(config); // Creates a new Hazelcast instance with the provided configuration.
+        hazelcastInstance = Hazelcast.newHazelcastInstance(config); // Creates a new Hazelcast instance with the provided configuration.
     }
+
     /**
      * This method retrieves the IP address associated with the location of a given
      * filename by computing a hash value for the filename and comparing it with the
@@ -157,12 +129,13 @@ public class NamingServer implements I_NamingServer {
     public Inet4Address getIP(int nodeID) {
         return this.database.get(nodeID);
     }
+
     /**
      * This method removes a node with the given node name and IP address from the database.
      * It computes a hash value for the node name, removes the corresponding entry from the
      * database, and saves the updated database.
      *
-     * @param nodeName  the name of the node to be removed
+     * @param nodeName the name of the node to be removed
      */
     @Override
     public void removeNodeIP(String nodeName) {
@@ -209,8 +182,7 @@ public class NamingServer implements I_NamingServer {
     }
 
     @Override
-    public int[] giveLinkIds(int nodeID)
-    {
+    public int[] giveLinkIds(int nodeID) {
         // Step 1: Compute hash value for the nodeID
         int hash = computeHash(Integer.toString(nodeID));
 
@@ -251,6 +223,32 @@ public class NamingServer implements I_NamingServer {
 
         // Step 4: Return the previous and next IDs as an array
         return new int[]{prevID, nextID};
+    }
+
+    public class ClusterMemberShipListener implements MembershipListener {
+        public void memberAdded(MembershipEvent membershipEvent) {
+            String s = membershipEvent.getMember().getSocketAddress().toString();
+            s = s.substring(s.indexOf("/") + 1, s.indexOf(":"));
+            int hash = computeHash(s);
+            try {
+                Inet4Address ip_address = (Inet4Address) Inet4Address.getByName(s);
+                database.put(hash, ip_address);
+            } catch (UnknownHostException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        public void memberRemoved(MembershipEvent membershipEvent) {
+            String s = membershipEvent.getMember().getSocketAddress().toString();
+            s = s.substring(s.indexOf("/") + 1, s.indexOf(":"));
+            int hash = computeHash(s);
+            try {
+                Inet4Address ip_address = (Inet4Address) Inet4Address.getByName(s);
+                database.put(hash, ip_address);
+            } catch (UnknownHostException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
 }

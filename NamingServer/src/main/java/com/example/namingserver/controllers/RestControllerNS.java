@@ -22,7 +22,7 @@ public class RestControllerNS {
      * @return the IP-address of the file location
      */
 
-    @GetMapping("/project/searchFile")
+    @GetMapping("/ns/searchFile")
     public Inet4Address searchFile(@RequestParam String fileName) {
         Inet4Address address = namingServer.getLocationIP(fileName);
         System.out.println(address);
@@ -34,7 +34,7 @@ public class RestControllerNS {
      *
      * @param request the JSON request body with "ip" as ip address
      */
-    @PostMapping("/project/addNode")
+    @PostMapping("/ns/addNode")
     public void addNode(@RequestBody Map<String, Object> request) throws UnknownHostException {
         String ipAddressString = (String) request.get("ip");
         Inet4Address ipAddress = (Inet4Address) InetAddress.getByName(ipAddressString);
@@ -47,13 +47,13 @@ public class RestControllerNS {
      *
      * @param request the JSON request body with "ip" as ip address
      */
-    @PostMapping("/project/removeNode")
+    @PostMapping("/ns/removeNode")
     public void removeNode(@RequestBody Map<String, Object> request) throws UnknownHostException {
         String failedNode = (String) request.get("failedNode");
         namingServer.removeNodeIP(failedNode);
     }
 
-    @GetMapping("/project/getIp")
+    @GetMapping("/ns/getIp")
     public Inet4Address getIp(@RequestParam String failedID){
         int searchID = Integer.parseInt(failedID);
         return namingServer.getIP(searchID);

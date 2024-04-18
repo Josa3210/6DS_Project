@@ -19,14 +19,12 @@ import java.util.Map;
 
 public class Client implements I_Client {
 
-    private static Config config;
     private static final String multicast_address = "224.2.2.5";
-    private static HazelcastInstance hazelcastInstance;
     RestClient restClient;
     int currentID, nextID, prevID;
     Map<String, Inet4Address> ipMap;
     private Inet4Address namingServerIP;
-    Inet4Address currentIP = requestLinkIPs(currentID);
+    Inet4Address currentIP;
     private Integer namingServerPort;
     private String hostname;
 
@@ -38,8 +36,11 @@ public class Client implements I_Client {
             Client.CreateConfig();
             this.hostname = hostname;
             this.restClient = RestClient.create();
+            this.currentIP = (Inet4Address) InetAddress.getLocalHost();
         } catch (FileNotFoundException e) {
             System.err.println(e.getMessage());
+        } catch (UnknownHostException e) {
+            throw new RuntimeException(e);
         }
 
     }
@@ -61,7 +62,7 @@ public class Client implements I_Client {
 
     private static void CreateConfig() throws FileNotFoundException {
 
-        config = new Config();
+        Config config = new Config();
         config.getJetConfig().setEnabled(true);
         config.setClusterName("testCluster");
         NetworkConfig networkConfig = config.getNetworkConfig();
@@ -75,7 +76,7 @@ public class Client implements I_Client {
         joinConfig.getMulticastConfig().setMulticastPort(54321);
         config.getManagementCenterConfig().setConsoleEnabled(true); // Enables the management center console.
         config.addListenerConfig(new ListenerConfig(event_listener));
-        hazelcastInstance = Hazelcast.newHazelcastInstance(config); // Creates a new Hazelcast instance with the provided configuration.
+        HazelcastInstance hazelcastInstance = Hazelcast.newHazelcastInstance(config); // Creates a new Hazelcast instance with the provided configuration.
     }
 
     @PostConstruct
