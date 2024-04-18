@@ -75,30 +75,22 @@ public class NamingServer implements I_NamingServer {
         // Find the closest smaller and larger keys than the hash
         int closestSmaller = -1;
         int closestLarger = Integer.MAX_VALUE;
-        for (Integer key : keys) {
-            if (key < hash && key > closestSmaller) {
-                closestSmaller = key;
-            }
-            if (key > hash && key < closestLarger) {
-                closestLarger = key;
-            }
+        for (Integer key : keys)
+        {
+            if (key < hash && key > closestSmaller) closestSmaller = key;
+            if (key > hash && key < closestLarger) closestLarger = key;
         }
 
         // Check if closestSmaller is still -1, meaning no smaller key found
-        if (closestSmaller != -1) {
-            prevID = closestSmaller;
-        } else {
-            // If no smaller key found, wrap around to the maximum key
-            prevID = max(keys);
-        }
+        // If no smaller key found, wrap around to the maximum key
+        if (closestSmaller != -1) prevID = closestSmaller;
+        else prevID = max(keys);
+
 
         // Check if closestLarger is still Integer.MAX_VALUE, meaning no larger key found
-        if (closestLarger != Integer.MAX_VALUE) {
-            nextID = closestLarger;
-        } else {
-            // If no larger key found, wrap around to the minimum key
-            nextID = Collections.min(keys);
-        }
+        // If no larger key found, wrap around to the minimum key
+        if (closestLarger != Integer.MAX_VALUE) nextID = closestLarger;
+        else nextID = Collections.min(keys);
 
         // Step 4: Return the previous and next IDs as an array
         return new int[]{prevID, nextID};

@@ -50,31 +50,42 @@ public class Client implements I_Client
 
     }
 
+    /**
+     * Requests the ID's from the previous and next node from the naming server using REST
+     * URI : http://[namingServerIP]/ns/giveLinkID
+     * @return int[] of length 2, int[0] = previous node id, int[1] = next node id
+     */
     @Override
     public int[] requestLinkIds()
     {
-        String getUrl = "http://"+ namingServerIP +"/ns/giveLinkID";
+        String getUrl = "http://" + namingServerIP + "/ns/giveLinkID";
+
         RestTemplate restTemplate = new RestTemplate();
 
-        // Make the GET request
         ResponseEntity<int[]> responseEntity = restTemplate.getForEntity(getUrl, int[].class);
 
-        // Return the link IDs
         return responseEntity.getBody();
     }
 
+    /**
+     * Requests the ip from the naming server by id
+     * @param linkID the ID of the node
+     * @return Inet4Address of the requested node
+     */
     @Override
     public Inet4Address requestLinkIPs(int linkID)
     {
-        String getUrl = "http://"+ namingServerIP +"/ns/getIP";
+        String getUrl = "http://" + namingServerIP + "/ns/getIP";
 
         RestTemplate restTemplate = new RestTemplate();
 
-        Inet4Address ip = restTemplate.getForObject(getUrl, Inet4Address.class);
-
-        return ip;
+        return restTemplate.getForObject(getUrl, Inet4Address.class);
     }
 
+    /**
+     * Shuts down the node by sending the previous and next node id's to the corresponding nodes
+     * and removing from the naming server
+     */
     @Override
     public void shutDown()
     {
@@ -95,6 +106,13 @@ public class Client implements I_Client
         removeFromNS(namingServerIP, currentIP);
     }
 
+    /**
+     * Sends the previous and next id to the corresponding client, so it can update its id's
+     * URI : http://[nodeIP]/shutdown/updateID
+     * @param nodeIP the IP of the receiving client
+     * @param startID the previous ID or the node ID
+     * @param otherID the next ID or the node ID
+     */
     @Override
     public void sendLinkID(Inet4Address nodeIP, int startID, int otherID)
     {
@@ -105,21 +123,30 @@ public class Client implements I_Client
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         // Create the request body
-        Map<String, Object> requestBody = new HashMap<>();
-
-        requestBody.put("prevID", startID);
-        requestBody.put("nextID", otherID);
+        Map<String, Object> requestBody = new HashMap<>()
+        {{
+            put("prevID", startID);
+            put("nextID", otherID);
+        }};
 
         // Create the request entity with headers and body
         HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
 
         // Send the POST request
         ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
+
         HttpStatusCode statusCode = responseEntity.getStatusCode();
         if (statusCode == HttpStatus.OK) {System.out.println("Update successful");}
         else {System.err.println("Update failed with status code: " + statusCode);}
     }
 
+    /**
+     * Updates the next and previous id
+     * When the previous id is equal to the client id, the next id will be updated
+     * When the next id is equal to the client id, the previous id will be updated
+     * @param prevID the previous id or client id
+     * @param nextID the next id or client id
+     */
     @Override
     public void receiveLinkID(int prevID, int nextID)
     {
