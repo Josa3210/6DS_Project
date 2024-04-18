@@ -1,5 +1,7 @@
 package com.example.namingserver;
 
+import com.hazelcast.cluster.MembershipEvent;
+import com.hazelcast.cluster.MembershipListener;
 import com.hazelcast.config.*;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
@@ -31,16 +33,37 @@ public class NamingServer implements I_NamingServer {
     private static Config config;
     private static HazelcastInstance hazelcastInstance;
 
+    private static IMap<String, String> mapIP;
+
+    private static ClusterMemberShipListener event_listener;
+
 
 
     public NamingServer() {
         try {
+            event_listener = new ClusterMemberShipListener();
             NamingServer.CreateConfig();
+            mapIP = hazelcastInstance.getMap("mapIP");
             database = new NamingserverDB();
             this.database.load();
         }
         catch (FileNotFoundException e){
             System.err.println(e.getMessage());
+        }
+    }
+
+    public class ClusterMemberShipListener implements MembershipListener {
+        public void memberAdded(MembershipEvent membershipEvent) {
+            String s = membershipEvent.getMember().getSocketAddress().toString();
+            s = s.substring(s.indexOf("/")+1, s.indexOf(":"));
+            System.err.println(computeHash(s));
+            System.err.println(s);
+        }
+        public void memberRemoved(MembershipEvent membershipEvent) {
+            String s = membershipEvent.getMember().getSocketAddress().toString();
+            s = s.substring(s.indexOf("/")+1, s.indexOf(":"));
+            System.err.println(computeHash(s));
+            System.err.println(s);
         }
     }
 
@@ -67,6 +90,7 @@ public class NamingServer implements I_NamingServer {
         joinConfig.getMulticastConfig().setMulticastGroup(multicast_address); // Sets the multicast group address.
         joinConfig.getMulticastConfig().setMulticastPort(54321);
         config.getManagementCenterConfig().setConsoleEnabled(true); // Enables the management center console.
+        config.addListenerConfig(new ListenerConfig(event_listener));
         hazelcastInstance =  Hazelcast.newHazelcastInstance(config); // Creates a new Hazelcast instance with the provided configuration.
     }
 

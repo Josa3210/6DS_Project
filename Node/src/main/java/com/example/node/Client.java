@@ -1,5 +1,8 @@
 package com.example.node;
 
+import com.hazelcast.cluster.Member;
+import com.hazelcast.cluster.MembershipEvent;
+import com.hazelcast.cluster.MembershipListener;
 import com.hazelcast.config.*;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
@@ -8,6 +11,8 @@ import org.springframework.web.client.RestClient;
 
 import java.io.FileNotFoundException;
 import java.net.Inet4Address;
+import java.net.UnknownHostException;
+import java.util.EventListener;
 
 public class Client implements I_Client {
 
@@ -17,18 +22,40 @@ public class Client implements I_Client {
     private static Config config;
     private static String multicast_address = "224.2.2.5";
     private static HazelcastInstance hazelcastInstance;
+    private static String IPaddress;
+
+    private static MembershipListener event_listener;
 
     public Client(String hostname) {
         try{
+        event_listener = new ClusterMemberShipListener();
         Client.CreateConfig();
         this.hostname = hostname;
+        this.IPaddress = Inet4Address.getLocalHost().getHostAddress();
+        hazelcastInstance.getMap("mapIP").put(IPaddress, this.hostname);
         this.restClient = RestClient.create();
         }
 
         catch (FileNotFoundException e){
         System.err.println(e.getMessage());
+    } catch (UnknownHostException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
+    public class ClusterMemberShipListener implements MembershipListener {
+        public void memberAdded(MembershipEvent membershipEvent) {
+            String s = membershipEvent.getMember().getSocketAddress().toString();
+            s = s.substring(s.indexOf("/")+1, s.indexOf(":"));
+            System.err.println(computeHash(s));
+            System.err.println(s);
+        }
+        public void memberRemoved(MembershipEvent membershipEvent) {
+            String s = membershipEvent.getMember().getSocketAddress().toString();
+            s = s.substring(s.indexOf("/")+1, s.indexOf(":"));
+            System.err.println(s);
+        }
     }
 
     private static void CreateConfig() throws FileNotFoundException {
@@ -46,6 +73,7 @@ public class Client implements I_Client {
         joinConfig.getMulticastConfig().setMulticastGroup(multicast_address); // Sets the multicast group address.
         joinConfig.getMulticastConfig().setMulticastPort(54321);
         config.getManagementCenterConfig().setConsoleEnabled(true); // Enables the management center console.
+        config.addListenerConfig(new ListenerConfig(event_listener));
         hazelcastInstance =  Hazelcast.newHazelcastInstance(config); // Creates a new Hazelcast instance with the provided configuration.
     }
 
