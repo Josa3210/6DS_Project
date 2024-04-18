@@ -71,13 +71,6 @@ public class RestControllerNS {
         return namingServer.giveLinkIds(nodeID);
     }
 
-    @GetMapping("/project/getIp")
-    public Inet4Address GetNode(@RequestParam String id)
-    {
-        int nodeID = Integer.parseInt(id);
-        return namingServer.getIP(nodeID);
-    }
-
     /**
      * Sets the naming server for the rest controller
      *
