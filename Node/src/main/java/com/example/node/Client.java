@@ -143,15 +143,18 @@ public class Client implements I_Client {
 
     }
 
-    /**
-     * Receive the nextID or previousID from other node.
-     * <p>
-     * If startID == currentID than otherID = nextID
-     * If otherID == currentID than startID = prevID
-     * </p>
-     */
     @Override
-    public void receiveLinkID() {
+    public Inet4Address requestLinkIPs(int linkID) {
+        return null;
+    }
+
+    @Override
+    public int[] requestLinkIds() {
+        return new int[0];
+    }
+
+    @Override
+    public void receiveLinkID(int prevID, int nextID) {
 
     }
 
