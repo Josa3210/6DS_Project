@@ -42,5 +42,4 @@ public interface I_NamingServer {
      * Return the nextID and previousID of the given ID
      */
     int[] giveLinkIds(int nodeID);
-
 }

@@ -5,7 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="24625506-5042-49f6-9116-6172614facb2" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/NamingServer/src/main/java/com/example/namingserver/I_NamingServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/NamingServer/src/main/java/com/example/namingserver/I_NamingServer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/NamingServer/src/main/java/com/example/namingserver/controllers/RestControllerNS.java" beforeDir="false" afterPath="$PROJECT_DIR$/NamingServer/src/main/java/com/example/namingserver/controllers/RestControllerNS.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Node/src/main/java/com/example/node/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/Node/src/main/java/com/example/node/Client.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Node/src/main/java/com/example/node/controllers/RestControllerFailure.java" beforeDir="false" afterPath="$PROJECT_DIR$/Node/src/main/java/com/example/node/controllers/RestControllerFailure.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Node/src/main/java/com/example/node/controllers/RestControllerShutdown.java" beforeDir="false" afterPath="$PROJECT_DIR$/Node/src/main/java/com/example/node/controllers/RestControllerShutdown.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/ds_project/Client/Client.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/META-INF/MANIFEST.MF" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,36 +51,36 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
-    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
-    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
-    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
-    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;extract.method.default.visibility&quot;: &quot;private&quot;,
-    &quot;jdk.selected.JAVA_MODULE&quot;: &quot;temurin-17&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/_Opslag/Java/Distributed_Systems/6DS_Project/Node/src/main/java/com/example/node&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
-    &quot;spring.configuration.checksum&quot;: &quot;13ec53d5febec2d87a9a28d74f1dabe2&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "extract.method.default.visibility": "private",
+    "jdk.selected.JAVA_MODULE": "temurin-17",
+    "last_opened_file_path": "D:/_Opslag/Java/Distributed_Systems/6DS_Project/src/main/java/com/example/ds_project/Client/Client.java",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "spring.configuration.checksum": "13ec53d5febec2d87a9a28d74f1dabe2",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
-      &quot;JAVA&quot;
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "JAVA"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\_Opslag\Java\Distributed_Systems\" />
@@ -190,7 +197,7 @@
       <workItem from="1712139974998" duration="299000" />
       <workItem from="1712561782404" duration="1948000" />
       <workItem from="1713162848322" duration="5863000" />
-      <workItem from="1713422511583" duration="1599000" />
+      <workItem from="1713422511583" duration="2269000" />
     </task>
     <servers />
   </component>

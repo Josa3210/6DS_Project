@@ -37,7 +37,7 @@ public class CLIDaemon {
             switch (command) {
                 case PING -> {
                     try {
-                        client.ping((Inet4Address) InetAddress.getByName(args[0]));
+                        client.ping((Inet4Address) InetAddress.getByName(args[0]), args[1]);
                     } catch (UnknownHostException e) {
                         print("Could not find address: " + args[0]);
                     }

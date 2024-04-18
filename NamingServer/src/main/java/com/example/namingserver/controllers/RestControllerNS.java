@@ -75,7 +75,7 @@ public class RestControllerNS {
     public Inet4Address GetNode(@RequestParam String id)
     {
         int nodeID = Integer.parseInt(id);
-        return namingServer.getIp(nodeID);
+        return namingServer.getIP(nodeID);
     }
 
     /**

@@ -4,8 +4,9 @@ import com.hazelcast.config.*;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import jakarta.annotation.PostConstruct;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.FileNotFoundException;
 import java.net.Inet4Address;
@@ -16,26 +17,25 @@ import java.util.Map;
 
 public class Client implements I_Client {
 
+    private static Config config;
+    private static final String multicast_address = "224.2.2.5";
+    private static HazelcastInstance hazelcastInstance;
     RestClient restClient;
     int currentID, nextID, prevID;
-    private Inet4Address namingServerIP;
-    private Integer namingServerPort;
     Map<String, Inet4Address> ipMap;
+    private Inet4Address namingServerIP;
+    Inet4Address currentIP = requestLinkIPs(currentID);
+    private Integer namingServerPort;
     private String hostname;
-    private static Config config;
-    private static String multicast_address = "224.2.2.5";
-    private static HazelcastInstance hazelcastInstance;
 
     public Client(String hostname) {
-        try{
-        Client.CreateConfig();
-        this.hostname = hostname;
-        this.restClient = RestClient.create();
+        try {
+            Client.CreateConfig();
+            this.hostname = hostname;
+            this.restClient = RestClient.create();
+        } catch (FileNotFoundException e) {
+            System.err.println(e.getMessage());
         }
-
-        catch (FileNotFoundException e){
-        System.err.println(e.getMessage());
-    }
 
     }
 
@@ -54,7 +54,7 @@ public class Client implements I_Client {
         joinConfig.getMulticastConfig().setMulticastGroup(multicast_address); // Sets the multicast group address.
         joinConfig.getMulticastConfig().setMulticastPort(54321);
         config.getManagementCenterConfig().setConsoleEnabled(true); // Enables the management center console.
-        hazelcastInstance =  Hazelcast.newHazelcastInstance(config); // Creates a new Hazelcast instance with the provided configuration.
+        hazelcastInstance = Hazelcast.newHazelcastInstance(config); // Creates a new Hazelcast instance with the provided configuration.
     }
 
     @PostConstruct
@@ -123,39 +123,79 @@ public class Client implements I_Client {
 
     /*Shutdown*/
 
-    /**
-     * Shutdown the client with informing the other nodes + NS
-     */
     @Override
-    public void shutDown() {
+    public int[] requestLinkIds() {
+        String getUrl = "http://" + namingServerIP + "/ns/giveLinkID";
+        RestTemplate restTemplate = new RestTemplate();
 
-    }
+        // Make the GET request
+        ResponseEntity<int[]> responseEntity = restTemplate.getForEntity(getUrl, int[].class);
 
-    /**
-     * Send the nextID or previousID to the other host.
-     * <p>
-     * If startID == nodeID than otherID = nextID
-     * If otherID == nodeID than startID = prevID
-     * </p>
-     */
-    @Override
-    public void sendLinkID(Inet4Address nodeIP, int startID, int otherID) {
-
+        // Return the link IDs
+        return responseEntity.getBody();
     }
 
     @Override
     public Inet4Address requestLinkIPs(int linkID) {
-        return null;
+        String getUrl = "http://" + namingServerIP + "/ns/getIP";
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        Inet4Address ip = restTemplate.getForObject(getUrl, Inet4Address.class);
+
+        return ip;
     }
 
     @Override
-    public int[] requestLinkIds() {
-        return new int[0];
+    public void shutDown() {
+        int[] linkIds = requestLinkIds();
+        int prevID = linkIds[0];
+        int nextID = linkIds[1];
+
+        Inet4Address nextNodeIP = requestLinkIPs(nextID);
+        Inet4Address prevNodeIP = requestLinkIPs(prevID);
+
+        // Send the previous ID to the next node
+        sendLinkID(nextNodeIP, prevID, currentID);
+
+        // Send the next ID to the previous node
+        sendLinkID(prevNodeIP, currentID, nextID);
+
+        // Remove from the naming server
+        removeFromNS(namingServerIP, currentIP);
+    }
+
+    @Override
+    public void sendLinkID(Inet4Address nodeIP, int startID, int otherID) {
+        String postUrl = "http://" + nodeIP + "/shutdown/updateID";
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        // Create the request body
+        Map<String, Object> requestBody = new HashMap<>();
+
+        requestBody.put("prevID", startID);
+        requestBody.put("nextID", otherID);
+
+        // Create the request entity with headers and body
+        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
+
+        // Send the POST request
+        ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
+        HttpStatusCode statusCode = responseEntity.getStatusCode();
+        if (statusCode == HttpStatus.OK) {
+            System.out.println("Update successful");
+        } else {
+            System.err.println("Update failed with status code: " + statusCode);
+        }
     }
 
     @Override
     public void receiveLinkID(int prevID, int nextID) {
-
+        this.nextID = prevID == currentID ? nextID : currentID;
+        this.prevID = nextID == currentID ? prevID : currentID;
     }
 
     /**
