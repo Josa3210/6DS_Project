@@ -242,6 +242,7 @@ public class NamingServer implements I_NamingServer {
         if (clientIP.equals(this.ip)) return;
 
         String postUrl = "http:/" + clientIP + ":9090" + "/welcome";
+        String ipString = InetAddress.getLocalHost().getHostAddress();
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -252,7 +253,7 @@ public class NamingServer implements I_NamingServer {
 
         try {
             requestBody.put("nrNodes", sendNumNodes());
-            requestBody.put("ip", InetAddress.getLocalHost());
+            requestBody.put("ip", ipString);
             requestBody.put("port", 9090);
         } catch (UnknownHostException e) {
             throw new RuntimeException(e);
