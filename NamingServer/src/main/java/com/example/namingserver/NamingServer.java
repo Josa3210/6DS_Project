@@ -241,35 +241,28 @@ public class NamingServer implements I_NamingServer {
     private void welcomeClient(Inet4Address clientIP) {
         if (clientIP.equals(this.ip)) return;
 
-        String postUrl = "http:/" + clientIP + ":9090" + "/welcome";
-
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        // Create the request body
-        Map<String, Object> requestBody = new HashMap<>();
-
-        try {
+        try
+        {
+            String ipString = InetAddress.getLocalHost().getHostAddress();
+            System.out.println("IP : " + ipString);
+            String postUrl = "http://" + ipString + ":9090/welcome";
+            System.out.println("URI : " + postUrl);
+            
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+    
+            // Create the request body
+            Map<String, Object> requestBody = new HashMap<>();
             requestBody.put("nrNodes", sendNumNodes());
-            requestBody.put("ip", InetAddress.getLocalHost().getHostAddress());
+            requestBody.put("ip", ipString);
             requestBody.put("port", 9090);
-        } catch (UnknownHostException e) {
-            throw new RuntimeException(e);
+            System.out.println("Body : " + requestBody);
+
+            HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
+            ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
         }
-
-        // Create the request entity with headers and body
-        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
-
-        // Send the POST request
-        ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
-        HttpStatusCode statusCode = responseEntity.getStatusCode();
-        if (statusCode == HttpStatus.OK) {
-            System.out.println("Update successful");
-        } else {
-            System.err.println("Update failed with status code: " + statusCode);
-        }
-
+        catch (UnknownHostException e) {throw new RuntimeException(e);}
     }
 
     public class ClusterMemberShipListener implements MembershipListener {
