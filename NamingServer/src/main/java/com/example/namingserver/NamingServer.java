@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import static java.lang.Math.abs;
 import static java.util.Collections.max;
@@ -277,8 +278,11 @@ public class NamingServer implements I_NamingServer {
             try {
                 Inet4Address ip_address = (Inet4Address) Inet4Address.getByName(s);
                 database.put(hash, ip_address);
+                TimeUnit.SECONDS.sleep(5);
                 welcomeClient(ip_address);
             } catch (UnknownHostException e) {
+                throw new RuntimeException(e);
+            } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
         }
