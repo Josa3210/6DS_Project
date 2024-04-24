@@ -238,8 +238,11 @@ public class NamingServer implements I_NamingServer {
         return new int[]{prevID, nextID};
     }
 
-    private void welcomeClient(Inet4Address clientIP) {
-        if (clientIP.equals(this.ip)) return;
+    private void welcomeClient(Inet4Address clientIP)
+    {
+        System.out.println("clientIP: " + clientIP.getHostAddress());
+        System.out.println("ip: " + this.ip.getHostAddress());
+        if (clientIP.getHostAddress().equals(this.ip.getHostAddress())) return;
 
         try
         {
