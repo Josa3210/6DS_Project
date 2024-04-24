@@ -159,7 +159,7 @@ public class Client implements I_Client {
 
     @Override
     public int[] requestLinkIds() {
-        String getUrl = "http://" + namingServerIP + "/ns/giveLinkID";
+        String getUrl = "http://" + namingServerIP.getHostAddress() + "/ns/giveLinkID";
         RestTemplate restTemplate = new RestTemplate();
 
         // Make the GET request
@@ -175,7 +175,7 @@ public class Client implements I_Client {
 
     @Override
     public Inet4Address requestLinkIPs(int linkID) {
-        String getUrl = "http://" + namingServerIP + "/ns/getIP";
+        String getUrl = "http://" + namingServerIP.getHostAddress() + "/ns/getIP";
 
         RestTemplate restTemplate = new RestTemplate();
 
@@ -259,7 +259,7 @@ public class Client implements I_Client {
     @Override
     public void ping(Inet4Address hostIP, String port) {
 
-        String uri = "http:/" + hostIP + ":" + port + "/test" + "?testString=test";
+        String uri = "http:/" + hostIP.getHostAddress() + ":" + port + "/test" + "?testString=test";
         System.out.println("Pinging " + uri);
         String answer = restClient.get().uri(uri).retrieve().body(String.class);
         System.out.println(answer);
@@ -283,10 +283,10 @@ public class Client implements I_Client {
         ResponseEntity<String> response;
         Inet4Address nextIP, prevIP;
         try {
-            response = restClient.post().uri("http:/" + this.namingServerIP + ":" + this.namingServerPort + "/project/getIP").body(nextID).retrieve().toEntity(String.class);
+            response = restClient.post().uri("http:/" + this.namingServerIP.getHostAddress() + ":" + this.namingServerPort + "/project/getIP").body(nextID).retrieve().toEntity(String.class);
             nextIP = (Inet4Address) InetAddress.getByName(response.getBody());
 
-            response = restClient.post().uri("http:/" + this.namingServerIP + ":" + this.namingServerPort + "/project/getIP").body(nextID).retrieve().toEntity(String.class);
+            response = restClient.post().uri("http:/" + this.namingServerIP.getHostAddress() + ":" + this.namingServerPort + "/project/getIP").body(nextID).retrieve().toEntity(String.class);
             prevIP = (Inet4Address) InetAddress.getByName(response.getBody());
         } catch (UnknownHostException e) {
             throw new RuntimeException(e);
@@ -296,7 +296,7 @@ public class Client implements I_Client {
         sendLinkID(prevIP, prevID, nextID);
 
         // Remove failed node from network
-        restClient.post().uri("http:/" + this.namingServerIP + ":" + this.namingServerPort + "/project/removeNode").body(failedNode).retrieve().toBodilessEntity();
+        restClient.post().uri("http:/" + this.namingServerIP.getHostAddress() + ":" + this.namingServerPort + "/project/removeNode").body(failedNode).retrieve().toBodilessEntity();
 
     }
 
