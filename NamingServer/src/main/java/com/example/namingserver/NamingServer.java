@@ -245,7 +245,7 @@ public class NamingServer implements I_NamingServer {
         {
             String ipString = InetAddress.getLocalHost().getHostAddress();
             System.out.println("IP : " + ipString);
-            String postUrl = "http://" + ipString + ":8080/welcome";
+            String postUrl = "http://" + clientIP + ":8080/welcome";
             System.out.println("URI : " + postUrl);
             
             RestTemplate restTemplate = new RestTemplate();
@@ -256,7 +256,7 @@ public class NamingServer implements I_NamingServer {
             Map<String, Object> requestBody = new HashMap<>();
             requestBody.put("nrNodes", sendNumNodes());
             requestBody.put("ip", ipString);
-            requestBody.put("port", 9090);
+            requestBody.put("port", 8080);
             System.out.println("Body : " + requestBody);
 
             HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
