@@ -196,46 +196,29 @@ public class NamingServer implements I_NamingServer {
     }
 
     @Override
-    public int[] giveLinkIds(int nodeID) {
-        // Step 1: Compute hash value for the nodeID
+    public int[] giveLinkIds(int nodeID)
+    {
         int hash = computeHash(Integer.toString(nodeID));
-
-        // Step 2: Retrieve the set of keys from the database
         Set<Integer> keys = this.database.getKeys();
 
-        // Step 3: Find previous and next IDs
-        int prevID = -1;
-        int nextID = -1;
-
         // Find the closest smaller and larger keys than the hash
-        int closestSmaller = -1;
-        int closestLarger = Integer.MAX_VALUE;
-        for (Integer key : keys) {
-            if (key < hash && key > closestSmaller) {
-                closestSmaller = key;
-            }
-            if (key > hash && key < closestLarger) {
-                closestLarger = key;
-            }
+        int prevID = -1, nextID = -1;
+        int closestSmaller = -1, closestLarger = Integer.MAX_VALUE;
+
+        for (Integer key : keys)
+        {
+            if (key < hash && key > closestSmaller) closestSmaller = key;
+            if (key > hash && key < closestLarger) closestLarger = key;
         }
 
         // Check if closestSmaller is still -1, meaning no smaller key found
-        if (closestSmaller != -1) {
-            prevID = closestSmaller;
-        } else {
-            // If no smaller key found, wrap around to the maximum key
-            prevID = max(keys);
-        }
+        if (closestSmaller != -1) prevID = closestSmaller;
+        else prevID = max(keys);
 
         // Check if closestLarger is still Integer.MAX_VALUE, meaning no larger key found
-        if (closestLarger != Integer.MAX_VALUE) {
-            nextID = closestLarger;
-        } else {
-            // If no larger key found, wrap around to the minimum key
-            nextID = Collections.min(keys);
-        }
+        if (closestLarger != Integer.MAX_VALUE) nextID = closestLarger;
+        else nextID = Collections.min(keys);
 
-        // Step 4: Return the previous and next IDs as an array
         return new int[]{prevID, nextID};
     }
 

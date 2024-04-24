@@ -163,12 +163,16 @@ public class Client implements I_Client {
         String getUrl = "http://" + namingServerIP.getHostAddress() + "/ns/giveLinkID";
         RestTemplate restTemplate = new RestTemplate();
 
+        System.out.println("RequestLinks---------------");
+        System.out.println("url requestLinks: " + getUrl);
+
         Map<String, Object> requestBody = new HashMap<>()
         {{
             put("nodeID", currentID);
         }};
 
-        // Make the GET request and parse the response
+        System.out.println("requestBody: " + requestBody);
+
         ResponseEntity<int[]> response = restTemplate.getForEntity(getUrl, int[].class, requestBody);
         System.out.println("response: " + response.getBody());
         return response.getBody();
