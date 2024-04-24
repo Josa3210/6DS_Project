@@ -245,7 +245,7 @@ public class NamingServer implements I_NamingServer {
         {
             String ipString = InetAddress.getLocalHost().getHostAddress();
             System.out.println("IP : " + ipString);
-            String postUrl = "http://" + clientIP.getHostAddress() + ":5701/welcome";
+            String postUrl = "http://" + clientIP.getHostAddress() + ":8080/welcome";
             System.out.println("URI : " + postUrl);
             
             RestTemplate restTemplate = new RestTemplate();
