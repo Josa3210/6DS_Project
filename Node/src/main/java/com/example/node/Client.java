@@ -158,15 +158,20 @@ public class Client implements I_Client {
     }
 
     @Override
-    public int[] requestLinkIds() {
+    public int[] requestLinkIds()
+    {
         String getUrl = "http://" + namingServerIP.getHostAddress() + "/ns/giveLinkID";
         RestTemplate restTemplate = new RestTemplate();
 
-        // Make the GET request
-        ResponseEntity<int[]> responseEntity = restTemplate.getForEntity(getUrl, int[].class);
+        Map<String, Object> requestBody = new HashMap<>()
+        {{
+            put("nodeID", currentID);
+        }};
 
-        // Return the link IDs
-        return responseEntity.getBody();
+        // Make the GET request and parse the response
+        ResponseEntity<int[]> response = restTemplate.getForEntity(getUrl, int[].class, requestBody);
+        System.out.println("response: " + response.getBody());
+        return response.getBody();
     }
 
     // Use "receiveLinkID" and "sendLinkID" from Shutdown
@@ -174,18 +179,24 @@ public class Client implements I_Client {
     /*Shutdown*/
 
     @Override
-    public Inet4Address requestLinkIPs(int linkID) {
+    public Inet4Address requestLinkIPs(int linkID)
+    {
         String getUrl = "http://" + namingServerIP.getHostAddress() + "/ns/getIP";
-
         RestTemplate restTemplate = new RestTemplate();
 
-        Inet4Address ip = restTemplate.getForObject(getUrl, Inet4Address.class);
+        Map<String, Object> requestBody = new HashMap<>()
+        {{
+            put("id", linkID);
+        }};
 
-        return ip;
+        ResponseEntity<Inet4Address> response = restTemplate.getForEntity(getUrl, Inet4Address.class, requestBody);
+        System.out.println("response: " + response.getBody());
+        return response.getBody();
     }
 
     @Override
-    public void shutDown() {
+    public void shutDown()
+    {
         int[] linkIds = requestLinkIds();
         int prevID = linkIds[0];
         int nextID = linkIds[1];
@@ -204,7 +215,8 @@ public class Client implements I_Client {
     }
 
     @Override
-    public void sendLinkID(Inet4Address nodeIP, int startID, int otherID) {
+    public void sendLinkID(Inet4Address nodeIP, int startID, int otherID)
+    {
         String postUrl = "http://" + nodeIP + "/shutdown/updateID";
 
         RestTemplate restTemplate = new RestTemplate();
@@ -212,22 +224,14 @@ public class Client implements I_Client {
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         // Create the request body
-        Map<String, Object> requestBody = new HashMap<>();
-
-        requestBody.put("prevID", startID);
-        requestBody.put("nextID", otherID);
-
-        // Create the request entity with headers and body
-        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
+        Map<String, Object> requestBody = new HashMap<>()
+        {{
+            put("prevID", startID);
+            put("nextID", otherID);
+        }};
 
         // Send the POST request
-        ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
-        HttpStatusCode statusCode = responseEntity.getStatusCode();
-        if (statusCode == HttpStatus.OK) {
-            System.out.println("Update successful");
-        } else {
-            System.err.println("Update failed with status code: " + statusCode);
-        }
+        restTemplate.postForEntity(postUrl, requestBody, Void.class);
     }
 
     @Override

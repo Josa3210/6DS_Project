@@ -54,8 +54,8 @@ public class RestControllerNS {
     }
 
     @GetMapping("/ns/getIp")
-    public Inet4Address getIp(@RequestParam String failedID){
-        int searchID = Integer.parseInt(failedID);
+    public Inet4Address getIp(@RequestBody Map<String, Object> request){
+        int searchID = Integer.parseInt(request.get("id").toString());
         return namingServer.getIP(searchID);
     }
 
