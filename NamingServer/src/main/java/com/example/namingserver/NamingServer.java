@@ -242,6 +242,7 @@ public class NamingServer implements I_NamingServer {
     {
         System.out.println("clientIP: " + clientIP.getHostAddress());
         System.out.println("ip: " + this.ip.getHostAddress());
+        System.out.println("CHECK: " + clientIP.getHostAddress().equals(this.ip.getHostAddress()));
         if (clientIP.getHostAddress().equals(this.ip.getHostAddress())) return;
 
         try
