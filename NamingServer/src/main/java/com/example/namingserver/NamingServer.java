@@ -278,7 +278,7 @@ public class NamingServer implements I_NamingServer {
             try {
                 Inet4Address ip_address = (Inet4Address) Inet4Address.getByName(s);
                 database.put(hash, ip_address);
-                TimeUnit.SECONDS.sleep(5);
+                TimeUnit.SECONDS.sleep(20);
                 welcomeClient(ip_address);
             } catch (UnknownHostException e) {
                 throw new RuntimeException(e);
