@@ -32,16 +32,20 @@ public class RestControllerDiscAndBoot {
     }
 
     @PostMapping("/welcome")
-    public void welcome(@RequestBody Map<String, Object> request) {
+    public void welcome(@RequestBody Map<String, Object> request)
+    {
+        System.out.println("Welcome --------------");
         int nrNodes =  Integer.parseInt((String) request.get("nrNodes"));
+        System.out.println("nrNodes: " + nrNodes);
         Inet4Address ipAddress = null;
-        try {
+        try
+        {
             ipAddress = (Inet4Address) InetAddress.getByName((String) request.get("ip"));
-        } catch (UnknownHostException e) {
-            throw new RuntimeException(e);
+            System.out.println("ipAddr: " + ipAddress);
         }
+        catch (UnknownHostException e) {throw new RuntimeException(e);}
         int port = Integer.parseInt((String) request.get("port"));
-
+        System.out.println("port: " + port);
         client.setupClient(nrNodes, ipAddress, port);
     }
 
