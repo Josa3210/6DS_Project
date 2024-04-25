@@ -219,7 +219,7 @@ public class Client implements I_Client {
     @Override
     public Inet4Address requestLinkIPs(int linkID)
     {
-        String getUrl = "http://" + namingServerIP.getHostAddress() + ":8080/ns/getIP/" + linkID;
+        String getUrl = "http://" + namingServerIP.getHostAddress() + ":8080/ns/getIp/" + linkID;
         RestTemplate restTemplate = new RestTemplate();
 
 
