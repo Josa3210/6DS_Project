@@ -64,16 +64,10 @@ public class RestControllerNS {
         return ("Test Communication : " + testString + "\n");
     }
 
-    @GetMapping("/ns/giveLinkID")
-    public int[] GiveLinkID(@RequestBody Map<String, Object> request)
+    @GetMapping("/ns/giveLinkID/{id}")
+    public int[] GiveLinkID(@PathVariable("id") int id)
     {
-        System.out.println("request: " + request.entrySet());
-
-        int nodeID = (Integer) request.get("nodeID");
-
-        System.out.println("nodeID: " + nodeID);
-
-        return namingServer.giveLinkIds(nodeID);
+        return namingServer.giveLinkIds(id);
     }
 
     /**

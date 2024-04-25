@@ -160,20 +160,13 @@ public class Client implements I_Client {
     @Override
     public int[] requestLinkIds()
     {
-        String getUrl = "http://" + namingServerIP.getHostAddress() + ":8080/ns/giveLinkID";
+        String getUrl = "http://" + namingServerIP.getHostAddress() + ":8080/ns/giveLinkID/" + currentID;
         RestTemplate restTemplate = new RestTemplate();
 
         System.out.println("RequestLinks---------------");
         System.out.println("url requestLinks: " + getUrl);
 
-        Map<String, Object> requestBody = new HashMap<>()
-        {{
-            put("nodeID", currentID);
-        }};
-
-        System.out.println("requestBody: " + requestBody);
-
-        ResponseEntity<int[]> response = restTemplate.getForEntity(getUrl, int[].class, requestBody);
+        ResponseEntity<int[]> response = restTemplate.getForEntity(getUrl, int[].class);
         System.out.println("response: " + response.getBody());
         return response.getBody();
     }
