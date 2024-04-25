@@ -23,7 +23,7 @@ public class RestControllerShutdown
     {
         int prevID = Integer.parseInt(request.get("prevID").toString());
         int nextID = Integer.parseInt(request.get("nextID").toString());
-
+        System.out.println("updating REST received---------");
         client.receiveLinkID(prevID, nextID);
     }
 }
