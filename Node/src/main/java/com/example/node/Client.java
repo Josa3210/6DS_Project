@@ -160,7 +160,7 @@ public class Client implements I_Client {
     @Override
     public int[] requestLinkIds()
     {
-        String getUrl = "http://" + namingServerIP.getHostAddress() + "/ns/giveLinkID";
+        String getUrl = "http://" + namingServerIP.getHostAddress() + ":8080/ns/giveLinkID";
         RestTemplate restTemplate = new RestTemplate();
 
         System.out.println("RequestLinks---------------");
@@ -185,7 +185,7 @@ public class Client implements I_Client {
     @Override
     public Inet4Address requestLinkIPs(int linkID)
     {
-        String getUrl = "http://" + namingServerIP.getHostAddress() + "/ns/getIP";
+        String getUrl = "http://" + namingServerIP.getHostAddress() + ":8080/ns/getIP";
         RestTemplate restTemplate = new RestTemplate();
 
         Map<String, Object> requestBody = new HashMap<>()
@@ -221,7 +221,7 @@ public class Client implements I_Client {
     @Override
     public void sendLinkID(Inet4Address nodeIP, int startID, int otherID)
     {
-        String postUrl = "http://" + nodeIP + "/shutdown/updateID";
+        String postUrl = "http://" + nodeIP + ":8080/shutdown/updateID";
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
