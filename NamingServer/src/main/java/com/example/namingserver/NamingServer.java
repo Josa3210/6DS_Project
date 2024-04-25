@@ -198,8 +198,10 @@ public class NamingServer implements I_NamingServer {
     @Override
     public int[] giveLinkIds(int nodeID)
     {
+        System.out.println("Giving link ids to client---------");
         int hash = computeHash(Integer.toString(nodeID));
         Set<Integer> keys = this.database.getKeys();
+        System.out.println("hash: " + hash);
 
         // Find the closest smaller and larger keys than the hash
         int prevID = -1, nextID = -1;
@@ -211,6 +213,8 @@ public class NamingServer implements I_NamingServer {
             if (key > hash && key < closestLarger) closestLarger = key;
         }
 
+        System.out.println("closest: " + closestLarger + "." + closestSmaller);
+
         // Check if closestSmaller is still -1, meaning no smaller key found
         if (closestSmaller != -1) prevID = closestSmaller;
         else prevID = max(keys);
@@ -218,6 +222,7 @@ public class NamingServer implements I_NamingServer {
         // Check if closestLarger is still Integer.MAX_VALUE, meaning no larger key found
         if (closestLarger != Integer.MAX_VALUE) nextID = closestLarger;
         else nextID = Collections.min(keys);
+        System.out.println("returning: " + nextID);
 
         return new int[]{prevID, nextID};
     }
