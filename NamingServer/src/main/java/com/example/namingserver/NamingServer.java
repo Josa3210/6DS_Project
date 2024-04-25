@@ -81,7 +81,7 @@ public class NamingServer implements I_NamingServer {
             this.database.load();
             System.out.println("Database in namingServer: ");
             this.database.print();
-            event_listener = new ClusterMemberShipListener();
+            event_listener = new ClusterMemberShipListener((NamingserverDB) this.database);
             NamingServer.CreateConfig();
             mapIP = hazelcastInstance.getMap("mapIP");
         } catch (FileNotFoundException e) {
@@ -259,13 +259,20 @@ public class NamingServer implements I_NamingServer {
     }
 
     public class ClusterMemberShipListener implements MembershipListener {
+        I_NamingserverDB database;
+
+        public ClusterMemberShipListener(NamingserverDB namingserverDB) {
+            this.database = namingserverDB;
+        }
+
         public void memberAdded(MembershipEvent membershipEvent) {
             String s = membershipEvent.getMember().getSocketAddress().toString();
             s = s.substring(s.indexOf("/") + 1, s.indexOf(":"));
             int hash = computeHash(s);
             try {
                 Inet4Address ip_address = (Inet4Address) Inet4Address.getByName(s);
-                database.put(hash, ip_address);
+                this.database.put(hash, ip_address);
+                this.database.print();
                 TimeUnit.SECONDS.sleep(20);
                 welcomeClient(ip_address);
             } catch (UnknownHostException e) {
@@ -281,7 +288,7 @@ public class NamingServer implements I_NamingServer {
             int hash = computeHash(s);
             try {
                 Inet4Address ip_address = (Inet4Address) Inet4Address.getByName(s);
-                database.put(hash, ip_address);
+                this.database.put(hash, ip_address);
             } catch (UnknownHostException e) {
                 throw new RuntimeException(e);
             }
