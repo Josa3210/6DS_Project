@@ -225,6 +225,7 @@ public class Client implements I_Client {
         ResponseEntity<String> response = restTemplate.getForEntity(getUrl, String.class);
         try
         {
+            System.out.println("Body: " + response.getBody());
             Inet4Address ip = (Inet4Address) InetAddress.getByName(response.getBody());
             System.out.println("response: " + response.getBody());
             return ip;
