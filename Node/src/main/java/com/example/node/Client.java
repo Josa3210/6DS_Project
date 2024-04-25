@@ -29,6 +29,7 @@ public class Client implements I_Client {
     private Inet4Address namingServerIP;
     private Integer namingServerPort;
     private String hostname;
+    private Logger logger;
 
     public Client(String hostname) {
         try {
@@ -37,6 +38,15 @@ public class Client implements I_Client {
             this.hostname = hostname;
             this.restClient = RestClient.create();
             this.currentIP = (Inet4Address) InetAddress.getLocalHost();
+
+            // We make a new logger file that keeps track of changes in the 'Files' map
+            logger = new Logger();
+
+            // We create a new thread to check if a new file is created or deleted ...
+            Thread fileMonitorThread = new Thread(new FileMonitor(this, "C:/Data/Java/6DS_Project/Node/Data/node/Files"));
+            fileMonitorThread.start();
+
+
         } catch (FileNotFoundException e) {
             System.err.println(e.getMessage());
         } catch (UnknownHostException e) {
@@ -62,6 +72,10 @@ public class Client implements I_Client {
         config.getManagementCenterConfig().setConsoleEnabled(true); // Enables the management center console.
         config.addListenerConfig(new ListenerConfig(event_listener));
         return config;
+    }
+
+    public Logger getLogger() {
+        return logger;
     }
 
     @Override
@@ -301,6 +315,33 @@ public class Client implements I_Client {
 
     }
 
+    /**
+     * Reports the filename the naming server.
+     *
+     * @param filename The name of the file.
+     */
+
+    @Override
+    public void reportFilenameToNamingServer(String filename) {
+
+        // Prepare the URL for reporting the hash value to the naming server
+        String postUrl = "http://localhost:9090/ns/reportFilename";
+
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("filename", filename);
+        requestBody.put("ip", currentIP);
+
+        // Make an HTTP POST request to report the hash value
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestBody, Void.class);
+
+        if (responseEntity.getStatusCode().is2xxSuccessful()) {
+            System.out.println("Hash value reported to naming server for file: " + filename);
+        } else {
+            System.err.println("Failed to report hash value to naming server for file: " + filename);
+        }
+    }
+
     public class ClusterMemberShipListener implements MembershipListener {
         public void memberAdded(MembershipEvent membershipEvent) {
             String s = membershipEvent.getMember().getSocketAddress().toString();
@@ -315,4 +356,6 @@ public class Client implements I_Client {
 
         }
     }
+
+
 }

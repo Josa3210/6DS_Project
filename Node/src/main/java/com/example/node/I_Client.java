@@ -99,4 +99,6 @@ public interface I_Client {
      * @param failedNode
      */
     void removeFromNetwork(String failedNode);
+
+    void reportFilenameToNamingServer(String filename);
 }
