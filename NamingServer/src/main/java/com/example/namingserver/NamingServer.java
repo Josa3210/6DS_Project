@@ -40,7 +40,7 @@ public class NamingServer implements I_NamingServer {
     /**
      * Database containing the IP's of the different nodes {@see I_NamingserverDB}
      */
-    I_NamingserverDB database;
+    private static I_NamingserverDB database;
     private InetAddress ip;
 
     public NamingServer() {
@@ -79,6 +79,7 @@ public class NamingServer implements I_NamingServer {
         try {
             this.ip = InetAddress.getLocalHost();
             database = new NamingserverDB();
+            System.out.println(database);
             this.database.load();
             event_listener = new ClusterMemberShipListener();
             NamingServer.CreateConfig();
@@ -295,7 +296,7 @@ public class NamingServer implements I_NamingServer {
         Integer fileHash = computeHash(filename);
         isReplicated = true;
 
-        String postUrl = "http:/" + replicatedIP + ":9090" + "/isReplicatedNode";
+        String postUrl = "http://localhost:8080/isReplicatedNode";
 
         // Create the request entity with headers and body
         HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
@@ -303,7 +304,7 @@ public class NamingServer implements I_NamingServer {
         try {
             // Send the POST request
             requestBody.put("hashValue", fileHash);
-            requestBody.put("original ip", originalIP);
+            requestBody.put("original ip",replicatedIP);
 
             ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
             HttpStatusCode statusCode = responseEntity.getStatusCode();

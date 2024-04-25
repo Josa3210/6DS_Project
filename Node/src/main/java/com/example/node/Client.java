@@ -21,11 +21,11 @@ public class Client implements I_Client {
 
     private static final String multicast_address = "224.2.2.5";
     private static ClusterMemberShipListener event_listener;
-    RestClient restClient;
+    private RestClient restClient;
     int currentID, nextID, prevID;
-    Config config;
-    Map<String, Inet4Address> ipMap;
-    Inet4Address currentIP;
+    private Config config;
+    private Map<String, Inet4Address> ipMap;
+    private Inet4Address currentIP;
     private Inet4Address namingServerIP;
     private Integer namingServerPort;
     private String hostname;
@@ -37,7 +37,7 @@ public class Client implements I_Client {
             this.config = createConfig();
             this.hostname = hostname;
             this.restClient = RestClient.create();
-            this.currentIP = (Inet4Address) InetAddress.getLocalHost();
+            this.currentIP = (Inet4Address) InetAddress.getByName(Inet4Address.getLocalHost().getHostAddress());
 
             // We make a new logger file that keeps track of changes in the 'Files' map
             logger = new Logger();
@@ -325,11 +325,11 @@ public class Client implements I_Client {
     public void reportFilenameToNamingServer(String filename) {
 
         // Prepare the URL for reporting the hash value to the naming server
-        String postUrl = "http://localhost:9090/ns/reportFilename";
+        String postUrl = "http://localhost:9090/ns/reportFileName";
 
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("filename", filename);
-        requestBody.put("ip", currentIP);
+        requestBody.put("ip", currentIP.toString());
 
         // Make an HTTP POST request to report the hash value
         RestTemplate restTemplate = new RestTemplate();

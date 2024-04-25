@@ -86,11 +86,11 @@ public class RestControllerNS {
      */
 
     @PostMapping("/ns/reportFileName")
-    public void reportFileHash(@RequestBody Map<String, Object> requestBody) {
+    public void reportFileHash(@RequestBody Map<String, Object> requestBody) throws UnknownHostException {
 
         String filename = (String) requestBody.get("filename");
-        Inet4Address originalIP = (Inet4Address) requestBody.get("ip");
-
+        String ipAddressString = (String) requestBody.get("ip");
+        Inet4Address originalIP = (Inet4Address) InetAddress.getByName(ipAddressString);
         namingServer.isReplicatedNode(filename, originalIP);
 
     }
