@@ -256,7 +256,7 @@ public class Client implements I_Client {
     @Override
     public void sendLinkID(Inet4Address nodeIP, int startID, int otherID)
     {
-        String postUrl = "http://" + nodeIP + ":8080/shutdown/updateID";
+        String postUrl = "http://" + nodeIP.getHostAddress() + ":8080/shutdown/updateID";
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
