@@ -139,6 +139,9 @@ public class Client implements I_Client {
         Inet4Address nextNodeIP = requestLinkIPs(nextID);
         Inet4Address prevNodeIP = requestLinkIPs(prevID);
 
+        System.out.println("Next node IP: " + nextNodeIP);
+        System.out.println("Prev node IP: " + prevNodeIP);
+
         // Send the previous ID to the next node
         sendLinkID(nextNodeIP, prevID, currentID);
 
@@ -257,7 +260,7 @@ public class Client implements I_Client {
     public void sendLinkID(Inet4Address nodeIP, int startID, int otherID)
     {
         String postUrl = "http://" + nodeIP.getHostAddress() + ":8080/shutdown/updateID";
-
+        System.out.println("Sending Link IDS to other Nodes----------------");
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -274,7 +277,9 @@ public class Client implements I_Client {
     }
 
     @Override
-    public void receiveLinkID(int prevID, int nextID) {
+    public void receiveLinkID(int prevID, int nextID)
+    {
+        System.out.println("Updating prev and next ID : current:" + currentID + "&next:" + nextID + "&prev:" + prevID);
         this.nextID = prevID == currentID ? nextID : currentID;
         this.prevID = nextID == currentID ? prevID : currentID;
     }
