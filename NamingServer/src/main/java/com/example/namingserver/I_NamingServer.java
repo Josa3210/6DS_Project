@@ -44,4 +44,6 @@ public interface I_NamingServer {
      * Return the nextID and previousID of the given ID
      */
     int[] giveLinkIds(int nodeID);
+
+    void isReplicatedNode(String filename, Inet4Address originalIP);
 }

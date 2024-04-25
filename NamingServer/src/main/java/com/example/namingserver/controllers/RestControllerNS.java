@@ -78,4 +78,20 @@ public class RestControllerNS {
     public void setNamingServer(NamingServer namingServer) {
         this.namingServer = namingServer;
     }
+
+    /**
+     * Reports the hash of a newly created file on the node and calculates if there are replicated nodes
+     *
+     * @param requestBody the JSON request body with "ip" as ip address
+     */
+
+    @PostMapping("/ns/reportFileName")
+    public void reportFileHash(@RequestBody Map<String, Object> requestBody) {
+
+        String filename = (String) requestBody.get("filename");
+        Inet4Address originalIP = (Inet4Address) requestBody.get("ip");
+
+        namingServer.isReplicatedNode(filename, originalIP);
+
+    }
 }
