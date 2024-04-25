@@ -39,7 +39,7 @@ public class NamingServer implements I_NamingServer {
     /**
      * Database containing the IP's of the different nodes {@see I_NamingserverDB}
      */
-    private I_NamingserverDB database;
+    private static I_NamingserverDB database;
     private InetAddress ip;
 
     public NamingServer() {
