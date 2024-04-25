@@ -143,10 +143,10 @@ public class Client implements I_Client {
         System.out.println("Prev node IP: " + prevNodeIP);
 
         // Send the previous ID to the next node
-        sendLinkID(nextNodeIP, prevID, currentID);
+        sendLinkID(nextNodeIP, currentID, nextID);
 
         // Send the next ID to the previous node
-        sendLinkID(prevNodeIP, currentID, nextID);
+        sendLinkID(prevNodeIP, prevID, currentID);
     }
 
     private void addNameToNS()
