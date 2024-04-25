@@ -138,6 +138,9 @@ public class Client implements I_Client {
     public void setupClient(int nrNodes, Inet4Address namingServerIP, int namingServerPort){
         this.namingServerIP = namingServerIP;
         this.namingServerPort = namingServerPort;
+
+        addNameToNS();
+
         if (nrNodes == 1){
             nextID = currentID;
             prevID = currentID;
@@ -146,6 +149,53 @@ public class Client implements I_Client {
             this.prevID = ids[0];
             this.nextID = ids[1];
         }
+
+        Inet4Address nextNodeIP = requestLinkIPs(nextID);
+        Inet4Address prevNodeIP = requestLinkIPs(prevID);
+
+        System.out.println("Next node IP: " + nextNodeIP);
+        System.out.println("Prev node IP: " + prevNodeIP);
+
+        int sendNextId = nextID == currentID ? prevID : nextID;
+        int sendPrevId = prevID == currentID ? nextID : prevID;
+
+        // Send the previous ID to the next node
+        sendLinkID(nextNodeIP, currentID, sendNextId);
+
+        // Send the next ID to the previous node
+        sendLinkID(prevNodeIP, sendPrevId, currentID);
+
+        //TODO : werkt bijna prefect, enkel de eerste node nexId wordt nooit geupdate omdat de twee volgende nodes
+        //TODO : hun ID lager zijn dan de eerste.
+    }
+
+    private void addNameToNS()
+    {
+        try
+        {
+            String ip = InetAddress.getLocalHost().getHostAddress();
+            String postUrl = "http://" + namingServerIP.getHostAddress() + ":8080/ns/addNode";
+
+            System.out.println("posturl: " + postUrl);
+            System.out.println("input: " + ip + "&" + hostname);
+
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            // Create the request body
+            Map<String, Object> requestBody = new HashMap<>()
+            {{
+                put("ip", ip);
+                put("name", hostname);
+            }};
+
+            System.out.println("Requesting...");
+
+            // Send the POST request
+            restTemplate.postForEntity(postUrl, requestBody, Void.class);
+        }
+        catch (UnknownHostException e) {throw new RuntimeException(e);}
     }
 
     /*Discovery + Bootstrap*/
@@ -192,17 +242,18 @@ public class Client implements I_Client {
     @Override
     public Inet4Address requestLinkIPs(int linkID)
     {
-        String getUrl = "http://" + namingServerIP.getHostAddress() + ":8080/ns/getIP";
+        String getUrl = "http://" + namingServerIP.getHostAddress() + ":8080/ns/getIp/" + linkID;
         RestTemplate restTemplate = new RestTemplate();
 
-        Map<String, Object> requestBody = new HashMap<>()
-        {{
-            put("id", linkID);
-        }};
-
-        ResponseEntity<Inet4Address> response = restTemplate.getForEntity(getUrl, Inet4Address.class, requestBody);
-        System.out.println("response: " + response.getBody());
-        return response.getBody();
+        ResponseEntity<String> response = restTemplate.getForEntity(getUrl, String.class);
+        try
+        {
+            System.out.println("Body: " + response.getBody());
+            Inet4Address ip = (Inet4Address) InetAddress.getByName(response.getBody());
+            System.out.println("response: " + response.getBody());
+            return ip;
+        }
+        catch (UnknownHostException e) {throw new RuntimeException(e);}
     }
 
     @Override
@@ -228,8 +279,8 @@ public class Client implements I_Client {
     @Override
     public void sendLinkID(Inet4Address nodeIP, int startID, int otherID)
     {
-        String postUrl = "http://" + nodeIP + ":8080/shutdown/updateID";
-
+        String postUrl = "http://" + nodeIP.getHostAddress() + ":8080/shutdown/updateID";
+        System.out.println("Sending Link IDS to other Nodes----------------");
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -246,9 +297,11 @@ public class Client implements I_Client {
     }
 
     @Override
-    public void receiveLinkID(int prevID, int nextID) {
-        this.nextID = prevID == currentID ? nextID : currentID;
-        this.prevID = nextID == currentID ? prevID : currentID;
+    public void receiveLinkID(int prevID, int nextID)
+    {
+        System.out.println("Updating prev and next ID : current:" + currentID + "&next:" + nextID + "&prev:" + prevID);
+        this.nextID = prevID == currentID ? nextID : this.nextID;
+        this.prevID = nextID == currentID ? prevID : this.prevID;
     }
 
     /**
@@ -315,11 +368,10 @@ public class Client implements I_Client {
 
     }
 
-    /**
-     * Reports the filename the naming server.
-     *
-     * @param filename The name of the file.
-     */
+    @Override
+    public void getName() {
+        System.out.println(this.hostname);
+    }
 
     @Override
     public void reportFilenameToNamingServer(String filename) {
