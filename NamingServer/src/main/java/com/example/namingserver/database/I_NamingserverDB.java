@@ -21,4 +21,6 @@ public interface I_NamingserverDB {
     Set<Integer> getKeys();
 
     void remove(int hash);
+
+    void print();
 }

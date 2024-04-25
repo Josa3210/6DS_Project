@@ -79,6 +79,7 @@ public class NamingServer implements I_NamingServer {
             this.ip = InetAddress.getLocalHost();
             database = new NamingserverDB();
             this.database.load();
+            System.out.println("Database in namingServer: " + this.database.print());
             event_listener = new ClusterMemberShipListener();
             NamingServer.CreateConfig();
             mapIP = hazelcastInstance.getMap("mapIP");
@@ -196,8 +197,7 @@ public class NamingServer implements I_NamingServer {
     }
 
     @Override
-    public int[] giveLinkIds(int nodeID)
-    {
+    public int[] giveLinkIds(int nodeID) {
         System.out.println("Giving link ids to client---------");
         int hash = computeHash(Integer.toString(nodeID));
         Set<Integer> keys = this.database.getKeys();
@@ -207,8 +207,7 @@ public class NamingServer implements I_NamingServer {
         int prevID = -1, nextID = -1;
         int closestSmaller = -1, closestLarger = Integer.MAX_VALUE;
 
-        for (Integer key : keys)
-        {
+        for (Integer key : keys) {
             if (key < hash && key > closestSmaller) closestSmaller = key;
             if (key > hash && key < closestLarger) closestLarger = key;
         }
@@ -227,24 +226,22 @@ public class NamingServer implements I_NamingServer {
         return new int[]{prevID, nextID};
     }
 
-    private void welcomeClient(Inet4Address clientIP)
-    {
+    private void welcomeClient(Inet4Address clientIP) {
         System.out.println("clientIP: " + clientIP.getHostAddress());
         System.out.println("ip: " + this.ip.getHostAddress());
         System.out.println("CHECK: " + clientIP.getHostAddress().equals(this.ip.getHostAddress()));
         if (clientIP.getHostAddress().equals(this.ip.getHostAddress())) return;
 
-        try
-        {
+        try {
             String ipString = InetAddress.getLocalHost().getHostAddress();
             System.out.println("IP : " + ipString);
             String postUrl = "http://" + clientIP.getHostAddress() + ":8080/welcome";
             System.out.println("URI : " + postUrl);
-            
+
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-    
+
             // Create the request body
             Map<String, Object> requestBody = new HashMap<>();
             requestBody.put("nrNodes", sendNumNodes());
@@ -254,8 +251,9 @@ public class NamingServer implements I_NamingServer {
 
             HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
             ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
+        } catch (UnknownHostException e) {
+            throw new RuntimeException(e);
         }
-        catch (UnknownHostException e) {throw new RuntimeException(e);}
     }
 
     public class ClusterMemberShipListener implements MembershipListener {

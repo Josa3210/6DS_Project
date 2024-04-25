@@ -185,6 +185,11 @@ public class NamingserverDB implements I_NamingserverDB {
         }
     }
 
+    @Override
+    public void print() {
+        System.out.println(this.nodeMap);
+    }
+
 }
 
 
