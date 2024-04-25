@@ -77,7 +77,7 @@ public class NamingServer implements I_NamingServer {
     public void init() {
         try {
             this.ip = InetAddress.getLocalHost();
-            database = new NamingserverDB();
+            this.database = new NamingserverDB();
             this.database.load();
             System.out.println("Database in namingServer: ");
             this.database.print();
