@@ -206,9 +206,10 @@ public class NamingServer implements I_NamingServer {
         System.out.println("hash: " + hash);
 
         // Find the closest smaller and larger keys than the hash
-        int prevID = -1, nextID = -1;
+        int prevID, nextID;
         int closestSmaller = -1, closestLarger = Integer.MAX_VALUE;
 
+        // Check if
         for (Integer key : keys) {
             if (key < hash && key > closestSmaller) closestSmaller = key;
             if (key > hash && key < closestLarger) closestLarger = key;
@@ -252,7 +253,7 @@ public class NamingServer implements I_NamingServer {
             System.out.println("Body : " + requestBody);
 
             HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
-            ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
+            restTemplate.postForEntity(postUrl, requestEntity, Void.class);
         } catch (UnknownHostException e) {
             throw new RuntimeException(e);
         }
