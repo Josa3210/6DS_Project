@@ -280,8 +280,8 @@ public class Client implements I_Client {
     public void receiveLinkID(int prevID, int nextID)
     {
         System.out.println("Updating prev and next ID : current:" + currentID + "&next:" + nextID + "&prev:" + prevID);
-        this.nextID = prevID == currentID ? nextID : currentID;
-        this.prevID = nextID == currentID ? prevID : currentID;
+        this.nextID = prevID == currentID ? nextID : this.nextID;
+        this.prevID = nextID == currentID ? prevID : this.prevID;
     }
 
     /**
