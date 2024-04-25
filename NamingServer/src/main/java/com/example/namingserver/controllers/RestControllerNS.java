@@ -56,7 +56,7 @@ public class RestControllerNS {
     @GetMapping("/ns/getIp/{id}")
     public String getIp(@PathVariable("id") int id)
     {
-        return namingServer.getIP(id).toString();
+        return namingServer.getIP(id).getHostAddress();
     }
 
     @GetMapping("/test")
