@@ -79,7 +79,8 @@ public class NamingServer implements I_NamingServer {
             this.ip = InetAddress.getLocalHost();
             database = new NamingserverDB();
             this.database.load();
-            System.out.println("Database in namingServer: " + this.database.print());
+            System.out.println("Database in namingServer: ");
+            this.database.print();
             event_listener = new ClusterMemberShipListener();
             NamingServer.CreateConfig();
             mapIP = hazelcastInstance.getMap("mapIP");
