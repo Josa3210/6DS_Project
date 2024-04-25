@@ -80,6 +80,7 @@ public class NamingserverDB implements I_NamingserverDB {
                 }
 
                 System.out.println("Map loaded from file: " + filePath);
+                System.out.println(nodeMap);
             } else {
                 // Create a new file if it doesn't exist
                 if (file.createNewFile()) {
@@ -121,6 +122,7 @@ public class NamingserverDB implements I_NamingserverDB {
 
 
     public Inet4Address get(Integer hash) {
+        System.out.println("Map: " + nodeMap);
         if (nodeMap != null) {
             Inet4Address address = nodeMap.get(hash);
             if (address == null) {
