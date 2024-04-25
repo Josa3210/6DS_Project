@@ -48,6 +48,7 @@ public class CLIDaemon {
                 }
                 case SHUTDOWN -> client.shutDown();
                 case GETLINKIDS -> client.printLinkIds();
+                case GETNAME -> client.getName();
             }
         }
     }

@@ -301,6 +301,11 @@ public class Client implements I_Client {
 
     }
 
+    @Override
+    public void getName() {
+        System.out.println(this.hostname);
+    }
+
     public class ClusterMemberShipListener implements MembershipListener {
         public void memberAdded(MembershipEvent membershipEvent) {
             String s = membershipEvent.getMember().getSocketAddress().toString();

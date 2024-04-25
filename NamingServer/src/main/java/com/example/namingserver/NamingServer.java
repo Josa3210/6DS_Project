@@ -122,7 +122,7 @@ public class NamingServer implements I_NamingServer {
             node = max(keys);
         }
 
-        return this.database.get(node);
+        return database.get(node);
     }
 
     /**
@@ -136,14 +136,14 @@ public class NamingServer implements I_NamingServer {
     @Override
     public void addNodeIP(String nodeName, Inet4Address ipaddress) {
         int hash = computeHash(nodeName);
-        this.database.put(hash, ipaddress);
+        database.put(hash, ipaddress);
 
         // Reallocate resources
     }
 
     @Override
     public Inet4Address getIP(int nodeID) {
-        return this.database.get(nodeID);
+        return database.get(nodeID);
     }
 
     /**
@@ -156,7 +156,7 @@ public class NamingServer implements I_NamingServer {
     @Override
     public void removeNodeIP(String nodeName) {
         int hash = computeHash(nodeName);
-        this.database.remove(hash);
+        database.remove(hash);
 
         // Reallocate resources
     }
@@ -188,7 +188,7 @@ public class NamingServer implements I_NamingServer {
     }
 
     public Inet4Address getIp(int id) {
-        return this.database.get(id);
+        return database.get(id);
     }
 
     @Override
@@ -200,9 +200,9 @@ public class NamingServer implements I_NamingServer {
     @Override
     public int[] giveLinkIds(int nodeID) {
         System.out.println("Giving link ids to client---------");
-        this.database.print();
+        database.print();
         int hash = computeHash(Integer.toString(nodeID));
-        Set<Integer> keys = this.database.getKeys();
+        Set<Integer> keys = database.getKeys();
         System.out.println("hash: " + hash);
 
         // Find the closest smaller and larger keys than the hash
@@ -268,16 +268,12 @@ public class NamingServer implements I_NamingServer {
         public void memberAdded(MembershipEvent membershipEvent) {
             String s = membershipEvent.getMember().getSocketAddress().toString();
             s = s.substring(s.indexOf("/") + 1, s.indexOf(":"));
-            int hash = computeHash(s);
+
             try {
                 Inet4Address ip_address = (Inet4Address) Inet4Address.getByName(s);
-                this.database.put(hash, ip_address);
-                this.database.print();
                 TimeUnit.SECONDS.sleep(20);
                 welcomeClient(ip_address);
-            } catch (UnknownHostException e) {
-                throw new RuntimeException(e);
-            } catch (InterruptedException e) {
+            } catch (UnknownHostException | InterruptedException e) {
                 throw new RuntimeException(e);
             }
         }
