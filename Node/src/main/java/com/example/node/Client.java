@@ -135,6 +135,15 @@ public class Client implements I_Client {
             this.prevID = ids[0];
             this.nextID = ids[1];
         }
+
+        Inet4Address nextNodeIP = requestLinkIPs(nextID);
+        Inet4Address prevNodeIP = requestLinkIPs(prevID);
+
+        // Send the previous ID to the next node
+        sendLinkID(nextNodeIP, prevID, currentID);
+
+        // Send the next ID to the previous node
+        sendLinkID(prevNodeIP, currentID, nextID);
     }
 
     private void addNameToNS()
@@ -210,15 +219,11 @@ public class Client implements I_Client {
     @Override
     public Inet4Address requestLinkIPs(int linkID)
     {
-        String getUrl = "http://" + namingServerIP.getHostAddress() + ":8080/ns/getIP";
+        String getUrl = "http://" + namingServerIP.getHostAddress() + ":8080/ns/getIP/" + linkID;
         RestTemplate restTemplate = new RestTemplate();
 
-        Map<String, Object> requestBody = new HashMap<>()
-        {{
-            put("id", linkID);
-        }};
 
-        ResponseEntity<Inet4Address> response = restTemplate.getForEntity(getUrl, Inet4Address.class, requestBody);
+        ResponseEntity<Inet4Address> response = restTemplate.getForEntity(getUrl, Inet4Address.class);
         System.out.println("response: " + response.getBody());
         return response.getBody();
     }

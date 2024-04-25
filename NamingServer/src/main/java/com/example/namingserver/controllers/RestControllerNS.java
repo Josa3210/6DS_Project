@@ -53,10 +53,10 @@ public class RestControllerNS {
         namingServer.removeNodeIP(failedNode);
     }
 
-    @GetMapping("/ns/getIp")
-    public Inet4Address getIp(@RequestBody Map<String, Object> request){
-        int searchID = Integer.parseInt(request.get("id").toString());
-        return namingServer.getIP(searchID);
+    @GetMapping("/ns/getIp/{id}")
+    public Inet4Address getIp(@PathVariable("id") int id)
+    {
+        return namingServer.getIP(id);
     }
 
     @GetMapping("/test")
