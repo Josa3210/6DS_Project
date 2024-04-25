@@ -124,6 +124,9 @@ public class Client implements I_Client {
     public void setupClient(int nrNodes, Inet4Address namingServerIP, int namingServerPort){
         this.namingServerIP = namingServerIP;
         this.namingServerPort = namingServerPort;
+
+        addNameToNS();
+
         if (nrNodes == 1){
             nextID = currentID;
             prevID = currentID;
@@ -132,6 +135,35 @@ public class Client implements I_Client {
             this.prevID = ids[0];
             this.nextID = ids[1];
         }
+    }
+
+    private void addNameToNS()
+    {
+        try
+        {
+            String ip = InetAddress.getLocalHost().getHostAddress();
+            String postUrl = "http://" + namingServerIP + ":8080/ns/addNode";
+
+            System.out.println("posturl: " + postUrl);
+            System.out.println("input: " + ip + "&" + hostname);
+
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            // Create the request body
+            Map<String, Object> requestBody = new HashMap<>()
+            {{
+                put("ip", ip);
+                put("name", hostname);
+            }};
+
+            System.out.println("Requesting...");
+
+            // Send the POST request
+            restTemplate.postForEntity(postUrl, requestBody, Void.class);
+        }
+        catch (UnknownHostException e) {throw new RuntimeException(e);}
     }
 
     /*Discovery + Bootstrap*/
