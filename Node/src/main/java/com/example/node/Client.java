@@ -150,6 +150,9 @@ public class Client implements I_Client {
 
         // Send the next ID to the previous node
         sendLinkID(prevNodeIP, sendPrevId, currentID);
+
+        //TODO : werkt bijna prefect, enkel de eerste node nexId wordt nooit geupdate omdat de twee volgende nodes
+        //TODO : hun ID lager zijn dan de eerste.
     }
 
     private void addNameToNS()
