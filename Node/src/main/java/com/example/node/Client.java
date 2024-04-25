@@ -222,10 +222,14 @@ public class Client implements I_Client {
         String getUrl = "http://" + namingServerIP.getHostAddress() + ":8080/ns/getIp/" + linkID;
         RestTemplate restTemplate = new RestTemplate();
 
-
-        ResponseEntity<Inet4Address> response = restTemplate.getForEntity(getUrl, Inet4Address.class);
-        System.out.println("response: " + response.getBody());
-        return response.getBody();
+        ResponseEntity<String> response = restTemplate.getForEntity(getUrl, String.class);
+        try
+        {
+            Inet4Address ip = (Inet4Address) InetAddress.getByName(response.getBody());
+            System.out.println("response: " + response.getBody());
+            return ip;
+        }
+        catch (UnknownHostException e) {throw new RuntimeException(e);}
     }
 
     @Override

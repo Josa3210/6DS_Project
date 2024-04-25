@@ -54,9 +54,9 @@ public class RestControllerNS {
     }
 
     @GetMapping("/ns/getIp/{id}")
-    public Inet4Address getIp(@PathVariable("id") int id)
+    public String getIp(@PathVariable("id") int id)
     {
-        return namingServer.getIP(id);
+        return namingServer.getIP(id).toString();
     }
 
     @GetMapping("/test")
