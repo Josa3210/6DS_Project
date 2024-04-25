@@ -102,14 +102,15 @@ public class NamingServer implements I_NamingServer {
      */
     @Override
     public Inet4Address getLocationIP(String filename) {
+        // Get hash of the file name
         int hash = computeHash(filename);
-        Set<Integer> keys = this.database.getKeys();
 
         // Setup variables
         double smallestDist = Double.POSITIVE_INFINITY;
         int node = 0;
 
         // Calculate distance
+        Set<Integer> keys = database.getKeys();
         for (Integer key : keys) {
             double dist = abs(key - hash);
             if (dist < smallestDist) {
@@ -209,10 +210,10 @@ public class NamingServer implements I_NamingServer {
         int prevID, nextID;
         int closestSmaller = -1, closestLarger = Integer.MAX_VALUE;
 
-        // Check if
+        // Check for the closest hash on the upside and downside
         for (Integer key : keys) {
-            if (key < hash && key > closestSmaller) closestSmaller = key;
-            if (key > hash && key < closestLarger) closestLarger = key;
+            if (closestSmaller < key && key < hash) closestSmaller = key;
+            if (hash < key && key < closestLarger) closestLarger = key;
         }
 
         System.out.println("closest: " + closestLarger + "." + closestSmaller);
