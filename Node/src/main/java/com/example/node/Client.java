@@ -142,7 +142,7 @@ public class Client implements I_Client {
         try
         {
             String ip = InetAddress.getLocalHost().getHostAddress();
-            String postUrl = "http://" + namingServerIP + ":8080/ns/addNode";
+            String postUrl = "http://" + namingServerIP.getHostAddress() + ":8080/ns/addNode";
 
             System.out.println("posturl: " + postUrl);
             System.out.println("input: " + ip + "&" + hostname);
