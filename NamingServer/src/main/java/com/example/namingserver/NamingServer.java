@@ -199,10 +199,9 @@ public class NamingServer implements I_NamingServer {
     }
 
     @Override
-    public int[] giveLinkIds(int nodeID) {
+    public int[] giveLinkIds(int hash) {
         System.out.println("Giving link ids to client---------");
         database.print();
-        int hash = computeHash(Integer.toString(nodeID));
         Set<Integer> keys = database.getKeys();
         System.out.println("hash: " + hash);
 

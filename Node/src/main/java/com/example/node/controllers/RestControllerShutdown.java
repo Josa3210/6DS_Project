@@ -26,6 +26,7 @@ public class RestControllerShutdown
         System.out.println("updating REST received---------");
         client.receiveLinkID(prevID, nextID);
         // code hierboven moet verwijderd worden
+        // Wordt hier aangeroepen omdat dan elke keer zowel next als prev wordt aangepast.
         int[] ids = client.requestLinkIds();
         client.setPrevID(ids[0]);
         client.setNextID(ids[1]);
