@@ -258,9 +258,17 @@ public class Client implements I_Client {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         Map<String, Object> requestBody = new HashMap<>();
-        ResponseEntity<Void> requestEntity = restTemplate.postForEntity(postUrl, requestBody, Void.class);
 
-        if (!requestEntity.getStatusCode().is2xxSuccessful()){
+        try {
+
+
+            ResponseEntity<Void> requestEntity = restTemplate.postForEntity(postUrl, requestBody, Void.class);
+
+            if (!requestEntity.getStatusCode().is2xxSuccessful()) {
+                removeFromNetwork(nodeID);
+            }
+        } catch (Exception e){
+            System.out.println("Failed comms: removing " + nodeID);
             removeFromNetwork(nodeID);
         }
     }
@@ -312,14 +320,18 @@ public class Client implements I_Client {
         String uri = "http://" + nodeIP.getHostAddress() + ":8080/test" + "?testString=test";
         System.out.println("Pinging " + uri);
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> responseEntity = restTemplate.getForEntity(uri, String.class);
+        try {
+            ResponseEntity<String> responseEntity = restTemplate.getForEntity(uri, String.class);
+            System.out.println(responseEntity.getBody());
 
-
-        System.out.println(responseEntity.getBody());
-
-        if (!responseEntity.getStatusCode().is2xxSuccessful()){
+            if (!responseEntity.getStatusCode().is2xxSuccessful()) {
+                removeFromNetwork(nodeID);
+            }
+        } catch (Exception e) {
+            System.out.println("Failed comms: removing " + nodeID);
             removeFromNetwork(nodeID);
         }
+
     }
 
     /*Failure*/
