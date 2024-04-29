@@ -251,6 +251,8 @@ public class Client implements I_Client {
 
         sendLinkID(nextNodeIP);
         sendLinkID(prevNodeIP);
+
+        ClientApplication.exitApplication();
     }
 
     @Override
