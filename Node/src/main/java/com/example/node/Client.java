@@ -373,4 +373,12 @@ public class Client implements I_Client {
 
         }
     }
+
+    public void setNextID(int nextID) {
+        this.nextID = nextID;
+    }
+
+    public void setPrevID(int prevID) {
+        this.prevID = prevID;
+    }
 }

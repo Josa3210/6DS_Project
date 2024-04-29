@@ -25,5 +25,9 @@ public class RestControllerShutdown
         int nextID = Integer.parseInt(request.get("nextID").toString());
         System.out.println("updating REST received---------");
         client.receiveLinkID(prevID, nextID);
+        // code hierboven moet verwijderd worden
+        int[] ids = client.requestLinkIds();
+        client.setPrevID(ids[0]);
+        client.setNextID(ids[1]);
     }
 }
