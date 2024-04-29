@@ -57,7 +57,10 @@ public interface I_Client {
      * If otherID == nodeID than startID = prevID
      * </p>
      */
-    void sendLinkID(Inet4Address nodeIP);
+    void sendLinkID(int nodeID);
+
+    int[] requestLinkIds(int requestID);
+
 
     Inet4Address requestLinkIPs(int linkID);
 
@@ -82,6 +85,8 @@ public interface I_Client {
 
     /*Failure*/
 
+    void removeFromNS(int removeID);
+
     /**
      * Check for connection with other host
      *
@@ -94,9 +99,9 @@ public interface I_Client {
     /**
      * Reaction to a failure during communication with another node.
      *
-     * @param failedNode
+     * @param failedID
      */
-    void removeFromNetwork(String failedNode);
+    void removeFromNetwork(int failedID);
 
     void getName();
 }

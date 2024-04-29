@@ -55,7 +55,6 @@ public class RestControllerDiscAndBoot {
     }
 
     @GetMapping("/createinstance")
-
     public Object createHazelcastInstance() throws JsonProcessingException {
         return JSONObject.wrap((Object) Hazelcast.newHazelcastInstance(config));
     }
