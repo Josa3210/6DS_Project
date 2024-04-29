@@ -121,6 +121,7 @@ public class NamingserverDB implements I_NamingserverDB {
 
 
     public Inet4Address get(Integer hash) {
+        System.out.println("Map: " + nodeMap);
         if (nodeMap != null) {
             Inet4Address address = nodeMap.get(hash);
             if (address == null) {
@@ -181,6 +182,11 @@ public class NamingserverDB implements I_NamingserverDB {
         } else {
             System.err.println("Database is not initialized. Please load the database first.");
         }
+    }
+
+    @Override
+    public void print() {
+        System.out.println(this.nodeMap);
     }
 
 }

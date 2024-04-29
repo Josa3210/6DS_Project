@@ -39,15 +39,10 @@ public class CLIDaemon {
             command = commandParser.parse(inputString);
             args = command.getArgs();
             switch (command) {
-                case PING -> {
-                    try {
-                        client.ping((Inet4Address) InetAddress.getByName(args[0]), args[1]);
-                    } catch (UnknownHostException e) {
-                        print("Could not find address: " + args[0]);
-                    }
-                }
+                case PING -> client.ping(Integer.parseInt(args[0]));
                 case SHUTDOWN -> client.shutDown();
                 case GETLINKIDS -> client.printLinkIds();
+                case GETNAME -> client.getName();
             }
         }
     }

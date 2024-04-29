@@ -48,15 +48,14 @@ public class RestControllerNS {
      * @param request the JSON request body with "ip" as ip address
      */
     @PostMapping("/ns/removeNode")
-    public void removeNode(@RequestBody Map<String, Object> request) throws UnknownHostException {
-        String failedNode = (String) request.get("failedNode");
-        namingServer.removeNodeIP(failedNode);
+    public void removeNode(@RequestBody Map<String, Object> request) {
+        int nodeID = Integer.parseInt(request.get("nodeID").toString());
+        namingServer.removeNodeIP(nodeID);
     }
 
-    @GetMapping("/ns/getIp")
-    public Inet4Address getIp(@RequestParam String failedID){
-        int searchID = Integer.parseInt(failedID);
-        return namingServer.getIP(searchID);
+    @GetMapping("/ns/getIp/{id}")
+    public String getIp(@PathVariable("id") int id) {
+        return namingServer.getIP(id).getHostAddress();
     }
 
     @GetMapping("/test")
@@ -64,11 +63,9 @@ public class RestControllerNS {
         return ("Test Communication : " + testString + "\n");
     }
 
-    @GetMapping("/ns/giveLinkID")
-    public int[] GiveLinkID(@RequestBody Map<String, Object> request)
-    {
-        int nodeID = (Integer) request.get("nodeID");
-        return namingServer.giveLinkIds(nodeID);
+    @GetMapping("/ns/giveLinkID/{id}")
+    public int[] GiveLinkID(@PathVariable("id") int id) {
+        return namingServer.giveLinkIds(id);
     }
 
     /**

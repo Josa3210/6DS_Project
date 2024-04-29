@@ -32,16 +32,20 @@ public class RestControllerDiscAndBoot {
     }
 
     @PostMapping("/welcome")
-    public void welcome(@RequestBody Map<String, Object> request) {
-        int nrNodes =  Integer.parseInt((String) request.get("nrNodes"));
+    public void welcome(@RequestBody Map<String, Object> request)
+    {
+        System.out.println("Welcome --------------");
+        int nrNodes =  Integer.parseInt(request.get("nrNodes").toString());
+        System.out.println("nrNodes: " + nrNodes);
         Inet4Address ipAddress = null;
-        try {
+        try
+        {
             ipAddress = (Inet4Address) InetAddress.getByName((String) request.get("ip"));
-        } catch (UnknownHostException e) {
-            throw new RuntimeException(e);
+            System.out.println("ipAddr: " + ipAddress);
         }
-        int port = Integer.parseInt((String) request.get("port"));
-
+        catch (UnknownHostException e) {throw new RuntimeException(e);}
+        int port = Integer.parseInt(request.get("port").toString());
+        System.out.println("port: " + port);
         client.setupClient(nrNodes, ipAddress, port);
     }
 
@@ -51,7 +55,6 @@ public class RestControllerDiscAndBoot {
     }
 
     @GetMapping("/createinstance")
-
     public Object createHazelcastInstance() throws JsonProcessingException {
         return JSONObject.wrap((Object) Hazelcast.newHazelcastInstance(config));
     }

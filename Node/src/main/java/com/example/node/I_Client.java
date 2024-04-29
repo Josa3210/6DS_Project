@@ -57,9 +57,13 @@ public interface I_Client {
      * If otherID == nodeID than startID = prevID
      * </p>
      */
-    void sendLinkID(Inet4Address nodeIP, int startID, int otherID);
+    void sendLinkID(int nodeID);
 
-    Inet4Address requestLinkIPs(int linkID);
+    int[] requestLinkIds(int requestID);
+
+
+    Inet4Address requestIP(int linkID);
+
     int[] requestLinkIds();
 
     /**
@@ -76,13 +80,12 @@ public interface I_Client {
      * <p>
      * Can also give own IP to be removed
      * </p>
-     *
-     * @param nsIP   IP of the namingServer
-     * @param nodeIP IP of the node to be removed
      */
-    void removeFromNS(Inet4Address nsIP, Inet4Address nodeIP);
+    void removeFromNS();
 
     /*Failure*/
+
+    void removeFromNS(int removeID);
 
     /**
      * Check for connection with other host
@@ -91,12 +94,14 @@ public interface I_Client {
      * @param arg
      * @return
      */
-    void ping(Inet4Address hostIP, String arg);
+    void ping(int nodeID);
 
     /**
      * Reaction to a failure during communication with another node.
      *
-     * @param failedNode
+     * @param failedID
      */
-    void removeFromNetwork(String failedNode);
+    void removeFromNetwork(int failedID);
+
+    void getName();
 }

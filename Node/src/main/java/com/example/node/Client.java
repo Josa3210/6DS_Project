@@ -121,16 +121,55 @@ public class Client implements I_Client {
     }
 
 
-    public void setupClient(int nrNodes, Inet4Address namingServerIP, int namingServerPort){
+    public void setupClient(int nrNodes, Inet4Address namingServerIP, int namingServerPort) {
         this.namingServerIP = namingServerIP;
         this.namingServerPort = namingServerPort;
-        if (nrNodes == 1){
+
+        addNameToNS();
+
+        if (nrNodes == 1) {
             nextID = currentID;
             prevID = currentID;
         } else {
             int[] ids = requestLinkIds();
             this.prevID = ids[0];
             this.nextID = ids[1];
+        }
+
+        System.out.println("Next node ID: " + nextID);
+        System.out.println("Prev node ID: " + prevID);
+
+        sendLinkID(nextID);
+        sendLinkID(prevID);
+
+        //TODO : werkt bijna prefect, enkel de eerste node nexId wordt nooit geupdate omdat de twee volgende nodes
+        //TODO : hun ID lager zijn dan de eerste.
+    }
+
+    private void addNameToNS() {
+        try {
+            String ip = InetAddress.getLocalHost().getHostAddress();
+            String postUrl = "http://" + namingServerIP.getHostAddress() + ":8080/ns/addNode";
+
+            System.out.println("posturl: " + postUrl);
+            System.out.println("input: " + ip + "&" + hostname);
+
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            // Create the request body
+            Map<String, Object> requestBody = new HashMap<>() {{
+                put("ip", ip);
+                put("name", hostname);
+            }};
+
+            System.out.println("Requesting...");
+
+            // Send the POST request
+            restTemplate.postForEntity(postUrl, requestBody, Void.class);
+        } catch (UnknownHostException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -159,14 +198,20 @@ public class Client implements I_Client {
 
     @Override
     public int[] requestLinkIds() {
-        String getUrl = "http://" + namingServerIP + "/ns/giveLinkID";
+        return requestLinkIds(currentID);
+    }
+
+    @Override
+    public int[] requestLinkIds(int requestID) {
+        String getUrl = "http://" + namingServerIP.getHostAddress() + ":8080/ns/giveLinkID/" + requestID;
         RestTemplate restTemplate = new RestTemplate();
 
-        // Make the GET request
-        ResponseEntity<int[]> responseEntity = restTemplate.getForEntity(getUrl, int[].class);
+        System.out.println("RequestLinks---------------");
+        System.out.println("url requestLinks: " + getUrl);
 
-        // Return the link IDs
-        return responseEntity.getBody();
+        ResponseEntity<int[]> response = restTemplate.getForEntity(getUrl, int[].class);
+        System.out.println("response: " + response.getBody()[0] + "&" + response.getBody()[1]);
+        return response.getBody();
     }
 
     // Use "receiveLinkID" and "sendLinkID" from Shutdown
@@ -174,14 +219,19 @@ public class Client implements I_Client {
     /*Shutdown*/
 
     @Override
-    public Inet4Address requestLinkIPs(int linkID) {
-        String getUrl = "http://" + namingServerIP + "/ns/getIP";
-
+    public Inet4Address requestIP(int nodeID) {
+        String getUrl = "http://" + namingServerIP.getHostAddress() + ":8080/ns/getIp/" + nodeID;
         RestTemplate restTemplate = new RestTemplate();
 
-        Inet4Address ip = restTemplate.getForObject(getUrl, Inet4Address.class);
-
-        return ip;
+        ResponseEntity<String> response = restTemplate.getForEntity(getUrl, String.class);
+        try {
+            System.out.println("Body: " + response.getBody());
+            Inet4Address ip = (Inet4Address) InetAddress.getByName(response.getBody());
+            System.out.println("response: " + response.getBody());
+            return ip;
+        } catch (UnknownHostException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -190,50 +240,44 @@ public class Client implements I_Client {
         int prevID = linkIds[0];
         int nextID = linkIds[1];
 
-        Inet4Address nextNodeIP = requestLinkIPs(nextID);
-        Inet4Address prevNodeIP = requestLinkIPs(prevID);
-
-        // Send the previous ID to the next node
-        sendLinkID(nextNodeIP, prevID, currentID);
-
-        // Send the next ID to the previous node
-        sendLinkID(prevNodeIP, currentID, nextID);
-
         // Remove from the naming server
-        removeFromNS(namingServerIP, currentIP);
+        removeFromNS();
+
+        sendLinkID(nextID);
+        sendLinkID(prevID);
+
+        ClientApplication.exitApplication();
     }
 
     @Override
-    public void sendLinkID(Inet4Address nodeIP, int startID, int otherID) {
-        String postUrl = "http://" + nodeIP + "/shutdown/updateID";
-
+    public void sendLinkID(int nodeID) {
+        Inet4Address nodeIP = requestIP(nodeID);
+        String postUrl = "http://" + nodeIP.getHostAddress() + ":8080/shutdown/updateID";
+        System.out.println("Sending Link IDS to other Nodes----------------");
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-
-        // Create the request body
         Map<String, Object> requestBody = new HashMap<>();
 
-        requestBody.put("prevID", startID);
-        requestBody.put("nextID", otherID);
+        try {
 
-        // Create the request entity with headers and body
-        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
 
-        // Send the POST request
-        ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
-        HttpStatusCode statusCode = responseEntity.getStatusCode();
-        if (statusCode == HttpStatus.OK) {
-            System.out.println("Update successful");
-        } else {
-            System.err.println("Update failed with status code: " + statusCode);
+            ResponseEntity<Void> requestEntity = restTemplate.postForEntity(postUrl, requestBody, Void.class);
+
+            if (!requestEntity.getStatusCode().is2xxSuccessful()) {
+                removeFromNetwork(nodeID);
+            }
+        } catch (Exception e){
+            System.out.println("Failed comms: removing " + nodeID);
+            removeFromNetwork(nodeID);
         }
     }
 
     @Override
     public void receiveLinkID(int prevID, int nextID) {
-        this.nextID = prevID == currentID ? nextID : currentID;
-        this.prevID = nextID == currentID ? prevID : currentID;
+        System.out.println("Updating prev and next ID : current:" + currentID + "&next:" + nextID + "&prev:" + prevID);
+        this.nextID = prevID == currentID ? nextID : this.nextID;
+        this.prevID = nextID == currentID ? prevID : this.prevID;
     }
 
     /**
@@ -241,28 +285,53 @@ public class Client implements I_Client {
      * <p>
      * Can also give own IP to be removed
      * </p>
-     *
-     * @param nsIP   IP of the namingServer
-     * @param nodeIP IP of the node to be removed
      */
     @Override
-    public void removeFromNS(Inet4Address nsIP, Inet4Address nodeIP) {
+    public void removeFromNS() {
+        removeFromNS(currentID);
+    }
 
+    @Override
+    public void removeFromNS(int removeID) {
+        String postUrl = "http://" + namingServerIP.getHostAddress() + ":8080/ns/removeNode";
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        // Create the request body
+        Map<String, Object> requestBody = new HashMap<>() {{
+            put("nodeID", removeID);
+        }};
+
+        System.out.println("Requesting...");
+
+        // Send the POST request
+        restTemplate.postForEntity(postUrl, requestBody, Void.class);
     }
 
     /**
      * Check for connection with other host
      *
-     * @param hostIP IP of the host to reach
-     * @param port   port to ping to
+     * @param hostID
      */
     @Override
-    public void ping(Inet4Address hostIP, String port) {
+    public void ping(int nodeID) {
+        Inet4Address nodeIP = requestIP(nodeID);
 
-        String uri = "http:/" + hostIP + ":" + port + "/test" + "?testString=test";
+        String uri = "http://" + nodeIP.getHostAddress() + ":8080/test" + "?testString=test";
         System.out.println("Pinging " + uri);
-        String answer = restClient.get().uri(uri).retrieve().body(String.class);
-        System.out.println(answer);
+        RestTemplate restTemplate = new RestTemplate();
+        try {
+            ResponseEntity<String> responseEntity = restTemplate.getForEntity(uri, String.class);
+            System.out.println(responseEntity.getBody());
+
+            if (!responseEntity.getStatusCode().is2xxSuccessful()) {
+                removeFromNetwork(nodeID);
+            }
+        } catch (Exception e) {
+            System.out.println("Failed comms: removing " + nodeID);
+            removeFromNetwork(nodeID);
+        }
+
     }
 
     /*Failure*/
@@ -270,34 +339,32 @@ public class Client implements I_Client {
     /**
      * Reaction to a failure during communication with another node.
      *
-     * @param failedNode
+     * @param failedID
      */
     @Override
-    public void removeFromNetwork(String failedNode) {
-        int nextID = 1;
-        int prevID = 2;
-        // Get linkID's from NS (now with examples because function in NS is not yet made)
-        // nextID, prevID = APIGetLinkIDs(failedIP)
+    public void removeFromNetwork(int failedID) {
+        int[] ids = requestLinkIds(failedID);
 
-        // Get IP addresses of the link IDs
-        ResponseEntity<String> response;
-        Inet4Address nextIP, prevIP;
-        try {
-            response = restClient.post().uri("http:/" + this.namingServerIP + ":" + this.namingServerPort + "/project/getIP").body(nextID).retrieve().toEntity(String.class);
-            nextIP = (Inet4Address) InetAddress.getByName(response.getBody());
+        // remove failed node from network
+        removeFromNS(failedID);
 
-            response = restClient.post().uri("http:/" + this.namingServerIP + ":" + this.namingServerPort + "/project/getIP").body(nextID).retrieve().toEntity(String.class);
-            prevIP = (Inet4Address) InetAddress.getByName(response.getBody());
-        } catch (UnknownHostException e) {
-            throw new RuntimeException(e);
-        }
         // Send prevID to nextIP and nextID to prevID
-        sendLinkID(nextIP, prevID, nextID);
-        sendLinkID(prevIP, prevID, nextID);
+        sendLinkID(ids[0]);
+        sendLinkID(ids[1]);
 
-        // Remove failed node from network
-        restClient.post().uri("http:/" + this.namingServerIP + ":" + this.namingServerPort + "/project/removeNode").body(failedNode).retrieve().toBodilessEntity();
+    }
 
+    @Override
+    public void getName() {
+        System.out.println(this.hostname);
+    }
+
+    public void setNextID(int nextID) {
+        this.nextID = nextID;
+    }
+
+    public void setPrevID(int prevID) {
+        this.prevID = prevID;
     }
 
     public class ClusterMemberShipListener implements MembershipListener {

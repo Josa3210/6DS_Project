@@ -12,17 +12,23 @@ public class CommandParser {
         String commandName = args[0];
         Command command = Command.NONE;
         switch (commandName) {
-
-            case "ping":
+            case "ping" -> {
                 command = Command.PING;
                 if (args.length - 1 > command.getNrArgs()) {
                     System.out.println("Too many arguments");
                 }
                 command.setArgs(Arrays.copyOfRange(args, 1, args.length));
-            case "shutdown":
-
-            case "getLinkIds":
-                command = Command.GETLINKIDS;
+                return command;
+            }
+            case "getLinkIds" -> {
+                return Command.GETLINKIDS;
+            }
+            case "getName" -> {
+                return Command.GETNAME;
+            }
+            case "shutdown" -> {
+                return Command.SHUTDOWN;
+            }
         }
         return command;
     }
