@@ -217,7 +217,7 @@ public class Client implements I_Client {
         System.out.println("url requestLinks: " + getUrl);
 
         ResponseEntity<int[]> response = restTemplate.getForEntity(getUrl, int[].class);
-        System.out.println("response: " + response.getBody());
+        System.out.println("response: " + response.getBody()[0] + "&" + response.getBody()[1]);
         return response.getBody();
     }
 
