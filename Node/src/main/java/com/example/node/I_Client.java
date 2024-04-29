@@ -62,7 +62,7 @@ public interface I_Client {
     int[] requestLinkIds(int requestID);
 
 
-    Inet4Address requestLinkIPs(int linkID);
+    Inet4Address requestIP(int linkID);
 
     int[] requestLinkIds();
 
@@ -94,7 +94,7 @@ public interface I_Client {
      * @param arg
      * @return
      */
-    void ping(Inet4Address hostIP, String arg);
+    void ping(int nodeID);
 
     /**
      * Reaction to a failure during communication with another node.

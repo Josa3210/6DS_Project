@@ -219,8 +219,8 @@ public class Client implements I_Client {
     /*Shutdown*/
 
     @Override
-    public Inet4Address requestLinkIPs(int linkID) {
-        String getUrl = "http://" + namingServerIP.getHostAddress() + ":8080/ns/getIp/" + linkID;
+    public Inet4Address requestIP(int nodeID) {
+        String getUrl = "http://" + namingServerIP.getHostAddress() + ":8080/ns/getIp/" + nodeID;
         RestTemplate restTemplate = new RestTemplate();
 
         ResponseEntity<String> response = restTemplate.getForEntity(getUrl, String.class);
@@ -251,7 +251,7 @@ public class Client implements I_Client {
 
     @Override
     public void sendLinkID(int nodeID) {
-        Inet4Address nodeIP = requestLinkIPs(nodeID);
+        Inet4Address nodeIP = requestIP(nodeID);
         String postUrl = "http://" + nodeIP.getHostAddress() + ":8080/shutdown/updateID";
         System.out.println("Sending Link IDS to other Nodes----------------");
         RestTemplate restTemplate = new RestTemplate();
@@ -288,8 +288,6 @@ public class Client implements I_Client {
         String postUrl = "http://" + namingServerIP.getHostAddress() + ":8080/ns/removeNode";
 
         RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
 
         // Create the request body
         Map<String, Object> requestBody = new HashMap<>() {{
@@ -305,16 +303,23 @@ public class Client implements I_Client {
     /**
      * Check for connection with other host
      *
-     * @param hostIP IP of the host to reach
-     * @param port   port to ping to
+     * @param hostID
      */
     @Override
-    public void ping(Inet4Address hostIP, String port) {
+    public void ping(int nodeID) {
+        Inet4Address nodeIP = requestIP(nodeID);
 
-        String uri = "http:/" + hostIP.getHostAddress() + ":" + port + "/test" + "?testString=test";
+        String uri = "http:/" + nodeIP.getHostAddress() + ":8080/test" + "?testString=test";
         System.out.println("Pinging " + uri);
-        String answer = restClient.get().uri(uri).retrieve().body(String.class);
-        System.out.println(answer);
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> responseEntity = restTemplate.getForEntity(uri, String.class);
+
+
+        System.out.println(responseEntity.getBody());
+
+        if (!responseEntity.getStatusCode().is2xxSuccessful()){
+            removeFromNetwork(nodeID);
+        }
     }
 
     /*Failure*/
