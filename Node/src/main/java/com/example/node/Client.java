@@ -246,11 +246,11 @@ public class Client implements I_Client {
         Inet4Address nextNodeIP = requestLinkIPs(nextID);
         Inet4Address prevNodeIP = requestLinkIPs(prevID);
 
-        sendLinkID(nextNodeIP);
-        sendLinkID(prevNodeIP);
-
         // Remove from the naming server
         removeFromNS(namingServerIP, currentIP);
+
+        sendLinkID(nextNodeIP);
+        sendLinkID(prevNodeIP);
     }
 
     @Override
@@ -283,8 +283,24 @@ public class Client implements I_Client {
      * @param nodeIP IP of the node to be removed
      */
     @Override
-    public void removeFromNS(Inet4Address nsIP, Inet4Address nodeIP) {
+    public void removeFromNS(Inet4Address nsIP, Inet4Address nodeIP)
+    {
+        String postUrl = "http://" + namingServerIP.getHostAddress() + ":8080/ns/removeNode";
 
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        // Create the request body
+        Map<String, Object> requestBody = new HashMap<>()
+        {{
+            put("ip", nodeIP.getHostAddress());
+        }};
+
+        System.out.println("Requesting...");
+
+        // Send the POST request
+        restTemplate.postForEntity(postUrl, requestBody, Void.class);
     }
 
     /**

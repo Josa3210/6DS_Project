@@ -48,9 +48,10 @@ public class RestControllerNS {
      * @param request the JSON request body with "ip" as ip address
      */
     @PostMapping("/ns/removeNode")
-    public void removeNode(@RequestBody Map<String, Object> request) throws UnknownHostException {
-        String failedNode = (String) request.get("failedNode");
-        namingServer.removeNodeIP(failedNode);
+    public void removeNode(@RequestBody Map<String, Object> request)
+    {
+        String ipNode = (String) request.get("ip");
+        namingServer.removeNodeIP(ipNode);
     }
 
     @GetMapping("/ns/getIp/{id}")
