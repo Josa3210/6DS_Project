@@ -21,12 +21,13 @@ public class CommandParser {
                 return command;
             }
             case "getLinkIds" -> {
-                command = Command.GETLINKIDS;
-                return command;
+                return Command.GETLINKIDS;
             }
             case "getName" -> {
-                command = Command.GETNAME;
-                return command;
+                return Command.GETNAME;
+            }
+            case "shutdown" -> {
+                return Command.SHUTDOWN;
             }
         }
         return command;
