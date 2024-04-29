@@ -23,7 +23,7 @@ public interface I_NamingServer {
     /**
      * Remove a node from the namingServer
      */
-    void removeNodeIP(String nodeName);
+    void removeNodeIP(int nodeID);
 
     /**
      * Returns a hash (in the form of an integer) of any given string

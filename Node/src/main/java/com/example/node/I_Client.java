@@ -60,6 +60,7 @@ public interface I_Client {
     void sendLinkID(Inet4Address nodeIP);
 
     Inet4Address requestLinkIPs(int linkID);
+
     int[] requestLinkIds();
 
     /**
@@ -76,11 +77,8 @@ public interface I_Client {
      * <p>
      * Can also give own IP to be removed
      * </p>
-     *
-     * @param nsIP   IP of the namingServer
-     * @param nodeIP IP of the node to be removed
      */
-    void removeFromNS(Inet4Address nsIP, Inet4Address nodeIP);
+    void removeFromNS();
 
     /*Failure*/
 

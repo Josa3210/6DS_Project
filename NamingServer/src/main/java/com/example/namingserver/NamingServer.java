@@ -152,12 +152,11 @@ public class NamingServer implements I_NamingServer {
      * It computes a hash value for the node name, removes the corresponding entry from the
      * database, and saves the updated database.
      *
-     * @param nodeName the name of the node to be removed
+     * @param nodeID the id of the node to be removed
      */
     @Override
-    public void removeNodeIP(String nodeName) {
-        int hash = computeHash(nodeName);
-        database.remove(hash);
+    public void removeNodeIP(int nodeID) {
+        database.remove(nodeID);
 
         // Reallocate resources
     }

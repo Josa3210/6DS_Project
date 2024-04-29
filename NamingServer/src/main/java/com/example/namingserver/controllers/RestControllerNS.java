@@ -48,15 +48,13 @@ public class RestControllerNS {
      * @param request the JSON request body with "ip" as ip address
      */
     @PostMapping("/ns/removeNode")
-    public void removeNode(@RequestBody Map<String, Object> request)
-    {
-        String ipNode = (String) request.get("ip");
-        namingServer.removeNodeIP(ipNode);
+    public void removeNode(@RequestBody Map<String, Object> request) {
+        int nodeID = Integer.parseInt(request.get("nodeID").toString());
+        namingServer.removeNodeIP(nodeID);
     }
 
     @GetMapping("/ns/getIp/{id}")
-    public String getIp(@PathVariable("id") int id)
-    {
+    public String getIp(@PathVariable("id") int id) {
         return namingServer.getIP(id).getHostAddress();
     }
 
@@ -66,8 +64,7 @@ public class RestControllerNS {
     }
 
     @GetMapping("/ns/giveLinkID/{id}")
-    public int[] GiveLinkID(@PathVariable("id") int id)
-    {
+    public int[] GiveLinkID(@PathVariable("id") int id) {
         return namingServer.giveLinkIds(id);
     }
 

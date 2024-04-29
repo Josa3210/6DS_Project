@@ -247,7 +247,7 @@ public class Client implements I_Client {
         Inet4Address prevNodeIP = requestLinkIPs(prevID);
 
         // Remove from the naming server
-        removeFromNS(namingServerIP, currentIP);
+        removeFromNS();
 
         sendLinkID(nextNodeIP);
         sendLinkID(prevNodeIP);
@@ -281,11 +281,9 @@ public class Client implements I_Client {
      * Can also give own IP to be removed
      * </p>
      *
-     * @param nsIP   IP of the namingServer
-     * @param nodeIP IP of the node to be removed
      */
     @Override
-    public void removeFromNS(Inet4Address nsIP, Inet4Address nodeIP)
+    public void removeFromNS()
     {
         String postUrl = "http://" + namingServerIP.getHostAddress() + ":8080/ns/removeNode";
 
@@ -296,7 +294,7 @@ public class Client implements I_Client {
         // Create the request body
         Map<String, Object> requestBody = new HashMap<>()
         {{
-            put("ip", nodeIP.getHostAddress());
+            put("nodeID", currentID);
         }};
 
         System.out.println("Requesting...");
