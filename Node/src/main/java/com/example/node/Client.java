@@ -309,7 +309,7 @@ public class Client implements I_Client {
     public void ping(int nodeID) {
         Inet4Address nodeIP = requestIP(nodeID);
 
-        String uri = "http:/" + nodeIP.getHostAddress() + ":8080/test" + "?testString=test";
+        String uri = "http://" + nodeIP.getHostAddress() + ":8080/test" + "?testString=test";
         System.out.println("Pinging " + uri);
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> responseEntity = restTemplate.getForEntity(uri, String.class);

@@ -268,7 +268,6 @@ public class NamingServer implements I_NamingServer {
         public void memberAdded(MembershipEvent membershipEvent) {
             String s = membershipEvent.getMember().getSocketAddress().toString();
             s = s.substring(s.indexOf("/") + 1, s.indexOf(":"));
-
             try {
                 Inet4Address ip_address = (Inet4Address) Inet4Address.getByName(s);
                 TimeUnit.SECONDS.sleep(20);
@@ -279,15 +278,6 @@ public class NamingServer implements I_NamingServer {
         }
 
         public void memberRemoved(MembershipEvent membershipEvent) {
-            String s = membershipEvent.getMember().getSocketAddress().toString();
-            s = s.substring(s.indexOf("/") + 1, s.indexOf(":"));
-            int hash = computeHash(s);
-            try {
-                Inet4Address ip_address = (Inet4Address) Inet4Address.getByName(s);
-                this.database.put(hash, ip_address);
-            } catch (UnknownHostException e) {
-                throw new RuntimeException(e);
-            }
         }
     }
 
