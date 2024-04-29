@@ -57,7 +57,7 @@ public interface I_Client {
      * If otherID == nodeID than startID = prevID
      * </p>
      */
-    void sendLinkID(Inet4Address nodeIP, int startID, int otherID);
+    void sendLinkID(Inet4Address nodeIP);
 
     Inet4Address requestLinkIPs(int linkID);
     int[] requestLinkIds();

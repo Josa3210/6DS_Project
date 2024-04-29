@@ -142,14 +142,8 @@ public class Client implements I_Client {
         System.out.println("Next node IP: " + nextNodeIP);
         System.out.println("Prev node IP: " + prevNodeIP);
 
-        int sendNextId = nextID == currentID ? prevID : nextID;
-        int sendPrevId = prevID == currentID ? nextID : prevID;
-
-        // Send the previous ID to the next node
-        sendLinkID(nextNodeIP, currentID, sendNextId);
-
-        // Send the next ID to the previous node
-        sendLinkID(prevNodeIP, sendPrevId, currentID);
+        sendLinkID(nextNodeIP);
+        sendLinkID(prevNodeIP);
 
         //TODO : werkt bijna prefect, enkel de eerste node nexId wordt nooit geupdate omdat de twee volgende nodes
         //TODO : hun ID lager zijn dan de eerste.
@@ -252,33 +246,22 @@ public class Client implements I_Client {
         Inet4Address nextNodeIP = requestLinkIPs(nextID);
         Inet4Address prevNodeIP = requestLinkIPs(prevID);
 
-        // Send the previous ID to the next node
-        sendLinkID(nextNodeIP, prevID, currentID);
-
-        // Send the next ID to the previous node
-        sendLinkID(prevNodeIP, currentID, nextID);
+        sendLinkID(nextNodeIP);
+        sendLinkID(prevNodeIP);
 
         // Remove from the naming server
         removeFromNS(namingServerIP, currentIP);
     }
 
     @Override
-    public void sendLinkID(Inet4Address nodeIP, int startID, int otherID)
+    public void sendLinkID(Inet4Address nodeIP)
     {
         String postUrl = "http://" + nodeIP.getHostAddress() + ":8080/shutdown/updateID";
         System.out.println("Sending Link IDS to other Nodes----------------");
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-
-        // Create the request body
-        Map<String, Object> requestBody = new HashMap<>()
-        {{
-            put("prevID", startID);
-            put("nextID", otherID);
-        }};
-
-        // Send the POST request
+        Map<String, Object> requestBody = new HashMap<>();
         restTemplate.postForEntity(postUrl, requestBody, Void.class);
     }
 
@@ -346,8 +329,8 @@ public class Client implements I_Client {
             throw new RuntimeException(e);
         }
         // Send prevID to nextIP and nextID to prevID
-        sendLinkID(nextIP, prevID, nextID);
-        sendLinkID(prevIP, prevID, nextID);
+        sendLinkID(nextIP);
+        sendLinkID(prevIP);
 
         // Remove failed node from network
         restClient.post().uri("http:/" + this.namingServerIP.getHostAddress() + ":" + this.namingServerPort + "/project/removeNode").body(failedNode).retrieve().toBodilessEntity();
