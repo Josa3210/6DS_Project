@@ -24,50 +24,49 @@ public class RestControllerDiscAndBoot {
     private static final String multicast_address = "224.0.1.1";
     private static Config config;
     private static HazelcastInstance hazelcastInstance;
-    Client client;
+    private final Client client;
 
     @Autowired
-    public RestControllerDiscAndBoot(Client client) {
+    public RestControllerDiscAndBoot(Client client)
+    {
         hazelcastInstance = Hazelcast.newHazelcastInstance();
         this.client = client;
     }
 
+    /**
+     * This REST request will set up the client
+     * @param request the IP, Port and nr of nodes of the naming server
+     */
     @PostMapping("/welcome")
     public void welcome(@RequestBody Map<String, Object> request)
     {
-        System.out.println("Welcome --------------");
         int nrNodes =  Integer.parseInt(request.get("nrNodes").toString());
-        System.out.println("nrNodes: " + nrNodes);
-        Inet4Address ipAddress = null;
-        try
-        {
-            ipAddress = (Inet4Address) InetAddress.getByName((String) request.get("ip"));
-            System.out.println("ipAddr: " + ipAddress);
-        }
-        catch (UnknownHostException e) {throw new RuntimeException(e);}
-        int port = Integer.parseInt(request.get("port").toString());
-        System.out.println("port: " + port);
-        client.setupClient(nrNodes, ipAddress, port);
+        String ipNamingServer = request.get("ip").toString();
+        int portNamingServer = Integer.parseInt(request.get("port").toString());
+
+        client.setupClient(nrNodes, ipNamingServer, portNamingServer);
+
+        System.out.println(">> Welcome " + client.getHostname() + "!");
+        System.out.println("* Nr nodes: " + nrNodes);
+        System.out.println("* IP Naming Server: " + ipNamingServer);
+        System.out.println("* Port Naming Server: " + portNamingServer);
     }
 
     @GetMapping("/multicastaddress")
-    public String getMulticastAddress() {
-        return multicast_address;
-    }
+    public String getMulticastAddress() { return multicast_address; }
 
     @GetMapping("/createinstance")
-    public Object createHazelcastInstance() throws JsonProcessingException {
-        return JSONObject.wrap((Object) Hazelcast.newHazelcastInstance(config));
-    }
+    public Object createHazelcastInstance() { return JSONObject.wrap(Hazelcast.newHazelcastInstance(config)); }
 
     @PostMapping("/isReplicatedNode")
-    public void isReplicatedNode(@RequestBody Map<String, Object> request) {
-
+    public void isReplicatedNode(@RequestBody Map<String, Object> request)
+    {
         Integer fileHash = (Integer) request.get("hashValue");
         Inet4Address ip = (Inet4Address) request.get("original ip");
+
         Logger logger = client.getLogger();
         logger.load();
-        // Puts the filehash and the ip address of the node where the file was created in the logger ..
+        // Puts the filehash and the ip address of the node where the file was created in the logger
         logger.put(fileHash, ip);
     }
 

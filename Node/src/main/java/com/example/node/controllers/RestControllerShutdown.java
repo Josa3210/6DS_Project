@@ -18,6 +18,9 @@ public class RestControllerShutdown
         this.client = client;
     }
 
+    /**
+     * This REST request will update the client's previous and next ID's
+     */
     @PostMapping("/shutdown/updateID")
     public void updateID()
     {

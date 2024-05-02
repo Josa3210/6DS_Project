@@ -62,7 +62,7 @@ public interface I_Client {
     int[] requestLinkIds(int requestID);
 
 
-    Inet4Address requestIP(int linkID);
+    String requestIP(int linkID);
 
     int[] requestLinkIds();
 
@@ -90,8 +90,7 @@ public interface I_Client {
     /**
      * Check for connection with other host
      *
-     * @param hostIP IP of the host to reach
-     * @param arg
+     * @param nodeID ID of the host to reach
      * @return
      */
     void ping(int nodeID);
