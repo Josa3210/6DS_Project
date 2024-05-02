@@ -382,11 +382,6 @@ public class Client implements I_Client {
     }
 
     @Override
-    public void getName() {
-        System.out.println(this.hostname);
-    }
-
-    @Override
     public void reportFilenameToNamingServer(String filename) {
 
         // Prepare the URL for reporting the hash value to the naming server
@@ -421,6 +416,4 @@ public class Client implements I_Client {
 
         }
     }
-
-
 }
