@@ -102,6 +102,6 @@ public interface I_Client {
      * @param failedID
      */
     void removeFromNetwork(int failedID);
-
     void getName();
+    void reportFilenameToNamingServer(String filename);
 }

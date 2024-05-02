@@ -76,4 +76,20 @@ public class RestControllerNS {
     public void setNamingServer(NamingServer namingServer) {
         this.namingServer = namingServer;
     }
+
+    /**
+     * Reports the hash of a newly created file on the node and calculates if there are replicated nodes
+     *
+     * @param requestBody the JSON request body with "ip" as ip address
+     */
+
+    @PostMapping("/ns/reportFileName")
+    public void reportFileHash(@RequestBody Map<String, Object> requestBody) throws UnknownHostException {
+
+        String filename = (String) requestBody.get("filename");
+        String ipAddressString = (String) requestBody.get("ip");
+        Inet4Address originalIP = (Inet4Address) InetAddress.getByName(ipAddressString);
+        namingServer.isReplicatedNode(filename, originalIP);
+
+    }
 }
