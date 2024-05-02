@@ -1,18 +1,14 @@
 package com.example.node;
 
-import com.hazelcast.cluster.MembershipEvent;
-import com.hazelcast.cluster.MembershipListener;
+
 import com.hazelcast.config.*;
 import com.hazelcast.core.Hazelcast;
-import com.hazelcast.core.HazelcastInstance;
 import jakarta.annotation.PostConstruct;
 import org.springframework.http.*;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestTemplate;
-
 import java.io.FileNotFoundException;
 import java.net.Inet4Address;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +16,6 @@ import java.util.Map;
 public class Client implements I_Client {
 
     private static final String multicast_address = "224.2.2.5";
-    private static ClusterMemberShipListener event_listener;
     private RestClient restClient; // ?
     int currentID, nextID, prevID;
     private Config config;
@@ -33,7 +28,6 @@ public class Client implements I_Client {
     {
         try
         {
-            event_listener = new ClusterMemberShipListener();
             this.config = createConfig();
             this.hostname = hostname;
             this.restClient = RestClient.create();
@@ -64,7 +58,6 @@ public class Client implements I_Client {
         joinConfig.getMulticastConfig().setMulticastGroup(multicast_address); // Sets the multicast group address.
         joinConfig.getMulticastConfig().setMulticastPort(54321);
         config.getManagementCenterConfig().setConsoleEnabled(true); // Enables the management center console.
-        config.addListenerConfig(new ListenerConfig(event_listener));
         return config;
     }
 
@@ -338,8 +331,8 @@ public class Client implements I_Client {
     public Logger getLogger() { return logger; }
 
     @Override
-    public void reportFilenameToNamingServer(String filename) {
-
+    public void reportFilenameToNamingServer(String filename)
+    {
         // Prepare the URL for reporting the hash value to the naming server
         String postUrl = "http://localhost:9090/ns/reportFileName";
 
@@ -351,28 +344,7 @@ public class Client implements I_Client {
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestBody, Void.class);
 
-        if (responseEntity.getStatusCode().is2xxSuccessful()) {
-            System.out.println("Hash value reported to naming server for file: " + filename);
-        } else {
-            System.err.println("Failed to report hash value to naming server for file: " + filename);
-        }
+        if (responseEntity.getStatusCode().is2xxSuccessful()) System.out.println("Hash value reported to naming server for file: " + filename);
+        else System.err.println("Failed to report hash value to naming server for file: " + filename);
     }
-
-    public class ClusterMemberShipListener implements MembershipListener {
-        public void memberAdded(MembershipEvent membershipEvent)
-        {
-            // TODO : ip mag niet gehashed worden, moet node name zijn!
-            String s = membershipEvent.getMember().getSocketAddress().toString();
-            s = s.substring(s.indexOf("/") + 1, s.indexOf(":"));
-            int hash = computeHash(s);
-            karibu(hash);
-        }
-
-        public void memberRemoved(MembershipEvent membershipEvent)
-        {
-            System.out.println(">> Member removed: " + membershipEvent.getMember().getSocketAddress().toString());
-        }
-    }
-
-
 }
