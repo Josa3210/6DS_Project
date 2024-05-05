@@ -320,10 +320,10 @@ public class NamingServer implements I_NamingServer {
     }
 
     public class ClusterMemberShipListener implements MembershipListener {
-        I_NamingserverDB database;
+
 
         public ClusterMemberShipListener(NamingserverDB namingserverDB) {
-            this.database = namingserverDB;
+            database = namingserverDB;
         }
 
         public void memberAdded(MembershipEvent membershipEvent) {
