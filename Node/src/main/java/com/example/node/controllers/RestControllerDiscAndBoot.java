@@ -67,6 +67,7 @@ public class RestControllerDiscAndBoot {
         Integer fileHash = Integer.parseInt(request.get("hashValue").toString());
         Inet4Address ip = (Inet4Address) InetAddress.getByName((String) request.get("original ip"));
         Logger logger = client.getLogger();
+        System.out.println();
         logger.load();
 
         // Puts the filehash and the ip address of the node where the file was created in the logger ..

@@ -1,13 +1,17 @@
+
+
 package com.example.node;
 
 import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
 import org.apache.commons.io.monitor.FileAlterationObserver;
 
 import java.io.File;
+import java.util.Arrays;
 
 
 /**
  * This class represents a task for monitoring file system changes in the specified Files directory.
+ *
  * It implements the Runnable interface to be executed in a separate thread.
 
 **/
@@ -33,18 +37,16 @@ public class FileMonitor implements Runnable {
             @Override
             public void onFileCreate(File file) {
 
-                if (client.namingServerIP != null) {
-                    String filename = file.getName();
-                    System.out.println("File created: " + filename);
-                    client.reportFilenameToNamingServer(filename);
-                }
+                String filename = file.getName();
+                System.out.println("File created: " + filename);
+                client.reportFilenameToNamingServer(file.getName());
 
             }
 
             @Override
             public void onFileDelete(File file) {
 
-                System.out.println("File deleted: " + file.getName());
+                    System.out.println("File deleted: " + file.getName());
 
             }
         });
