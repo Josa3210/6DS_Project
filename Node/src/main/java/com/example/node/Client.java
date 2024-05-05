@@ -77,7 +77,7 @@ public class Client implements I_Client {
     }
 
     public boolean isSetupCompleted() {
-        return setupCompleted;
+        return setupCompleted = true;
     }
 
     @Override
@@ -158,6 +158,9 @@ public class Client implements I_Client {
         sendLinkID(nextID);
         sendLinkID(prevID);
 
+        // Set setupCompleted flag to true indicating setup is complete
+        isSetupCompleted();
+
         //TODO : werkt bijna prefect, enkel de eerste node nexId wordt nooit geupdate omdat de twee volgende nodes
         //TODO : hun ID lager zijn dan de eerste.
     }
@@ -227,8 +230,6 @@ public class Client implements I_Client {
 
         ResponseEntity<int[]> response = restTemplate.getForEntity(getUrl, int[].class);
         System.out.println("response: " + response.getBody()[0] + "&" + response.getBody()[1]);
-        // Set setupCompleted flag to true indicating setup is complete
-        setupCompleted = true;
         return response.getBody();
     }
 
