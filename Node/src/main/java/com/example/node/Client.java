@@ -32,6 +32,8 @@ public class Client implements I_Client {
     private Integer namingServerPort;
     private String hostname;
 
+    private boolean setupCompleted = false;
+
     public Client(String hostname) {
         try {
             event_listener = new ClusterMemberShipListener();
@@ -72,6 +74,10 @@ public class Client implements I_Client {
 
     public Logger getLogger() {
         return logger;
+    }
+
+    public boolean isSetupCompleted() {
+        return setupCompleted;
     }
 
     @Override
@@ -151,6 +157,9 @@ public class Client implements I_Client {
 
         sendLinkID(nextID);
         sendLinkID(prevID);
+
+        // Set setupCompleted flag to true indicating setup is complete
+        setupCompleted = true;
 
         //TODO : werkt bijna prefect, enkel de eerste node nexId wordt nooit geupdate omdat de twee volgende nodes
         //TODO : hun ID lager zijn dan de eerste.
@@ -380,10 +389,6 @@ public class Client implements I_Client {
     @Override
     public void reportFilenameToNamingServer(String filename) {
 
-        if (namingServerIP == null) {
-            throw new IllegalStateException("setupClient() must be called before reporting filename.");
-        }
-
         // Prepare the URL for reporting the hash value to the naming server
         String postUrl = "http://" + namingServerIP.getHostAddress() + ":8080/ns/reportFileName";
 
@@ -401,6 +406,7 @@ public class Client implements I_Client {
             System.err.println("Failed to report hash value to naming server for file: " + filename);
         }
     }
+
 
 
     public class ClusterMemberShipListener implements MembershipListener {

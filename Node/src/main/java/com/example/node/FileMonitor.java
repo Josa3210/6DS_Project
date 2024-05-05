@@ -34,12 +34,15 @@ public class FileMonitor implements Runnable {
         // Perform an initial scan of the directory, to check there are already files saved ..
         File[] existingFiles = new File(folderPath).listFiles();
 
-        if (existingFiles != null) {
+        // if the client setup is completed, we can start with reporting the files to the namingserver
+        if (client.isSetupCompleted()){
+            if (existingFiles != null) {
 
-            for (File file : existingFiles) {
-                System.out.println("Existing files found!");
-                // Calculate hash and report to naming server for existing files
-                client.reportFilenameToNamingServer(file.getName());
+                for (File file : existingFiles) {
+                    System.out.println("Existing files found!");
+                    // Calculate hash and report to naming server for existing files
+                    client.reportFilenameToNamingServer(file.getName());
+                }
             }
         }
 
@@ -50,17 +53,23 @@ public class FileMonitor implements Runnable {
             public void onFileCreate(File file) {
 
                 // Calculate hash and report to naming server when a new file is created
-                String filename = file.getName();
-                System.out.println("File created: " + filename);
 
-                int hash = client.computeHash(filename);
-                client.reportFilenameToNamingServer(file.getName());
+                if (client.isSetupCompleted()) {
+                    String filename = file.getName();
+                    System.out.println("File created: " + filename);
+
+                    int hash = client.computeHash(filename);
+                    client.reportFilenameToNamingServer(file.getName());
+                }
             }
 
             @Override
             public void onFileDelete(File file) {
-                // Handle file deletion event if needed
-                System.out.println("File deleted: " + file.getName());
+
+                if (client.isSetupCompleted()) {
+                    // Handle file deletion event if needed
+                    System.out.println("File deleted: " + file.getName());
+                }
             }
         });
 
