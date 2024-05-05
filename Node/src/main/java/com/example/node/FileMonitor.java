@@ -8,7 +8,6 @@ import java.io.File;
 
 /**
  * This class represents a task for monitoring file system changes in the specified Files directory.
- *
  * It implements the Runnable interface to be executed in a separate thread.
 
 **/
