@@ -61,12 +61,13 @@ public class RestControllerDiscAndBoot {
     }
 
     @PostMapping("/isReplicatedNode")
-    public void isReplicatedNode(@RequestBody Map<String, Object> request) {
+    public void isReplicatedNode(@RequestBody Map<String, Object> request) throws UnknownHostException {
 
-        Integer fileHash = (Integer) request.get("hashValue");
-        Inet4Address ip = (Inet4Address) request.get("original ip");
+        Integer fileHash = Integer.parseInt(request.get("hashValue").toString());
+        Inet4Address ip = (Inet4Address) InetAddress.getByName((String) request.get("original ip"));
         Logger logger = client.getLogger();
         logger.load();
+
         // Puts the filehash and the ip address of the node where the file was created in the logger ..
         logger.put(fileHash, ip);
     }

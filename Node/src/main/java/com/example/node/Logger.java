@@ -34,13 +34,10 @@ public class Logger {
             String currentPath = new java.io.File("").getCanonicalPath();
             String filepath = currentPath + "/Data/node/logger";
             Path path = Paths.get(filepath);
-
             System.out.println(filepath);
-
             Files.createDirectories(path);
 
             this.filePath = filepath;
-
             System.out.println("Database will be saved in: " + filePath);
 
         } catch (IOException e) {
