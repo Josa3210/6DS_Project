@@ -139,10 +139,6 @@ public class Client implements I_Client {
 
     public void setupClient(int nrNodes, Inet4Address namingServerIP, int namingServerPort) {
         this.namingServerIP = namingServerIP;
-        if (namingServerIP != null){
-
-            System.out.println("naming server ip: " + namingServerIP);
-        }
         this.namingServerPort = namingServerPort;
 
         addNameToNS();
@@ -392,25 +388,23 @@ public class Client implements I_Client {
     @Override
     public void reportFilenameToNamingServer(String filename) {
 
-        if (isSetupCompleted()) {
+        // Prepare the URL for reporting the hash value to the naming server
+        String postUrl = "http://" + namingServerIP.getHostAddress() + ":8080/ns/reportFileName";
 
-            // Prepare the URL for reporting the hash value to the naming server
-            String postUrl = "http://" + namingServerIP.getHostAddress() + ":8080/ns/reportFileName";
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("filename", filename);
+        requestBody.put("ip", currentIP.toString());
 
-            Map<String, Object> requestBody = new HashMap<>();
-            requestBody.put("filename", filename);
-            requestBody.put("ip", currentIP.toString());
+        // Make an HTTP POST request to report the hash value
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestBody, Void.class);
 
-            // Make an HTTP POST request to report the hash value
-            RestTemplate restTemplate = new RestTemplate();
-            ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestBody, Void.class);
-
-            if (responseEntity.getStatusCode().is2xxSuccessful()) {
-                System.out.println("Hash value reported to naming server for file: " + filename);
-            } else {
-                System.err.println("Failed to report hash value to naming server for file: " + filename);
-            }
+        if (responseEntity.getStatusCode().is2xxSuccessful()) {
+            System.out.println("Hash value reported to naming server for file: " + filename);
+        } else {
+            System.err.println("Failed to report hash value to naming server for file: " + filename);
         }
+
 
     }
 

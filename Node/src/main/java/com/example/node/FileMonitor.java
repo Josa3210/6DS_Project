@@ -38,20 +38,20 @@ public class FileMonitor implements Runnable {
             public void onFileCreate(File file) {
 
                 // Calculate hash and report to naming server when a new file is created
-                if (client.isSetupCompleted() && client.namingServerIP != null) {
+                //if (client.namingServerIP != null) {
                     String filename = file.getName();
                     System.out.println("File created: " + filename);
                     client.reportFilenameToNamingServer(file.getName());
-                }
+                //}
             }
 
             @Override
             public void onFileDelete(File file) {
 
-                if (client.isSetupCompleted() && client.namingServerIP != null) {
+                //if (client.namingServerIP != null) {
                     // Handle file deletion event if needed
                     System.out.println("File deleted: " + file.getName());
-                }
+                //}
             }
         });
 
