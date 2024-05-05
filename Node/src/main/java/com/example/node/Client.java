@@ -28,7 +28,7 @@ public class Client implements I_Client {
     Inet4Address currentIP;
     Logger logger;
     Thread fileMonitorThread;
-    private Inet4Address namingServerIP;
+    Inet4Address namingServerIP;
     private Integer namingServerPort;
     private String hostname;
 
@@ -78,10 +78,6 @@ public class Client implements I_Client {
 
     public boolean isSetupCompleted() {
         return setupCompleted = true;
-    }
-
-    public Inet4Address getNamingServerIP() {
-        return namingServerIP;
     }
 
     @Override
@@ -143,6 +139,7 @@ public class Client implements I_Client {
 
     public void setupClient(int nrNodes, Inet4Address namingServerIP, int namingServerPort) {
         this.namingServerIP = namingServerIP;
+        System.out.println("naming server ip: " + namingServerIP);
         this.namingServerPort = namingServerPort;
 
         addNameToNS();
@@ -161,6 +158,8 @@ public class Client implements I_Client {
 
         sendLinkID(nextID);
         sendLinkID(prevID);
+
+
 
         //TODO : werkt bijna prefect, enkel de eerste node nexId wordt nooit geupdate omdat de twee volgende nodes
         //TODO : hun ID lager zijn dan de eerste.
@@ -391,8 +390,6 @@ public class Client implements I_Client {
     public void reportFilenameToNamingServer(String filename) {
 
         if (isSetupCompleted()) {
-
-            System.out.println("setup complete -----------------");
 
             // Prepare the URL for reporting the hash value to the naming server
             String postUrl = "http://" + namingServerIP.getHostAddress() + ":8080/ns/reportFileName";
