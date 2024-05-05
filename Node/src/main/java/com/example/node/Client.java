@@ -386,13 +386,14 @@ public class Client implements I_Client {
     public void reportFilenameToNamingServer(String filename) {
 
         System.out.println("namingserver IP: " + namingServerIP.getHostAddress());
+        System.out.println("current IP: " + currentIP.getHostAddress());
 
         // Prepare the URL for reporting the hash value to the naming server
         String postUrl = "http://" + namingServerIP.getHostAddress() + ":8080/ns/reportFileName";
 
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("filename", filename);
-        requestBody.put("ip", currentIP.toString());
+        requestBody.put("ip", currentIP.getHostAddress());
 
         // Make an HTTP POST request to report the hash value
         RestTemplate restTemplate = new RestTemplate();
