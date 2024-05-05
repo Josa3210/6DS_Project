@@ -162,9 +162,6 @@ public class Client implements I_Client {
         sendLinkID(nextID);
         sendLinkID(prevID);
 
-        // Set setupCompleted flag to true indicating setup is complete
-        isSetupCompleted();
-
         //TODO : werkt bijna prefect, enkel de eerste node nexId wordt nooit geupdate omdat de twee volgende nodes
         //TODO : hun ID lager zijn dan de eerste.
     }
@@ -393,21 +390,26 @@ public class Client implements I_Client {
     @Override
     public void reportFilenameToNamingServer(String filename) {
 
-        // Prepare the URL for reporting the hash value to the naming server
-        String postUrl = "http://" + namingServerIP.getHostAddress() + ":8080/ns/reportFileName";
+        if (isSetupCompleted()) {
 
-        Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("filename", filename);
-        requestBody.put("ip", currentIP.toString());
+            System.out.println("setup complete -----------------");
 
-        // Make an HTTP POST request to report the hash value
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestBody, Void.class);
+            // Prepare the URL for reporting the hash value to the naming server
+            String postUrl = "http://" + namingServerIP.getHostAddress() + ":8080/ns/reportFileName";
 
-        if (responseEntity.getStatusCode().is2xxSuccessful()) {
-            System.out.println("Hash value reported to naming server for file: " + filename);
-        } else {
-            System.err.println("Failed to report hash value to naming server for file: " + filename);
+            Map<String, Object> requestBody = new HashMap<>();
+            requestBody.put("filename", filename);
+            requestBody.put("ip", currentIP.toString());
+
+            // Make an HTTP POST request to report the hash value
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestBody, Void.class);
+
+            if (responseEntity.getStatusCode().is2xxSuccessful()) {
+                System.out.println("Hash value reported to naming server for file: " + filename);
+            } else {
+                System.err.println("Failed to report hash value to naming server for file: " + filename);
+            }
         }
 
     }
