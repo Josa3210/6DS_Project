@@ -380,6 +380,10 @@ public class Client implements I_Client {
     @Override
     public void reportFilenameToNamingServer(String filename) {
 
+        if (namingServerIP == null) {
+            throw new IllegalStateException("setupClient() must be called before reporting filename.");
+        }
+
         // Prepare the URL for reporting the hash value to the naming server
         String postUrl = "http://" + namingServerIP.getHostAddress() + ":8080/ns/reportFileName";
 
