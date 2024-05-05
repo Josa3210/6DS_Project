@@ -71,7 +71,4 @@ public class RestControllerDiscAndBoot {
         logger.put(fileHash, ip);
     }
 
-
-
-
 }

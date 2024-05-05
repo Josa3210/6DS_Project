@@ -21,11 +21,11 @@ public class Client implements I_Client {
 
     private static final String multicast_address = "224.2.2.5";
     private static ClusterMemberShipListener event_listener;
-    private RestClient restClient;
+    RestClient restClient;
     int currentID, nextID, prevID;
     private Config config;
     private Map<String, Inet4Address> ipMap;
-    private Inet4Address currentIP;
+    Inet4Address currentIP;
     private Inet4Address namingServerIP;
     private Integer namingServerPort;
     private String hostname;
@@ -37,7 +37,7 @@ public class Client implements I_Client {
             this.config = createConfig();
             this.hostname = hostname;
             this.restClient = RestClient.create();
-            this.currentIP = (Inet4Address) InetAddress.getByName(Inet4Address.getLocalHost().getHostAddress());
+            this.currentIP = (Inet4Address) InetAddress.getLocalHost();
 
             // We make a new logger file that keeps track of changes in the 'Files' map
             logger = new Logger();
@@ -325,7 +325,7 @@ public class Client implements I_Client {
     /**
      * Check for connection with other host
      *
-     * @param hostID
+     * @param nodeID
      */
     @Override
     public void ping(int nodeID) {
