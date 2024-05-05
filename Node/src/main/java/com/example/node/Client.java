@@ -41,7 +41,7 @@ public class Client implements I_Client {
             this.logger = new Logger(); // We create a logger to keep track of the replication
             logger.load();
             fileMonitorThread = new Thread(new FileMonitor(this, "Data/node/Files"));
-            fileMonitorThread.start();
+            fileMonitorThread.run();
             this.hostname = hostname;
             this.restClient = RestClient.create();
             this.currentIP = (Inet4Address) InetAddress.getLocalHost();
@@ -405,9 +405,8 @@ public class Client implements I_Client {
         } else {
             System.err.println("Failed to report hash value to naming server for file: " + filename);
         }
+
     }
-
-
 
     public class ClusterMemberShipListener implements MembershipListener {
         public void memberAdded(MembershipEvent membershipEvent) {

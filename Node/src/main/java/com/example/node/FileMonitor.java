@@ -25,7 +25,6 @@ public class FileMonitor implements Runnable {
         this.folderPath = folderPath;
     }
 
-    @Override
     public void run() {
 
         // Create a FileAlterationObserver for the specified folder path (specified in the client)
