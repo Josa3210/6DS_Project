@@ -24,5 +24,4 @@ public interface I_NamingserverDB {
 
     void print();
 
-    void isReplicatedNode(String filename, Inet4Address originalIP);
 }
