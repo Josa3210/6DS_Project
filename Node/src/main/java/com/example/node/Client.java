@@ -27,7 +27,7 @@ public class Client implements I_Client {
     Map<String, Inet4Address> ipMap;
     Inet4Address currentIP;
     Logger logger;
-    Thread fileMonitorThread;
+    public Thread fileMonitorThread;
     Inet4Address namingServerIP;
     private Integer namingServerPort;
     private String hostname;
@@ -41,7 +41,6 @@ public class Client implements I_Client {
             this.logger = new Logger(); // We create a logger to keep track of the replication
             logger.load();
             fileMonitorThread = new Thread(new FileMonitor(this, "Data/node/Files"));
-            fileMonitorThread.start(); // Start the thread
             this.hostname = hostname;
             this.restClient = RestClient.create();
             this.currentIP = (Inet4Address) InetAddress.getLocalHost();
@@ -157,8 +156,6 @@ public class Client implements I_Client {
 
         sendLinkID(nextID);
         sendLinkID(prevID);
-
-
 
         //TODO : werkt bijna prefect, enkel de eerste node nexId wordt nooit geupdate omdat de twee volgende nodes
         //TODO : hun ID lager zijn dan de eerste.
