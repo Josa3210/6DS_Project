@@ -394,7 +394,7 @@ public class Client implements I_Client {
 
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("filename", filename);
-        requestBody.put("ip", currentIP.getHostAddress());
+        requestBody.put("ip", currentIP.toString());
 
         // Make an HTTP POST request to report the hash value
         RestTemplate restTemplate = new RestTemplate();
