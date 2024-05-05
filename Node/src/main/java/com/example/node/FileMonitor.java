@@ -37,6 +37,7 @@ public class FileMonitor implements Runnable {
 
         // if the client setup is completed, we can start with reporting the files to the namingserver
         if (client.isSetupCompleted()){
+            System.out.println("setup completed");
             if (existingFiles != null) {
 
                 for (File file : existingFiles) {
