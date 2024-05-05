@@ -73,18 +73,7 @@ public class RestControllerNS {
      *
      * @param namingServer the naming server
      */
-
     public void setNamingServer(NamingServer namingServer) {
         this.namingServer = namingServer;
-    }
-
-    @PostMapping("/ns/reportFileName")
-    public void reportFileHash(@RequestBody Map<String, Object> requestBody) throws UnknownHostException {
-
-        String filename = (String) requestBody.get("filename");
-        String ipAddressString = (String) requestBody.get("ip");
-        Inet4Address originalIP = (Inet4Address) InetAddress.getByName(ipAddressString);
-        namingServer.isReplicatedNode(filename, originalIP);
-
     }
 }
