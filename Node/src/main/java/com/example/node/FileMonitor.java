@@ -31,10 +31,6 @@ public class FileMonitor implements Runnable {
         // Create a FileAlterationObserver for the specified folder path (specified in the client)
         FileAlterationObserver observer = new FileAlterationObserver(folderPath);
 
-        // Perform an initial scan of the directory, to check there are already files saved ..
-        File[] existingFiles = new File(folderPath).listFiles();
-
-
         // Add a listener to handle file system events
         observer.addListener(new FileAlterationListenerAdaptor() {
 
@@ -42,18 +38,15 @@ public class FileMonitor implements Runnable {
             public void onFileCreate(File file) {
 
                 // Calculate hash and report to naming server when a new file is created
-
                 if (client.isSetupCompleted()) {
+                    String filename = file.getName();
+                    System.out.println("File created: " + filename);
 
-                    if (client.isSetupCompleted()) {
-                        String filename = file.getName();
-                        System.out.println("File created: " + filename);
-
-                        int hash = client.computeHash(filename);
-                        client.reportFilenameToNamingServer(file.getName());
-                    }
+                    int hash = client.computeHash(filename);
+                    client.reportFilenameToNamingServer(file.getName());
                 }
             }
+
 
             @Override
             public void onFileDelete(File file) {
