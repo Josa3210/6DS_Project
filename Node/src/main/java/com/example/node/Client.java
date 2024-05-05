@@ -139,7 +139,10 @@ public class Client implements I_Client {
 
     public void setupClient(int nrNodes, Inet4Address namingServerIP, int namingServerPort) {
         this.namingServerIP = namingServerIP;
-        System.out.println("naming server ip: " + namingServerIP);
+        if (namingServerIP != null){
+            isSetupCompleted();
+            System.out.println("naming server ip: " + namingServerIP);
+        }
         this.namingServerPort = namingServerPort;
 
         addNameToNS();
