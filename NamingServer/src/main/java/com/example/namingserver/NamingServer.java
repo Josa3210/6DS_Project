@@ -311,7 +311,7 @@ public class NamingServer implements I_NamingServer {
         Inet4Address replicatedIP = getLocationIP(filename);
         Integer fileHash = computeHash(filename);
 
-        String postUrl = "http:/" + replicatedIP.getHostAddress() + ":8080/isReplicatedNode";
+        String postUrl = "http://" + replicatedIP.getHostAddress() + ":8080/isReplicatedNode";
 
         // Create the request entity with headers and body
         HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
