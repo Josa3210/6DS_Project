@@ -35,21 +35,6 @@ public class FileMonitor implements Runnable {
         File[] existingFiles = new File(folderPath).listFiles();
 
 
-        // if the client setup is completed, we can start with reporting the files to the namingserver
-
-        if (existingFiles != null) {
-
-            System.out.println("Existing files found! -------------------------------------------------");
-
-            for (File file : existingFiles) {
-                // Print the name of each existing file
-                System.out.println(file.getName());
-                // Calculate hash and report to naming server for existing files
-                client.reportFilenameToNamingServer(file.getName());
-
-            }
-        }
-
         // Add a listener to handle file system events
         observer.addListener(new FileAlterationListenerAdaptor() {
 
