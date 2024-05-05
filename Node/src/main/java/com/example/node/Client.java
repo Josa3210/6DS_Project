@@ -40,7 +40,7 @@ public class Client implements I_Client {
             this.config = createConfig();
             this.logger = new Logger(); // We create a logger to keep track of the replication
             logger.load();
-            fileMonitorThread = new Thread(new FileMonitor(this, "../Data/node/Files"));
+            fileMonitorThread = new Thread(new FileMonitor(this, "Data/node/Files"));
             fileMonitorThread.start(); // Start the thread
             this.hostname = hostname;
             this.restClient = RestClient.create();
