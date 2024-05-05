@@ -296,6 +296,9 @@ public class NamingServer implements I_NamingServer {
 
     public void isReplicatedNode(String filename, Inet4Address originalIP) {
 
+        // We get the hashes from the database
+        Set<Integer> nodeHashes = database.getKeys();
+
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -322,7 +325,7 @@ public class NamingServer implements I_NamingServer {
             HttpStatusCode statusCode = responseEntity.getStatusCode();
 
             if (statusCode == HttpStatus.OK) {
-                System.out.println("Node list correctly sent to " + replicatedIP.getHostName());
+                System.out.println("Node list correctly sent to " + replicatedIP);
             } else {
                 System.err.println("Sending node list failed with status code: " + statusCode);
             }

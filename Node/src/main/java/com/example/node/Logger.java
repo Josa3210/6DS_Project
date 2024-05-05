@@ -51,7 +51,6 @@ public class Logger {
      * Loads the mapping from the JSON file into the logger.
      * If the file does not exist, initializes an empty map.
      */
-
     public void load() {
 
         try {
