@@ -23,4 +23,6 @@ public interface I_NamingserverDB {
     void remove(int hash);
 
     void print();
+
+    void isReplicatedNode(String filename, Inet4Address originalIP);
 }

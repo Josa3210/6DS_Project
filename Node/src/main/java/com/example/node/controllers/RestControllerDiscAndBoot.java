@@ -2,6 +2,7 @@ package com.example.node.controllers;
 
 import com.example.node.Client;
 import com.example.node.I_Client;
+import com.example.node.Logger;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.hazelcast.config.Config;
 import com.hazelcast.core.Hazelcast;
@@ -57,6 +58,18 @@ public class RestControllerDiscAndBoot {
     @GetMapping("/createinstance")
     public Object createHazelcastInstance() throws JsonProcessingException {
         return JSONObject.wrap((Object) Hazelcast.newHazelcastInstance(config));
+    }
+
+    @PostMapping("/isReplicatedNode")
+    public void isReplicatedNode(@RequestBody Map<String, Object> request) throws UnknownHostException {
+
+        Integer fileHash = Integer.parseInt(request.get("hashValue").toString());
+        Inet4Address ip = (Inet4Address) InetAddress.getByName((String) request.get("original ip"));
+        Logger logger = client.getLogger();
+        logger.load();
+
+        // Puts the filehash and the ip address of the node where the file was created in the logger ..
+        logger.put(fileHash, ip);
     }
 
 

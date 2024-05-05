@@ -1,5 +1,4 @@
-/**
- *
+
 
 package com.example.node;
 
@@ -14,6 +13,7 @@ import java.io.File;
  *
  * It implements the Runnable interface to be executed in a separate thread.
 
+**/
 
 public class FileMonitor implements Runnable {
 
@@ -37,8 +37,8 @@ public class FileMonitor implements Runnable {
         if (existingFiles != null) {
 
             for (File file : existingFiles) {
+                System.out.println("Existing files found!");
                 // Calculate hash and report to naming server for existing files
-                int hash = client.computeHash(file.getName());
                 client.reportFilenameToNamingServer(file.getName());
             }
         }
@@ -77,5 +77,3 @@ public class FileMonitor implements Runnable {
 
     }
 }
-
- **/

@@ -10,6 +10,7 @@ import com.hazelcast.map.IMap;
 
 import com.example.namingserver.database.I_NamingserverDB;
 import com.example.namingserver.database.NamingserverDB;
+import com.hazelcast.spi.exception.RestClientException;
 import jakarta.annotation.PostConstruct;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
@@ -77,10 +78,10 @@ public class NamingServer implements I_NamingServer {
     public void init() {
         try {
             this.ip = InetAddress.getLocalHost();
-            this.database = new NamingserverDB();
-            this.database.load();
+            database = new NamingserverDB();
+            database.load();
             System.out.println("Database in namingServer: ");
-            this.database.print();
+            database.print();
             event_listener = new ClusterMemberShipListener((NamingserverDB) this.database);
             NamingServer.CreateConfig();
             mapIP = hazelcastInstance.getMap("mapIP");
@@ -279,6 +280,59 @@ public class NamingServer implements I_NamingServer {
 
         public void memberRemoved(MembershipEvent membershipEvent) {
         }
+    }
+    /**
+     * Receives filename. Replication is performed as follows:
+     * 1. If the hash of the node is less than the hash of the file and the distance to it is the smallest, indicating that the node is a replicated node,
+     * the node becomes the owner of this file and creates a log with information on the file (references for the file).
+     * 2. The node then replicates the file.
+     *
+     * @param filename The name of the file that needs to be replicated.
+     *
+     *
+     *
+     * @return
+     */
+
+    public void isReplicatedNode(String filename, Inet4Address originalIP) {
+
+        // We get the hashes from the database
+        Set<Integer> nodeHashes = database.getKeys();
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        // Create the request body
+        Map<String, Object> requestBody = new HashMap<>();
+
+        // Check for every node in the list if it's a replicated node by checking which node hash in the dataset lies
+        // the closest to the hashed value of the filename
+        Inet4Address replicatedIP = getLocationIP(filename);
+        Integer fileHash = computeHash(filename);
+
+        String postUrl = "http:/" + replicatedIP + ":8080/isReplicatedNode";
+
+        // Create the request entity with headers and body
+        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
+
+        try {
+            // Send the POST request
+            requestBody.put("hashValue", fileHash);
+            requestBody.put("original ip", originalIP);
+
+            ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
+            HttpStatusCode statusCode = responseEntity.getStatusCode();
+
+            if (statusCode == HttpStatus.OK) {
+                System.out.println("Node list correctly sent to " + replicatedIP);
+            } else {
+                System.err.println("Sending node list failed with status code: " + statusCode);
+            }
+        } catch (RestClientException e) {
+            System.err.println("Failed to send node list to " + replicatedIP + ": " + e.getMessage());
+        }
+
     }
 
 }
