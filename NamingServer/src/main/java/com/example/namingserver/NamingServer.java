@@ -319,7 +319,7 @@ public class NamingServer implements I_NamingServer {
         try {
             // Send the POST request
             requestBody.put("hashValue", fileHash);
-            requestBody.put("original ip", originalIP.getHostAddress());
+            requestBody.put("original ip", originalIP);
 
             ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
             HttpStatusCode statusCode = responseEntity.getStatusCode();
