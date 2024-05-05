@@ -90,8 +90,7 @@ public interface I_Client {
     /**
      * Check for connection with other host
      *
-     * @param hostIP IP of the host to reach
-     * @param arg
+     * @param nodeID IP of the host to reach
      * @return
      */
     void ping(int nodeID);
@@ -103,5 +102,4 @@ public interface I_Client {
      */
     void removeFromNetwork(int failedID);
     void getName();
-    void reportFilenameToNamingServer(String filename);
 }
