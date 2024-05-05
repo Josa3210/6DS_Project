@@ -39,14 +39,6 @@ public class Client implements I_Client {
             this.restClient = RestClient.create();
             this.currentIP = (Inet4Address) InetAddress.getLocalHost();
 
-            // We make a new logger file that keeps track of changes in the 'Files' map
-            logger = new Logger();
-
-            // We create a new thread to check if a new file is created or deleted ...
-            Thread fileMonitorThread = new Thread(new FileMonitor(this, "6DS_Project/Node/Data/node/Files"));
-            fileMonitorThread.start();
-
-
         } catch (FileNotFoundException e) {
             System.err.println(e.getMessage());
         } catch (UnknownHostException e) {
@@ -71,6 +63,12 @@ public class Client implements I_Client {
         joinConfig.getMulticastConfig().setMulticastPort(54321);
         config.getManagementCenterConfig().setConsoleEnabled(true); // Enables the management center console.
         config.addListenerConfig(new ListenerConfig(event_listener));
+
+        logger = new Logger(); // We make a new logger file that keeps track of changes in the 'Files' map
+
+        // We create a new thread to check if a new file is created or deleted ...
+        Thread fileMonitorThread = new Thread(new FileMonitor(this, "6DS_Project/Node/Data/node/Files"));
+        fileMonitorThread.start();
         return config;
     }
 
