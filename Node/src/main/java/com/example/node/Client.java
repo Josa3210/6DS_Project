@@ -23,8 +23,8 @@ public class Client implements I_Client {
     private static ClusterMemberShipListener event_listener;
     RestClient restClient;
     int currentID, nextID, prevID;
-    private Config config;
-    private Map<String, Inet4Address> ipMap;
+    Config config;
+    Map<String, Inet4Address> ipMap;
     Inet4Address currentIP;
     private Inet4Address namingServerIP;
     private Integer namingServerPort;
@@ -43,7 +43,7 @@ public class Client implements I_Client {
             logger = new Logger();
 
             // We create a new thread to check if a new file is created or deleted ...
-            Thread fileMonitorThread = new Thread(new FileMonitor(this, "C:/Data/Java/6DS_Project/Node/Data/node/Files"));
+            Thread fileMonitorThread = new Thread(new FileMonitor(this, "6DS_Project/Node/Data/node/Files"));
             fileMonitorThread.start();
 
 
