@@ -40,9 +40,11 @@ public class FileMonitor implements Runnable {
 
             if (existingFiles != null) {
 
-                for (File file : existingFiles) {
-                    System.out.println("Existing files found! -------------------------------------------------");
+                System.out.println("Existing files found! -------------------------------------------------");
 
+                for (File file : existingFiles) {
+                    // Print the name of each existing file
+                    System.out.println(file.getName());
                     // Calculate hash and report to naming server for existing files
                     client.reportFilenameToNamingServer(file.getName());
                 }
