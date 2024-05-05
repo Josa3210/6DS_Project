@@ -6,6 +6,7 @@ import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
 import org.apache.commons.io.monitor.FileAlterationObserver;
 
 import java.io.File;
+import java.util.Arrays;
 
 
 /**
@@ -32,6 +33,7 @@ public class FileMonitor implements Runnable {
 
         // Perform an initial scan of the directory, to check there are already files saved ..
         File[] existingFiles = new File(folderPath).listFiles();
+        System.out.println("Existing files detected: " +  Arrays.toString(existingFiles));
 
         // if the client setup is completed, we can start with reporting the files to the namingserver
         if (client.isSetupCompleted()){
