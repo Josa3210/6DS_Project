@@ -40,16 +40,14 @@ public class FileMonitor implements Runnable {
 
             if (existingFiles != null) {
 
-                if (client.getNamingServerIP() != null) {
+                System.out.println("Existing files found! -------------------------------------------------");
 
-                    System.out.println("Existing files found! -------------------------------------------------");
+                for (File file : existingFiles) {
+                    // Print the name of each existing file
+                    System.out.println(file.getName());
+                    // Calculate hash and report to naming server for existing files
+                    client.reportFilenameToNamingServer(file.getName());
 
-                    for (File file : existingFiles) {
-                        // Print the name of each existing file
-                        System.out.println(file.getName());
-                        // Calculate hash and report to naming server for existing files
-                        client.reportFilenameToNamingServer(file.getName());
-                    }
                 }
             }
         }
@@ -63,11 +61,14 @@ public class FileMonitor implements Runnable {
                 // Calculate hash and report to naming server when a new file is created
 
                 if (client.isSetupCompleted()) {
-                    String filename = file.getName();
-                    System.out.println("File created: " + filename);
 
-                    int hash = client.computeHash(filename);
-                    client.reportFilenameToNamingServer(file.getName());
+                    if (client.isSetupCompleted()) {
+                        String filename = file.getName();
+                        System.out.println("File created: " + filename);
+
+                        int hash = client.computeHash(filename);
+                        client.reportFilenameToNamingServer(file.getName());
+                    }
                 }
             }
 
