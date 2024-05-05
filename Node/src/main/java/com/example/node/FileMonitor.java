@@ -1,12 +1,9 @@
-
-
 package com.example.node;
 
 import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
 import org.apache.commons.io.monitor.FileAlterationObserver;
 
 import java.io.File;
-import java.util.Arrays;
 
 
 /**
@@ -37,21 +34,17 @@ public class FileMonitor implements Runnable {
             @Override
             public void onFileCreate(File file) {
 
-                // Calculate hash and report to naming server when a new file is created
-                //if (client.namingServerIP != null) {
-                    String filename = file.getName();
-                    System.out.println("File created: " + filename);
-                    client.reportFilenameToNamingServer(file.getName());
-                //}
+                String filename = file.getName();
+                System.out.println("File created: " + filename);
+                client.reportFilenameToNamingServer(filename);
+
             }
 
             @Override
             public void onFileDelete(File file) {
 
-                //if (client.namingServerIP != null) {
-                    // Handle file deletion event if needed
-                    System.out.println("File deleted: " + file.getName());
-                //}
+                System.out.println("File deleted: " + file.getName());
+
             }
         });
 
