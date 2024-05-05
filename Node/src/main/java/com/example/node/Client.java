@@ -80,6 +80,10 @@ public class Client implements I_Client {
         return setupCompleted = true;
     }
 
+    public Inet4Address getNamingServerIP() {
+        return namingServerIP;
+    }
+
     @Override
     public void printLinkIds() {
         System.out.println("Link ids");
