@@ -48,6 +48,9 @@ public class FileMonitor implements Runnable {
 
                     System.out.println("File deleted: " + file.getName());
 
+                    // Todo: create a function that deletes a file from the namingserver
+                    //client.deleteFileFromNamingServer
+
             }
         });
 
