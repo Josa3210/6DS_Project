@@ -39,6 +39,7 @@ public class FileMonitor implements Runnable {
 
                 for (File file : existingFiles) {
                     System.out.println("Existing files found!");
+
                     // Calculate hash and report to naming server for existing files
                     client.reportFilenameToNamingServer(file.getName());
                 }
@@ -74,6 +75,7 @@ public class FileMonitor implements Runnable {
 
         // Start monitoring the directory
         while (true) {
+            System.out.println("lol");
             try {
                 observer.checkAndNotify();
                 Thread.sleep(1000); // Adjust sleep time as needed
