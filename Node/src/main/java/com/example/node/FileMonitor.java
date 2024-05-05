@@ -18,8 +18,8 @@ import java.util.Arrays;
 
 public class FileMonitor implements Runnable {
 
-    private final String folderPath;
-    private final Client client;
+    String folderPath;
+    Client client;
 
     public FileMonitor(Client client, String folderPath) {
         this.client = client;
@@ -33,11 +33,11 @@ public class FileMonitor implements Runnable {
 
         // Perform an initial scan of the directory, to check there are already files saved ..
         File[] existingFiles = new File(folderPath).listFiles();
-        System.out.println("Existing files detected: " +  Arrays.toString(existingFiles));
+
 
         // if the client setup is completed, we can start with reporting the files to the namingserver
         if (client.isSetupCompleted()){
-            System.out.println("setup completed");
+
             if (existingFiles != null) {
 
                 for (File file : existingFiles) {
@@ -47,10 +47,6 @@ public class FileMonitor implements Runnable {
                     client.reportFilenameToNamingServer(file.getName());
                 }
             }
-        }
-        else{
-
-            System.out.println("Setup not completed!");
         }
 
         // Add a listener to handle file system events
