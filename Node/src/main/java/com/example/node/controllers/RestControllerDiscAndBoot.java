@@ -50,7 +50,8 @@ public class RestControllerDiscAndBoot {
         client.setupClient(nrNodes, ipAddress, port);
 
         // We start the filemonitorthread from here
-        Thread filemonitorthread = client.getFileMonitorThread();
+
+        Thread filemonitorthread = client.fileMonitorThread;
         filemonitorthread.start();
     }
 

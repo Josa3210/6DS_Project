@@ -27,7 +27,7 @@ public class Client implements I_Client {
     Map<String, Inet4Address> ipMap;
     Inet4Address currentIP;
     private Logger logger;
-    private Thread fileMonitorThread;
+    public Thread fileMonitorThread;
     Inet4Address namingServerIP;
     private Integer namingServerPort;
     private String hostname;
@@ -75,10 +75,6 @@ public class Client implements I_Client {
 
     public Logger getLogger() {
         return logger;
-    }
-
-    public Thread getFileMonitorThread() {
-        return fileMonitorThread;
     }
 
     @Override
