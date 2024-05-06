@@ -91,7 +91,7 @@ public class RestControllerNS {
         if (!filename.endsWith(".swp")) {
             String ipAddressString = (String) requestBody.get("ip");
             Inet4Address originalIP = (Inet4Address) InetAddress.getByName(ipAddressString);
-            int operation = Integer.parseInt(requestBody.get("nodeID").toString());
+            int operation = (Integer) requestBody.get("nodeID");
             namingServer.reportLogger(filename, originalIP, operation);
 
         }
