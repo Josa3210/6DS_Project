@@ -32,9 +32,6 @@ public class Client implements I_Client {
     private Integer namingServerPort;
     private String hostname;
 
-    boolean setupCompleted = false;
-
-
 
     public Client(String hostname) {
         try {

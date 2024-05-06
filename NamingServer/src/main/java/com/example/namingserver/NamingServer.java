@@ -306,7 +306,7 @@ public class NamingServer implements I_NamingServer {
         // Check for every node in the list if it's a replicated node by checking which node hash in the dataset lies
         // the closest to the hashed value of the filename
         Inet4Address replicatedIP = getLocationIP(filename);
-        System.out.println("\nNode: " + replicatedIP.getCanonicalHostName() + " with IP " + replicatedIP.getHostAddress() + " is the replicated node of file: " + filename);
+        System.out.println("\nNode: " + replicatedIP.getHostName() + "with IP " + replicatedIP.getHostAddress() + " is the replicated node of file: " + filename);
         System.out.println("Computing hash the filename");
         Integer fileHash = computeHash(filename);
 
