@@ -55,7 +55,6 @@ public class Logger {
 
         try {
             File file = new File(filePath + "/" + fileName);
-
             if (file.exists()) {
 
                 // Read the JSON file and convert it to HashMap
@@ -92,7 +91,6 @@ public class Logger {
 
                 // Create a new file if it doesn't exist
                 if (file.createNewFile()) {
-
                     System.out.println("File is empty. Initializing an empty hashmap: " + fileName);
                     nodeMap = new HashMap<>();
                     // Save the empty hashmap
@@ -114,7 +112,6 @@ public class Logger {
     public void save() {
 
         try {
-
             // Write the JSON string to the file
             File file = new File(filePath + "/" + fileName);
             objectMapper.writeValue(file, nodeMap);
