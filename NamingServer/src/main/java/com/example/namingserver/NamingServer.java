@@ -297,10 +297,6 @@ public class NamingServer implements I_NamingServer {
     public void isReplicatedNode(String filename, Inet4Address originalIP) {
         // Filter out temporary or swap file extensions like .swp
 
-        if (filename.endsWith(".swp")) {
-            System.err.println("Ignoring temporary file: " + filename);
-            return;
-        }
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
