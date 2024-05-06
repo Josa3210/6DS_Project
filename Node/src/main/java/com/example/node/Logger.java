@@ -32,7 +32,7 @@ public class Logger {
         try {
 
             String currentPath = new java.io.File("").getCanonicalPath();
-            String filepath = currentPath + "/Data/node/logger";
+            String filepath = currentPath + "/Data/node";
             Path path = Paths.get(filepath);
             System.out.println(filepath);
             Files.createDirectories(path);
@@ -92,15 +92,17 @@ public class Logger {
                 // Create a new file if it doesn't exist
                 if (file.createNewFile()) {
 
-                    System.out.println("File does not exist. Initializing an empty hashmap: " + fileName);
+                    System.out.println("File is empty. Initializing an empty hashmap: " + fileName);
                     nodeMap = new HashMap<>();
                     // Save the empty hashmap
                     save();
                 }
             }
         } catch (IOException e) {
+
             System.err.println("Error loading hashmap from file: " + e.getMessage());
             nodeMap = new HashMap<>();
+
         }
     }
 
@@ -115,7 +117,6 @@ public class Logger {
             // Write the JSON string to the file
             File file = new File(filePath + "/" + fileName);
             objectMapper.writeValue(file, nodeMap);
-
             System.out.println("Map saved to file: " + filePath + "/" + fileName);
 
         } catch (IOException e) {
