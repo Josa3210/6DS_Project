@@ -32,12 +32,10 @@ public class Logger {
         try {
 
             String currentPath = new java.io.File("").getCanonicalPath();
-            String filepath = "Data/node/logger";
+            String filepath = currentPath + "/Data/node/logger";
             Path path = Paths.get(filepath);
             System.out.println(filepath);
             Files.createDirectories(path);
-
-            this.filePath = filepath;
             System.out.println("Logger will be saved in: " + filePath);
 
         } catch (IOException e) {
