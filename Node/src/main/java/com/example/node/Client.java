@@ -395,9 +395,13 @@ public class Client implements I_Client {
 
 
         Map<String, Object> requestBody = new HashMap<>();
+
+        System.out.println("operation: " + operation);
+
         requestBody.put("filename", filename);
         requestBody.put("ip", currentIP.getHostAddress());
         requestBody.put("operation", operation);
+
 
         // Make an HTTP POST request to report the hash value
         RestTemplate restTemplate = new RestTemplate();

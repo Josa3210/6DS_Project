@@ -52,7 +52,6 @@ public class FileMonitor implements Runnable {
                 logger.load();
                 int hash = client.computeHash(filename);
                 logger.remove(hash);
-
                 client.reportFilenameToNamingServer(file.getName(), 2); // Operation 2 --> file DELETE
             }
         });
