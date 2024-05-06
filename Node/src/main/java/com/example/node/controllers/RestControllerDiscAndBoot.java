@@ -48,7 +48,10 @@ public class RestControllerDiscAndBoot {
         int port = Integer.parseInt(request.get("port").toString());
         System.out.println("port: " + port);
         client.setupClient(nrNodes, ipAddress, port);
-        client.fileMonitorThread.start(); // Start the thread
+
+        // We start the filemonitorthread from here
+        Thread filemonitorthread = client.getFileMonitorThread();
+        filemonitorthread.start();
     }
 
     @GetMapping("/multicastaddress")

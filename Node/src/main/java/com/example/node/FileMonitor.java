@@ -38,7 +38,7 @@ public class FileMonitor implements Runnable {
             public void onFileCreate(File file) {
 
                 String filename = file.getName();
-                System.out.println("File created: " + filename);
+                System.out.println("\nFile created: " + filename);
                 client.reportFilenameToNamingServer(file.getName());
 
             }
