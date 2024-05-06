@@ -296,42 +296,46 @@ public class NamingServer implements I_NamingServer {
 
     public void isReplicatedNode(String filename, Inet4Address originalIP) {
 
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+        // Check if the file name does not end with .swp --> temporary files!
+        if (!filename.endsWith(".swp")) {
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
 
-        // Create the request body
-        Map<String, Object> requestBody = new HashMap<>();
+            // Create the request body
+            Map<String, Object> requestBody = new HashMap<>();
 
-        // Check for every node in the list if it's a replicated node by checking which node hash in the dataset lies
-        // the closest to the hashed value of the filename
-        Inet4Address replicatedIP = getLocationIP(filename);
-        System.out.println("\nNode: " + replicatedIP.getCanonicalHostName() + " with IP " + replicatedIP.getHostAddress() + " is the replicated node of file: " + filename);
-        System.out.println("Computing hash the filename");
-        Integer fileHash = computeHash(filename);
 
-        String postUrl = "http://" + replicatedIP.getHostAddress() + ":8080/isReplicatedNode";
+            // Check for every node in the list if it's a replicated node by checking which node hash in the dataset lies
+            // the closest to the hashed value of the filename
+            Inet4Address replicatedIP = getLocationIP(filename);
+            System.out.println("\nNode: " + replicatedIP.getCanonicalHostName() + " with IP " + replicatedIP.getHostAddress() + " is the replicated node of file: " + filename);
+            System.out.println("Computing hash the filename");
+            Integer fileHash = computeHash(filename);
 
-        // Create the request entity with headers and body
-        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
+            String postUrl = "http://" + replicatedIP.getHostAddress() + ":8080/isReplicatedNode";
 
-        try {
-            // Send the POST request
-            requestBody.put("hashValue", fileHash);
-            requestBody.put("original ip", originalIP);
+            // Create the request entity with headers and body
+            HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
 
-            ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
-            HttpStatusCode statusCode = responseEntity.getStatusCode();
+            try {
+                // Send the POST request
+                requestBody.put("hashValue", fileHash);
+                requestBody.put("original ip", originalIP);
 
-            if (statusCode == HttpStatus.OK) {
-                System.out.println("Node list correctly sent to " + replicatedIP.getHostAddress());
-            } else {
-                System.err.println("Sending node list failed with status code: " + statusCode);
+                ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
+                HttpStatusCode statusCode = responseEntity.getStatusCode();
+
+                if (statusCode == HttpStatus.OK) {
+                    System.out.println("Node list correctly sent to " + replicatedIP.getHostAddress());
+                } else {
+                    System.err.println("Sending node list failed with status code: " + statusCode);
+                }
+            } catch (RestClientException e) {
+                System.err.println("Failed to send node list to " + replicatedIP + ": " + e.getMessage());
             }
-        } catch (RestClientException e) {
-            System.err.println("Failed to send node list to " + replicatedIP + ": " + e.getMessage());
-        }
 
+        }
     }
 
 }
