@@ -40,7 +40,7 @@ public class Client implements I_Client {
         try {
             event_listener = new ClusterMemberShipListener();
             this.config = createConfig();
-            this.logger = new Logger(); // We create a logger to keep track of the replication
+            this.logger = new Logger(hostname); // We create a logger to keep track of the replication
             logger.load();
             fileMonitorThread = new Thread(new FileMonitor(this, "Data/node/Files"));
             this.hostname = hostname;
