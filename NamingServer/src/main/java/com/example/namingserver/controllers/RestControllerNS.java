@@ -84,7 +84,7 @@ public class RestControllerNS {
      */
 
     @PostMapping("/ns/reportFileName")
-    public void reportFileHash(@RequestBody Map<String, Object> requestBody) throws UnknownHostException {
+    public void reportFileName(@RequestBody Map<String, Object> requestBody) throws UnknownHostException {
 
         // Check if the file name does not end with .swp --> temporary files!
         String filename = (String) requestBody.get("filename");
