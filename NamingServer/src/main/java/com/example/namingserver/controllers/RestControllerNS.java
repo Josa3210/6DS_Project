@@ -86,10 +86,15 @@ public class RestControllerNS {
     @PostMapping("/ns/reportFileName")
     public void reportFileHash(@RequestBody Map<String, Object> requestBody) throws UnknownHostException {
 
+
+        // Check if the file name does not end with .swp --> temporary files!
         String filename = (String) requestBody.get("filename");
-        String ipAddressString = (String) requestBody.get("ip");
-        Inet4Address originalIP = (Inet4Address) InetAddress.getByName(ipAddressString);
-        namingServer.isReplicatedNode(filename, originalIP);
+
+        if (!filename.endsWith(".swp")) {
+            String ipAddressString = (String) requestBody.get("ip");
+            Inet4Address originalIP = (Inet4Address) InetAddress.getByName(ipAddressString);
+            namingServer.isReplicatedNode(filename, originalIP);
+        }
 
     }
 }
