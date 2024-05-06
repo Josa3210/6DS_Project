@@ -26,12 +26,13 @@ public class Client implements I_Client {
     Config config;
     Map<String, Inet4Address> ipMap;
     Inet4Address currentIP;
-    private Logger logger;
+    Logger logger;
     public Thread fileMonitorThread;
     Inet4Address namingServerIP;
     private Integer namingServerPort;
     private String hostname;
 
+    boolean setupCompleted = false;
 
     public Client(String hostname) {
         try {
@@ -72,6 +73,10 @@ public class Client implements I_Client {
 
     public Logger getLogger() {
         return logger;
+    }
+
+    public boolean isSetupCompleted() {
+        return setupCompleted = true;
     }
 
     @Override
