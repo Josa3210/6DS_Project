@@ -36,6 +36,7 @@ public class Logger {
             Path path = Paths.get(filepath);
             System.out.println(filepath);
             Files.createDirectories(path);
+            this.filePath = filepath;
             System.out.println("Logger will be saved in: " + filePath);
 
         } catch (IOException e) {
