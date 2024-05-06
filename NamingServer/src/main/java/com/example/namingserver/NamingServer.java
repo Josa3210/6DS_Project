@@ -297,7 +297,7 @@ public class NamingServer implements I_NamingServer {
     public void isReplicatedNode(String filename, Inet4Address originalIP) {
 
         // Check if the file name does not end with .swp --> temporary files!
-        if (!filename.endsWith(".swp")) {
+
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
@@ -313,30 +313,33 @@ public class NamingServer implements I_NamingServer {
             System.out.println("Computing hash the filename");
             Integer fileHash = computeHash(filename);
 
-            String postUrl = "http://" + replicatedIP.getHostAddress() + ":8080/isReplicatedNode";
+            if (!filename.endsWith(".swp")) {
 
-            // Create the request entity with headers and body
-            HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
+                String postUrl = "http://" + replicatedIP.getHostAddress() + ":8080/isReplicatedNode";
 
-            try {
-                // Send the POST request
-                requestBody.put("hashValue", fileHash);
-                requestBody.put("original ip", originalIP);
+                // Create the request entity with headers and body
+                HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
 
-                ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
-                HttpStatusCode statusCode = responseEntity.getStatusCode();
+                try {
+                    // Send the POST request
+                    requestBody.put("hashValue", fileHash);
+                    requestBody.put("original ip", originalIP);
 
-                if (statusCode == HttpStatus.OK) {
-                    System.out.println("Node list correctly sent to " + replicatedIP.getHostAddress());
-                } else {
-                    System.err.println("Sending node list failed with status code: " + statusCode);
+                    ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
+                    HttpStatusCode statusCode = responseEntity.getStatusCode();
+
+                    if (statusCode == HttpStatus.OK) {
+                        System.out.println("Node list correctly sent to " + replicatedIP.getHostAddress());
+                    } else {
+                        System.err.println("Sending node list failed with status code: " + statusCode);
+                    }
+                } catch (RestClientException e) {
+                    System.err.println("Failed to send node list to " + replicatedIP + ": " + e.getMessage());
                 }
-            } catch (RestClientException e) {
-                System.err.println("Failed to send node list to " + replicatedIP + ": " + e.getMessage());
             }
 
         }
-    }
+
 
 }
 
