@@ -402,7 +402,6 @@ public class Client implements I_Client {
         requestBody.put("ip", currentIP.getHostAddress());
         requestBody.put("operation", operation);
 
-
         // Make an HTTP POST request to report the hash value
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestBody, Void.class);
