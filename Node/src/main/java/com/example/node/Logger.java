@@ -87,7 +87,7 @@ public class Logger {
                     }
                 }
 
-                System.out.println("Map loaded from file: " + filePath);
+                System.out.println("Map loaded from logger: " + filePath);
 
             } else {
 

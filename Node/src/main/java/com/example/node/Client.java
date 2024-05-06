@@ -402,7 +402,7 @@ public class Client implements I_Client {
         ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestBody, Void.class);
 
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
-            System.out.println("Hash value reported to naming server for file: " + filename);
+            System.out.println("Hash value correctly : " + filename);
         } else {
             System.err.println("Failed to report hash value to naming server for file: " + filename);
         }
