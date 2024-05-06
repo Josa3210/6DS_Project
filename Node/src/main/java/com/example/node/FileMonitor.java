@@ -1,3 +1,5 @@
+
+
 package com.example.node;
 
 import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
@@ -51,10 +53,10 @@ public class FileMonitor implements Runnable {
 
         // Start monitoring the directory
         while (true) {
-
+            System.out.println("loop");
             try {
                 observer.checkAndNotify();
-                Thread.sleep(2000); // Adjust sleep time as needed
+                Thread.sleep(1000); // Adjust sleep time as needed
 
             } catch (InterruptedException e) {
                 e.printStackTrace();

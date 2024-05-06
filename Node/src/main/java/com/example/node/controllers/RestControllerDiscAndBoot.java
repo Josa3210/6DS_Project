@@ -50,7 +50,8 @@ public class RestControllerDiscAndBoot {
         client.setupClient(nrNodes, ipAddress, port);
 
         // We start the filemonitorthread from here
-        client.fileMonitorThread.start();
+        Thread filemonitorthread = client.getFileMonitorThread();
+        filemonitorthread.start();
     }
 
     @GetMapping("/multicastaddress")
