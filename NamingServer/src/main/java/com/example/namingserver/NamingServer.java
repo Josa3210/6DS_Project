@@ -295,7 +295,6 @@ public class NamingServer implements I_NamingServer {
      */
 
     public void isReplicatedNode(String filename, Inet4Address originalIP) {
-        // Filter out temporary or swap file extensions like .swp
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -332,8 +331,8 @@ public class NamingServer implements I_NamingServer {
         } catch (RestClientException e) {
             System.err.println("Failed to send node list to " + replicatedIP + ": " + e.getMessage());
         }
-    }
 
+    }
 
 }
 
