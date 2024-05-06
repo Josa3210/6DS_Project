@@ -32,7 +32,7 @@ public class Logger {
         try {
 
             String currentPath = new java.io.File("").getCanonicalPath();
-            String filepath = currentPath + "/Data/node/logger_" +hostname; // Append nodeName to differentiate logger directories
+            String filepath = currentPath + "/Data/node/logger_" + hostname; // Append nodeName to differentiate logger directories
             Path path = Paths.get(filepath);
             System.out.println(filepath);
             Files.createDirectories(path);

@@ -39,20 +39,26 @@ public class FileMonitor implements Runnable {
 
                 String filename = file.getName();
                 System.out.println("\nFile created: " + filename);
-                client.reportFilenameToNamingServer(file.getName());
-
+                client.reportFilenameToNamingServer(file.getName(),1); // Operation 1 --> file CREATE
             }
 
             @Override
             public void onFileDelete(File file) {
+                String filename = file.getName();
+                System.out.println("\nFile deleted: " + file.getName());
 
-                    System.out.println("File deleted: " + file.getName());
+                // We remove the file from the logger
+                Logger logger = client.getLogger();
+                logger.load();
+                int hash = client.computeHash(filename);
+                logger.remove(hash);
 
+                client.reportFilenameToNamingServer(file.getName(), 2); // Operation 2 --> file DELETE
             }
         });
 
-        // Start monitoring the directory
-        while (true) {
+        while (true) {  // Start monitoring the directory
+
             // System.out.println("loop");
             try {
                 observer.checkAndNotify();

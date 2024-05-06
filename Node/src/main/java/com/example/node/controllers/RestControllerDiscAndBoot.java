@@ -77,5 +77,22 @@ public class RestControllerDiscAndBoot {
         logger.put(fileHash, ip);
     }
 
+    @PostMapping("/newNodeOwner")
+    public void newNodeOwner(@RequestBody Map<String, Object> request) throws UnknownHostException {
+
+        Integer fileHash = Integer.parseInt(request.get("hashValue").toString());
+        System.out.println("This node becomes the new owner of file with hash: " + fileHash);
+
+        // We change the ip from the original IP --> current IP
+        Logger logger = client.getLogger();
+        logger.load();
+
+        // We first remove the current entry with the original IP
+        logger.remove(fileHash);
+
+        // We add the current IP nex to the filehash
+        logger.put(fileHash, client.currentIP);
+
+    }
 
 }

@@ -25,7 +25,7 @@ public class Client implements I_Client {
     int currentID, nextID, prevID;
     Config config;
     Map<String, Inet4Address> ipMap;
-    Inet4Address currentIP;
+    public Inet4Address currentIP;
     private Logger logger;
     private Thread fileMonitorThread;
     Inet4Address namingServerIP;
@@ -385,7 +385,7 @@ public class Client implements I_Client {
     }
 
     @Override
-    public void reportFilenameToNamingServer(String filename) {
+    public void reportFilenameToNamingServer(String filename, int operation) {
 
         System.out.println("namingserver IP: " + namingServerIP.getHostAddress());
         System.out.println("current IP: " + currentIP.getHostAddress());
@@ -393,9 +393,11 @@ public class Client implements I_Client {
         // Prepare the URL for reporting the hash value to the naming server
         String postUrl = "http://" + namingServerIP.getHostAddress() + ":8080/ns/reportFileName";
 
+
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("filename", filename);
         requestBody.put("ip", currentIP.getHostAddress());
+        requestBody.put("operation", operation);
 
         // Make an HTTP POST request to report the hash value
         RestTemplate restTemplate = new RestTemplate();
@@ -406,8 +408,6 @@ public class Client implements I_Client {
         } else {
             System.err.println("Failed to report hash value to naming server for file: " + filename);
         }
-
-
     }
 
     public class ClusterMemberShipListener implements MembershipListener {
