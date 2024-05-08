@@ -31,7 +31,8 @@ import static java.util.Collections.max;
 
 @Component
 
-public class NamingServer implements I_NamingServer {
+public class NamingServer implements I_NamingServer
+{
     private static String multicast_address = "224.2.2.5";
     private static HazelcastInstance hazelcastInstance;
     private static ClusterMemberShipListener event_listener;
@@ -41,9 +42,7 @@ public class NamingServer implements I_NamingServer {
     private static NamingserverDB database;
     private String ip;
 
-    public NamingServer() {
-
-    }
+    public NamingServer() {}
 
     /**
      * this method sets up a Hazelcast instance with clustering enabled, specific network configurations including
@@ -52,7 +51,6 @@ public class NamingServer implements I_NamingServer {
      *
      * @throws FileNotFoundException
      */
-
     private static void CreateConfig() throws FileNotFoundException
     {
         Config config = new Config();
@@ -72,6 +70,10 @@ public class NamingServer implements I_NamingServer {
         hazelcastInstance = Hazelcast.newHazelcastInstance(config); // Creates a new Hazelcast instance with the provided configuration.
     }
 
+    /**
+     * Constructor of the Naming Server
+     * Creating a new database
+     */
     @PostConstruct
     public void init()
     {
@@ -142,6 +144,11 @@ public class NamingServer implements I_NamingServer {
         // Reallocate resources
     }
 
+    /**
+     * Returns the IP of a node using the node ID
+     * @param nodeID the ID of the requested node
+     * @return Inet4Address of the node
+     */
     @Override
     public Inet4Address getIP(int nodeID)
     {
@@ -189,6 +196,10 @@ public class NamingServer implements I_NamingServer {
         return hash_value;
     }
 
+    /**
+     * Returns the size of the cluster of nodes in the network
+     * @return size of the cluster as an integer
+     */
     @Override
     public int sendNumNodes()
     {
@@ -196,6 +207,11 @@ public class NamingServer implements I_NamingServer {
         return hazelcastInstance.getCluster().getMembers().size() - 1;
     }
 
+    /**
+     * Searches for the 2 closest nodes in the network using its hash
+     * @param hash the hash of the node
+     * @return the closest smaller (int[0]) and closest larger node ID (int[1])
+     */
     @Override
     public int[] giveLinkIds(int hash)
     {
@@ -228,6 +244,11 @@ public class NamingServer implements I_NamingServer {
         return new int[]{prevID, nextID};
     }
 
+    /**
+     * Rest request to welcome the client (http://[clientIP]:8080/welcome)
+     * Sending the ip of the naming server, the size of the cluster and the port of the naming server
+     * @param clientIP the IP of the client
+     */
     private void welcomeClient(Inet4Address clientIP)
     {
         System.out.println(">> Welcoming client");

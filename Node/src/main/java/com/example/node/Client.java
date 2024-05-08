@@ -24,6 +24,10 @@ public class Client implements I_Client {
     private String hostname;
     private Logger logger;
 
+    /**
+     * Constructor of the client
+     * @param hostname the name of the client
+     */
     public Client(String hostname)
     {
         try
@@ -61,6 +65,11 @@ public class Client implements I_Client {
         return config;
     }
 
+    /**
+     * Writes information about the client to the console:
+     * - Current, next and previous ID
+     * - IP and Port of the naming server
+     */
     @Override
     public void printLinkIds()
     {
@@ -71,6 +80,9 @@ public class Client implements I_Client {
         System.out.println("* IP + port NS: " + this.namingServerIP + " + " + this.namingServerPort);
     }
 
+    /**
+     * Post Constructor of the client
+     */
     @PostConstruct
     public void init()
     {
@@ -80,6 +92,15 @@ public class Client implements I_Client {
         this.prevID = Integer.MIN_VALUE;
     }
 
+    /**
+     * This method computes a hash value for a given string by iterating through
+     * each character and applying a polynomial rolling hash function. The hash
+     * value is calculated as (sum of character values * p_pow) % m, where p is a
+     * prime number, m is a large prime number, and p_pow is the current power of p.
+     *
+     * @param s the input string for which the hash value needs to be computed
+     * @return the computed hash value for the input string
+     */
     @Override
     public int computeHash(String s)
     {
@@ -120,7 +141,13 @@ public class Client implements I_Client {
         Hazelcast.newHazelcastInstance(this.config); // Creates a new Hazelcast instance with the provided configuration.
     }
 
-
+    /**
+     * This method will set the previous and next node ID's
+     * and ask for the naming server to add the client
+     * @param nrNodes the size of the cluster in the network
+     * @param namingServerIP the IP of the naming server
+     * @param namingServerPort the port of the naming server
+     */
     public void setupClient(int nrNodes, String namingServerIP, int namingServerPort)
     {
         this.namingServerIP = namingServerIP;
@@ -136,6 +163,10 @@ public class Client implements I_Client {
         sendLinkID(prevID);
     }
 
+    /**
+     * This method sends a Post REST request to the naming server
+     * asking to add itself to the network
+     */
     private void addNameToNS()
     {
         String postUrl = "http://" + namingServerIP + ":" + namingServerPort + "/ns/addNode";
@@ -178,9 +209,18 @@ public class Client implements I_Client {
         else if ((this.prevID < hash) && (hash < this.currentID)) this.prevID = hash;
     }
 
+    /**
+     * Returns the previous and next ID of the client itself
+     * @return previous ID (int[0]) and next ID (int[1])
+     */
     @Override
     public int[] requestLinkIds() { return requestLinkIds(currentID); }
 
+    /**
+     * Returns the previous and next ID of the requested client
+     * @param requestID the ID of the requested client
+     * @return previous ID (int[0]) and next ID (int[1])
+     */
     @Override
     public int[] requestLinkIds(int requestID)
     {
@@ -194,6 +234,11 @@ public class Client implements I_Client {
         return response.getBody();
     }
 
+    /**
+     * Returns the IP of a node using the ID
+     * @param nodeID the ID of the requested node
+     * @return the IP of the requested node in a string
+     */
     @Override
     public String requestIP(int nodeID)
     {
@@ -206,6 +251,10 @@ public class Client implements I_Client {
         return response.getBody();
     }
 
+    /**
+     * This method will shut the client down by removing itself from the naming server
+     * and sending the previous and next ID to the corresponding nodes
+     */
     @Override
     public void shutDown()
     {
@@ -222,6 +271,10 @@ public class Client implements I_Client {
         ClientApplication.exitApplication();
     }
 
+    /**
+     * Requests a node to update it's previous and next ID
+     * @param nodeID the requested nodes ID
+     */
     @Override
     public void sendLinkID(int nodeID)
     {
@@ -240,6 +293,11 @@ public class Client implements I_Client {
         catch (Exception e){ removeFromNetwork(nodeID); }
     }
 
+    /**
+     * This method will update the client's previous and next ID
+     * @param prevID the previous ID or current ID
+     * @param nextID the next ID or current ID
+     */
     @Override
     public void receiveLinkID(int prevID, int nextID)
     {
