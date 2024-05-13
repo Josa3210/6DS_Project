@@ -10,7 +10,9 @@ import java.io.FileNotFoundException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Client implements I_Client {
@@ -24,6 +26,8 @@ public class Client implements I_Client {
     private Logger logger;
     private Thread fileMonitorThread;
     private String namingServerIP;
+    private List<NodeFileEntry> fileList;
+
     /**
      * Constructor of the client
      * @param hostname the name of the client
@@ -37,10 +41,9 @@ public class Client implements I_Client {
             fileMonitorThread = new Thread(new FileMonitor(this, "Data/node/Files"));
             this.hostname = hostname;
             this.currentIP = String.valueOf(InetAddress.getLocalHost());
-        } catch (FileNotFoundException e) {
+            this.fileList = new ArrayList<>();
+        } catch (FileNotFoundException | UnknownHostException e) {
             System.err.println(e.getMessage());
-        } catch (UnknownHostException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -389,6 +392,9 @@ public class Client implements I_Client {
     public String getHostname() { return hostname; }
     public Logger getLogger() { return logger; }
     public String getCurrentIP() { return currentIP; }
+    public List<NodeFileEntry> getFileList() {return fileList;}
+
+    public void setFileList(List<NodeFileEntry> newList) {this.fileList = newList;}
 
     @Override
     public void reportFilenameToNamingServer(String filename, int operation) {
