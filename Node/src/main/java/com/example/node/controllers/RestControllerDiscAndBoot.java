@@ -89,7 +89,8 @@ public class RestControllerDiscAndBoot {
         logger.remove(fileHash);
 
         // We add the current IP nex to the filehash
-        logger.put(fileHash, client.currentIP);
+        Inet4Address clientIP = (Inet4Address) InetAddress.getByName(client.getCurrentIP());
+        logger.put(fileHash, clientIP);
 
     }
 
