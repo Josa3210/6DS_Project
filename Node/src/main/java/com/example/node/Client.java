@@ -8,6 +8,7 @@ import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 import java.io.FileNotFoundException;
 import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,10 +18,12 @@ public class Client implements I_Client {
     private static final String multicast_address = "224.2.2.5";
     int currentID, nextID, prevID;
     private Config config;
-    private String currentIP, namingServerIP;
     private Integer namingServerPort;
     private String hostname;
-
+    private String currentIP;
+    private Logger logger;
+    private Thread fileMonitorThread;
+    private String namingServerIP;
     /**
      * Constructor of the client
      * @param hostname the name of the client
@@ -33,8 +36,7 @@ public class Client implements I_Client {
             logger.load();
             fileMonitorThread = new Thread(new FileMonitor(this, "Data/node/Files"));
             this.hostname = hostname;
-            this.restClient = RestClient.create();
-            this.currentIP = (Inet4Address) InetAddress.getLocalHost();
+            this.currentIP = String.valueOf(InetAddress.getLocalHost());
         } catch (FileNotFoundException e) {
             System.err.println(e.getMessage());
         } catch (UnknownHostException e) {
@@ -58,10 +60,6 @@ public class Client implements I_Client {
         joinConfig.getMulticastConfig().setMulticastPort(54321);
         config.getManagementCenterConfig().setConsoleEnabled(true); // Enables the management center console.
         return config;
-    }
-
-    public Logger getLogger() {
-        return logger;
     }
 
     public Thread getFileMonitorThread() {
@@ -394,11 +392,11 @@ public class Client implements I_Client {
     @Override
     public void reportFilenameToNamingServer(String filename, int operation) {
 
-        System.out.println("namingserver IP: " + namingServerIP.getHostAddress());
-        System.out.println("current IP: " + currentIP.getHostAddress());
+        System.out.println("namingserver IP: " + namingServerIP);
+        System.out.println("current IP: " + currentIP);
 
         // Prepare the URL for reporting the hash value to the naming server
-        String postUrl = "http://" + namingServerIP.getHostAddress() + ":8080/ns/reportFileName";
+        String postUrl = "http://" + namingServerIP + ":8080/ns/reportFileName";
 
 
         Map<String, Object> requestBody = new HashMap<>();
@@ -406,7 +404,7 @@ public class Client implements I_Client {
         System.out.println("operation: " + operation);
 
         requestBody.put("filename", filename);
-        requestBody.put("ip", currentIP.getHostAddress());
+        requestBody.put("ip", currentIP);
         requestBody.put("operation", operation);
 
         // Make an HTTP POST request to report the hash value
