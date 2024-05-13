@@ -9,14 +9,18 @@ import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.shaded.org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.net.*;
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -65,16 +69,32 @@ public class RestControllerDiscAndBoot {
     }
 
     @PostMapping("/isReplicatedNode")
-    public void isReplicatedNode(@RequestBody Map<String, Object> request) throws UnknownHostException {
+    public void isReplicatedNode(@RequestBody Map<String, Object> request) throws IOException {
 
         Integer fileHash = Integer.parseInt(request.get("hashValue").toString());
+        String filepath = (String) request.get("filepath");
         Inet4Address ip = (Inet4Address) InetAddress.getByName((String) request.get("original ip"));
         Logger logger = client.getLogger();
         System.out.println("This is the replicated node for file: " + fileHash);
         logger.load();
-
         // Puts the filehash and the ip address of the node where the file was created in the logger ..
         logger.put(fileHash, ip);
+        client.serverSocket = new ServerSocket(5000);
+        String url = "http://"+ip+":8080/OpenTCPConnection";
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("replicated ip", InetAddress.getLocalHost().getHostAddress());
+        String completed = String.valueOf(restTemplate.postForEntity(url, requestBody, String.class));
+        System.out.println(completed);
+        client.clientSocket = client.serverSocket.accept();
+        DataInputStream dataInputStream = new DataInputStream(client.clientSocket.getInputStream());
+        url = "http://"+ip+":8080/StartFileTransfer";
+        requestBody.clear();
+        requestBody.put("filepath", filepath);
+        restTemplate.postForEntity(url, requestBody, Void.class);
+        client.ReceiveFile(filepath,dataInputStream);
     }
 
     @PostMapping("/newNodeOwner")
@@ -95,4 +115,16 @@ public class RestControllerDiscAndBoot {
 
     }
 
+    @PostMapping("/OpenTCPConnection")
+    public String OpenTCPConnection(@RequestBody Map<String, Object> request) throws IOException {
+        String ip = (String) request.get("replicated ip");
+        client.clientSocket = new Socket(ip,5000);
+        return("TCP connection is established, ready for file transfer");
+    }
+
+    @PostMapping("/StartFileTransfer")
+    public void StartFileTransfer(@RequestBody Map<String, Object> request) throws UnknownHostException {
+        String filepath = (String) request.get("filepath");
+        client.SendFile(filepath);
+    }
 }
