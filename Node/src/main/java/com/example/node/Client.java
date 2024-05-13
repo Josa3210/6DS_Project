@@ -27,15 +27,7 @@ public class Client implements I_Client {
      */
     public Client(String hostname)
     {
-        try
-        {
-    boolean setupCompleted = false;
-
-
-
-    public Client(String hostname) {
         try {
-            event_listener = new ClusterMemberShipListener();
             this.config = createConfig();
             this.logger = new Logger(hostname); // We create a logger to keep track of the replication
             logger.load();
@@ -48,7 +40,6 @@ public class Client implements I_Client {
         } catch (UnknownHostException e) {
             throw new RuntimeException(e);
         }
-        catch (FileNotFoundException | UnknownHostException e) { throw new RuntimeException(e); }
     }
 
     private Config createConfig() throws FileNotFoundException
