@@ -11,10 +11,12 @@ public class AppConfig {
     @Bean
     public Client client()
     {
-        Scanner myObj = new Scanner(System.in);  // Create a Scanner object
+        // Create a Scanner object
+        Scanner myObj = new Scanner(System.in);
         System.out.println(">> Enter username: ");
 
-        String userName = myObj.nextLine();  // Read user input
+        // Read user input
+        String userName = myObj.nextLine();
         return new Client(userName);
     }
 }

@@ -2,13 +2,8 @@ package com.example.node.CLI;
 
 
 import com.example.node.Client;
-import com.example.node.I_Client;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Scanner;
 
 @Component
@@ -32,6 +27,7 @@ public class CLIDaemon {
             System.out.print("> ");
             inputString = getInput();
             if (inputString.equals("exit")) {
+                client.shutDown();
                 return;
             }
 
@@ -45,10 +41,6 @@ public class CLIDaemon {
                 case GETNAME -> client.getName();
             }
         }
-    }
-
-    public void print(String string) {
-        System.out.println(string);
     }
 
     public String getInput() {

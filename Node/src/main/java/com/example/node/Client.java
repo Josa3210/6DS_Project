@@ -5,7 +5,6 @@ import com.hazelcast.config.*;
 import com.hazelcast.core.Hazelcast;
 import jakarta.annotation.PostConstruct;
 import org.springframework.http.*;
-import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestTemplate;
 import java.io.FileNotFoundException;
 import java.net.Inet4Address;
@@ -16,7 +15,6 @@ import java.util.Map;
 public class Client implements I_Client {
 
     private static final String multicast_address = "224.2.2.5";
-    private RestClient restClient; // ?
     int currentID, nextID, prevID;
     private Config config;
     private String currentIP, namingServerIP;
@@ -34,7 +32,6 @@ public class Client implements I_Client {
         {
             this.config = createConfig();
             this.hostname = hostname;
-            this.restClient = RestClient.create();
             this.currentIP = Inet4Address.getByName(Inet4Address.getLocalHost().getHostAddress()).getHostAddress();
 
             // We make a new logger file that keeps track of changes in the 'Files' map
@@ -392,7 +389,7 @@ public class Client implements I_Client {
     public void reportFilenameToNamingServer(String filename)
     {
         // Prepare the URL for reporting the hash value to the naming server
-        String postUrl = "http://localhost:9090/ns/reportFileName";
+        String postUrl = "http://localhost:8080/ns/reportFileName";
 
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("filename", filename);

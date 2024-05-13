@@ -188,7 +188,10 @@ public class NamingServer implements I_NamingServer
 
         for (char c : s.toCharArray())
         {
-            if (Character.isDigit(c)) hash_value = (hash_value + Integer.parseInt(String.valueOf(c)) * p_pow) % m;
+            if (Character.isDigit(c)){
+                int cValue = Integer.parseInt(String.valueOf(c));
+                hash_value = (hash_value + cValue * p_pow) % m;
+            }
             else hash_value = (hash_value + (c - 'a' + 1) * p_pow) % m;
 
             p_pow = (p_pow * p) % m;
