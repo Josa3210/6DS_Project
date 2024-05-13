@@ -388,6 +388,7 @@ public class Client implements I_Client {
     public void setPrevID(int prevID) { this.prevID = prevID; }
     public String getHostname() { return hostname; }
     public Logger getLogger() { return logger; }
+    public String getCurrentIP() { return currentIP; }
 
     @Override
     public void reportFilenameToNamingServer(String filename, int operation) {
