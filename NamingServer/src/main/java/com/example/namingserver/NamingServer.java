@@ -139,7 +139,7 @@ public class NamingServer implements I_NamingServer {
     public void addNodeIP(String nodeName, Inet4Address ipaddress) {
         int hash = computeHash(nodeName);
         database.put(hash, ipaddress);
-
+        database.save();
         // Reallocate resources
     }
 
@@ -282,12 +282,6 @@ public class NamingServer implements I_NamingServer {
         public void memberRemoved(MembershipEvent membershipEvent) {
             String s = membershipEvent.getMember().getSocketAddress().toString();
             s = s.substring(s.indexOf("/") + 1, s.indexOf(":"));
-
-            // calculate the hash of the ip address, so we can remove it from the database
-            int hash = computeHash(s);
-            database.remove(hash);
-            database.save();
-
 
         }
     }
