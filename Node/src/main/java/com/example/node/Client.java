@@ -27,6 +27,7 @@ public class Client implements I_Client {
     private Thread fileMonitorThread;
     private String namingServerIP;
     private List<NodeFileEntry> fileList;
+    private SyncAgent syncAgent;
 
     /**
      * Constructor of the client
@@ -393,6 +394,9 @@ public class Client implements I_Client {
     public Logger getLogger() { return logger; }
     public String getCurrentIP() { return currentIP; }
     public List<NodeFileEntry> getFileList() {return fileList;}
+    public int getNextID() { return nextID; }
+    public int getPrevID() { return prevID; }
+    public SyncAgent getSyncAgent() { return syncAgent; }
 
     public void setFileList(List<NodeFileEntry> newList) {this.fileList = newList;}
 
