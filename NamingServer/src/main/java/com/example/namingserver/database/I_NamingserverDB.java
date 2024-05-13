@@ -23,4 +23,5 @@ public interface I_NamingserverDB {
     void remove(int hash);
 
     void print();
+
 }

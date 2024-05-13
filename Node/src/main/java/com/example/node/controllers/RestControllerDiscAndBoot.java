@@ -50,6 +50,10 @@ public class RestControllerDiscAndBoot {
         System.out.println("* Nr nodes: " + nrNodes);
         System.out.println("* IP Naming Server: " + ipNamingServer);
         System.out.println("* Port Naming Server: " + portNamingServer);
+
+        // We start the filemonitorthread from here
+        Thread filemonitorthread = client.getFileMonitorThread();
+        filemonitorthread.start();
     }
 
     @GetMapping("/multicastaddress")
@@ -59,18 +63,34 @@ public class RestControllerDiscAndBoot {
     public Object createHazelcastInstance() { return JSONObject.wrap(Hazelcast.newHazelcastInstance(config)); }
 
     @PostMapping("/isReplicatedNode")
-    public void isReplicatedNode(@RequestBody Map<String, Object> request)
-    {
-        Integer fileHash = (Integer) request.get("hashValue");
-        Inet4Address ip = (Inet4Address) request.get("original ip");
+    public void isReplicatedNode(@RequestBody Map<String, Object> request) throws UnknownHostException {
 
+        Integer fileHash = Integer.parseInt(request.get("hashValue").toString());
+        Inet4Address ip = (Inet4Address) InetAddress.getByName((String) request.get("original ip"));
         Logger logger = client.getLogger();
+        System.out.println("This is the replicated node for file: " + fileHash);
         logger.load();
-        // Puts the filehash and the ip address of the node where the file was created in the logger
+
+        // Puts the filehash and the ip address of the node where the file was created in the logger ..
         logger.put(fileHash, ip);
     }
 
+    @PostMapping("/newNodeOwner")
+    public void newNodeOwner(@RequestBody Map<String, Object> request) throws UnknownHostException {
 
+        Integer fileHash = Integer.parseInt(request.get("hashValue").toString());
+        System.out.println("This node becomes the new owner of file with hash: " + fileHash);
 
+        // We change the ip from the original IP --> current IP
+        Logger logger = client.getLogger();
+        logger.load();
+
+        // We first remove the current entry with the original IP
+        logger.remove(fileHash);
+
+        // We add the current IP nex to the filehash
+        logger.put(fileHash, client.currentIP);
+
+    }
 
 }

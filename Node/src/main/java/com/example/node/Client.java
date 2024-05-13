@@ -20,7 +20,6 @@ public class Client implements I_Client {
     private String currentIP, namingServerIP;
     private Integer namingServerPort;
     private String hostname;
-    private Logger logger;
 
     /**
      * Constructor of the client
@@ -30,16 +29,24 @@ public class Client implements I_Client {
     {
         try
         {
+    boolean setupCompleted = false;
+
+
+
+    public Client(String hostname) {
+        try {
+            event_listener = new ClusterMemberShipListener();
             this.config = createConfig();
+            this.logger = new Logger(hostname); // We create a logger to keep track of the replication
+            logger.load();
+            fileMonitorThread = new Thread(new FileMonitor(this, "Data/node/Files"));
             this.hostname = hostname;
-            this.currentIP = Inet4Address.getByName(Inet4Address.getLocalHost().getHostAddress()).getHostAddress();
-
-            // We make a new logger file that keeps track of changes in the 'Files' map
-            logger = new Logger();
-
-            // We create a new thread to check if a new file is created or deleted ...
-            Thread fileMonitorThread = new Thread(new FileMonitor(this, "C:/Data/Java/6DS_Project/Node/Data/node/Files"));
-            fileMonitorThread.start();
+            this.restClient = RestClient.create();
+            this.currentIP = (Inet4Address) InetAddress.getLocalHost();
+        } catch (FileNotFoundException e) {
+            System.err.println(e.getMessage());
+        } catch (UnknownHostException e) {
+            throw new RuntimeException(e);
         }
         catch (FileNotFoundException | UnknownHostException e) { throw new RuntimeException(e); }
     }
@@ -60,6 +67,14 @@ public class Client implements I_Client {
         joinConfig.getMulticastConfig().setMulticastPort(54321);
         config.getManagementCenterConfig().setConsoleEnabled(true); // Enables the management center console.
         return config;
+    }
+
+    public Logger getLogger() {
+        return logger;
+    }
+
+    public Thread getFileMonitorThread() {
+        return fileMonitorThread;
     }
 
     /**
@@ -386,20 +401,31 @@ public class Client implements I_Client {
     public Logger getLogger() { return logger; }
 
     @Override
-    public void reportFilenameToNamingServer(String filename)
-    {
+    public void reportFilenameToNamingServer(String filename, int operation) {
+
+        System.out.println("namingserver IP: " + namingServerIP.getHostAddress());
+        System.out.println("current IP: " + currentIP.getHostAddress());
+
         // Prepare the URL for reporting the hash value to the naming server
-        String postUrl = "http://localhost:8080/ns/reportFileName";
+        String postUrl = "http://" + namingServerIP.getHostAddress() + ":8080/ns/reportFileName";
+
 
         Map<String, Object> requestBody = new HashMap<>();
+
+        System.out.println("operation: " + operation);
+
         requestBody.put("filename", filename);
-        requestBody.put("ip", currentIP.toString());
+        requestBody.put("ip", currentIP.getHostAddress());
+        requestBody.put("operation", operation);
 
         // Make an HTTP POST request to report the hash value
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestBody, Void.class);
 
-        if (responseEntity.getStatusCode().is2xxSuccessful()) System.out.println("Hash value reported to naming server for file: " + filename);
-        else System.err.println("Failed to report hash value to naming server for file: " + filename);
+        if (responseEntity.getStatusCode().is2xxSuccessful()) {
+            System.out.println("Hash value: " + filename + " correctly handled by server");
+        } else {
+            System.err.println("Failed to report hash value to naming server for file: " + filename);
+        }
     }
 }

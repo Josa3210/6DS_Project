@@ -27,21 +27,18 @@ public class Logger {
     /**
      * Constructor to initialize the file path for the logger.
      */
-    public Logger() {
+    public Logger(String hostname) {
 
         try {
 
             String currentPath = new java.io.File("").getCanonicalPath();
-            String filepath = currentPath + "/Data/node/logger";
+            String filepath = currentPath + "/Data/node/logger_" + hostname; // Append nodeName to differentiate logger directories
             Path path = Paths.get(filepath);
-
             System.out.println(filepath);
-
             Files.createDirectories(path);
 
             this.filePath = filepath;
-
-            System.out.println("Database will be saved in: " + filePath);
+            System.out.println("Logger will be saved in: " + filePath);
 
         } catch (IOException e) {
 
@@ -54,6 +51,7 @@ public class Logger {
      * Loads the mapping from the JSON file into the logger.
      * If the file does not exist, initializes an empty map.
      */
+
     public void load() {
 
         try {
@@ -215,7 +213,8 @@ public class Logger {
     }
 
     public static void main(String[] args) {
-        Logger logger = new Logger();
+        String hostname = "node 1";
+        Logger logger = new Logger(hostname);
         logger.load();
 
 

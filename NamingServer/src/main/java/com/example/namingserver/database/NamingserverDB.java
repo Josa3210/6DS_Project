@@ -194,5 +194,3 @@ public class NamingserverDB implements I_NamingserverDB {
 
 
 
-
-
