@@ -37,29 +37,32 @@ public class RestControllerDiscAndBoot {
     }
 
     @PostMapping("/welcome")
-    public void welcome(@RequestBody Map<String, Object> request)
-    {
+    public void welcome(@RequestBody Map<String, Object> request) {
         System.out.println("Welcome --------------");
-        int nrNodes =  Integer.parseInt(request.get("nrNodes").toString());
+        int nrNodes = Integer.parseInt(request.get("nrNodes").toString());
         client.numberNodes = nrNodes;
         System.out.println("nrNodes: " + nrNodes);
         Inet4Address ipAddress = null;
-        try
-        {
+        try {
             ipAddress = (Inet4Address) InetAddress.getByName((String) request.get("ip"));
             System.out.println("ipAddr: " + ipAddress);
+        } catch (UnknownHostException e) {
+            throw new RuntimeException(e);
         }
-
-        catch (UnknownHostException e) {throw new RuntimeException(e);}
         int port = Integer.parseInt(request.get("port").toString());
         System.out.println("port: " + port);
         client.setupClient(nrNodes, ipAddress, port);
 
         System.out.println("hello");
         // We start the filemonitorthread from here
+
         if (nrNodes > 1) {
-            client.startFileMonitor = true;
+            Thread filemonitorthread = client.getFileMonitorThread();
+            filemonitorthread.start();
         }
+
+        else
+            client.startFileMonitor = true;
     }
 
     @GetMapping("/multicastaddress")

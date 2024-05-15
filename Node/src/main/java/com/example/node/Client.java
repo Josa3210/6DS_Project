@@ -491,8 +491,8 @@ public class Client implements I_Client {
 
     public class ClusterMemberShipListener implements MembershipListener {
         public void memberAdded(MembershipEvent membershipEvent) {
-            if (!startFileMonitor && numberNodes > 1){
-                startFileMonitor = true;
+            if (startFileMonitor){
+                startFileMonitor = false;
                 Thread filemonitorthread = getFileMonitorThread();
                 filemonitorthread.start();
             }
