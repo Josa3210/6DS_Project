@@ -97,7 +97,7 @@ public class RestControllerDiscAndBoot {
         System.out.println(completed);
         client.clientSocket = client.serverSocket.accept();
         DataInputStream dataInputStream = new DataInputStream(client.clientSocket.getInputStream());
-        url = "http://"+ip.getHostAddress()+":8080/StartFileTransfer";
+        url = "http://" + ip.getHostAddress()+ ":8080/StartFileTransfer";
         requestBody.clear();
         requestBody.put("filepath", filepath);
         restTemplate.postForEntity(url, requestBody, Void.class);
@@ -131,6 +131,7 @@ public class RestControllerDiscAndBoot {
 
     @PostMapping("/StartFileTransfer")
     public void StartFileTransfer(@RequestBody Map<String, Object> request) throws UnknownHostException {
+        System.out.println("start file transfer");
         String filepath = (String) request.get("filepath");
         client.SendFile(filepath);
     }
