@@ -1,4 +1,4 @@
-package com.example.node;
+package com.example.node.Agents;
 
 public abstract class Agents implements Runnable{
 
