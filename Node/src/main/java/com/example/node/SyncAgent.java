@@ -9,7 +9,7 @@ import java.util.List;
 
 public class SyncAgent implements Runnable
 {
-    private List<File> agentFiles;
+    private List<NodeFileEntry> agentFiles;
     private Client client;
     private Agent syncAgent;
 
@@ -25,6 +25,6 @@ public class SyncAgent implements Runnable
         syncAgent.addBehaviour(new SyncBehaviour(client, this));
     }
 
-    public List<File> getAgentFiles() { return agentFiles; }
+    public List<NodeFileEntry> getAgentFiles() { return agentFiles; }
     public Agent getSyncAgent() { return syncAgent; }
 }
