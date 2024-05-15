@@ -38,6 +38,9 @@ public class Client implements I_Client {
     Inet4Address namingServerIP;
     private Integer namingServerPort;
     private String hostname;
+    public String file_path = "Data/node/Files";
+    public int numberNodes = 0;
+    public boolean startFileMonitor = false;
 
     boolean setupCompleted = false;
     private int portNumber = 80;
@@ -54,7 +57,7 @@ public class Client implements I_Client {
             this.config = createConfig();
             this.logger = new Logger(hostname); // We create a logger to keep track of the replication
             logger.load();
-            fileMonitorThread = new Thread(new FileMonitor(this, "Data/node/Files"));
+            fileMonitorThread = new Thread(new FileMonitor(this, file_path));
             this.hostname = hostname;
             this.restClient = RestClient.create();
             this.currentIP = (Inet4Address) InetAddress.getLocalHost();
@@ -387,6 +390,13 @@ public class Client implements I_Client {
 
         // Send the POST request
         restTemplate.postForEntity(postUrl, requestBody, Void.class);
+
+        // if  a node gets removed from the namingserver, the files replicated on this node should be
+        // moved to  the previous node, that will become the owner of the files
+        // We first remove the current entry with the original IP
+
+
+
     }
 
     /**
@@ -433,6 +443,7 @@ public class Client implements I_Client {
         sendLinkID(ids[0]);
         sendLinkID(ids[1]);
 
+
     }
 
     @Override
@@ -449,7 +460,7 @@ public class Client implements I_Client {
     }
 
     @Override
-    public void reportFilenameToNamingServer(String filename, int operation) {
+    public void reportFilenameToNamingServer(String filename, String file_path, int operation) {
 
         System.out.println("namingserver IP: " + namingServerIP.getHostAddress());
         System.out.println("current IP: " + currentIP.getHostAddress());
@@ -463,6 +474,7 @@ public class Client implements I_Client {
         System.out.println("operation: " + operation);
 
         requestBody.put("filename", filename);
+        requestBody.put("filepath", file_path);
         requestBody.put("ip", currentIP.getHostAddress());
         requestBody.put("operation", operation);
 
@@ -479,6 +491,11 @@ public class Client implements I_Client {
 
     public class ClusterMemberShipListener implements MembershipListener {
         public void memberAdded(MembershipEvent membershipEvent) {
+            if (!startFileMonitor && numberNodes > 1){
+                startFileMonitor = true;
+                Thread filemonitorthread = getFileMonitorThread();
+                filemonitorthread.start();
+            }
             String s = membershipEvent.getMember().getSocketAddress().toString();
             s = s.substring(s.indexOf("/") + 1, s.indexOf(":"));
             int hash = computeHash(s);

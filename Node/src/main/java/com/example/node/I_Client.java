@@ -103,5 +103,5 @@ public interface I_Client {
     void removeFromNetwork(int failedID);
     void getName();
 
-    public void reportFilenameToNamingServer(String filename, int operation);
+    public void reportFilenameToNamingServer(String filename, String file_path, int operation);
 }

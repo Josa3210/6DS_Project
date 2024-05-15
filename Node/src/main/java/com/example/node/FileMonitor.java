@@ -39,7 +39,7 @@ public class FileMonitor implements Runnable {
 
                 String filename = file.getName();
                 System.out.println("\nFile created: " + filename);
-                client.reportFilenameToNamingServer(file.getName(),1); // Operation 1 --> file CREATE
+                client.reportFilenameToNamingServer(file.getName(), folderPath,1); // Operation 1 --> file CREATE
             }
 
             @Override
@@ -52,13 +52,13 @@ public class FileMonitor implements Runnable {
                 logger.load();
                 int hash = client.computeHash(filename);
                 logger.remove(hash);
-                client.reportFilenameToNamingServer(file.getName(), 2); // Operation 2 --> file DELETE
+                client.reportFilenameToNamingServer(file.getName(), folderPath,2); // Operation 2 --> file DELETE
             }
         });
 
         while (true) {  // Start monitoring the directory
 
-            // System.out.println("loop");
+            System.out.println("loop");
             try {
                 observer.checkAndNotify();
                 Thread.sleep(1000); // Adjust sleep time as needed

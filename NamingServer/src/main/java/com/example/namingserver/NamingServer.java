@@ -41,7 +41,9 @@ public class NamingServer implements I_NamingServer {
      * Database containing the IP's of the different nodes {@see I_NamingserverDB}
      */
     private static I_NamingserverDB database;
-    private InetAddress ip;
+    public String filePath;
+    InetAddress ip;
+    
 
     public NamingServer() {
 
@@ -289,7 +291,8 @@ public class NamingServer implements I_NamingServer {
      * Receives filename. Replication is performed as follows:
      * 1. If the hash of the node is less than the hash of the file and the distance to it is the smallest, indicating that the node is a replicated node,
      * the node becomes the owner of this file and creates a log with information on the file (references for the file).
-     * 2. The node then replicates the file.
+     *
+     * 2. The original node then replicates the file using TCP (after receiving a message from the replicated node).
      *
      * @param filename The name of the file that needs to be replicated.
      *
@@ -326,6 +329,7 @@ public class NamingServer implements I_NamingServer {
                 // Send the POST request
                 requestBody.put("hashValue", fileHash);
                 requestBody.put("original ip", originalIP);
+                requestBody.put("filepath", filePath);
 
                 ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
                 HttpStatusCode statusCode = responseEntity.getStatusCode();

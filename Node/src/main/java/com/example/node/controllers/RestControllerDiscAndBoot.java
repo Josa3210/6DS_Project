@@ -41,6 +41,7 @@ public class RestControllerDiscAndBoot {
     {
         System.out.println("Welcome --------------");
         int nrNodes =  Integer.parseInt(request.get("nrNodes").toString());
+        client.numberNodes = nrNodes;
         System.out.println("nrNodes: " + nrNodes);
         Inet4Address ipAddress = null;
         try
@@ -48,14 +49,17 @@ public class RestControllerDiscAndBoot {
             ipAddress = (Inet4Address) InetAddress.getByName((String) request.get("ip"));
             System.out.println("ipAddr: " + ipAddress);
         }
+
         catch (UnknownHostException e) {throw new RuntimeException(e);}
         int port = Integer.parseInt(request.get("port").toString());
         System.out.println("port: " + port);
         client.setupClient(nrNodes, ipAddress, port);
 
+        System.out.println("hello");
         // We start the filemonitorthread from here
-        Thread filemonitorthread = client.getFileMonitorThread();
-        filemonitorthread.start();
+        if (nrNodes > 1) {
+            client.startFileMonitor = true;
+        }
     }
 
     @GetMapping("/multicastaddress")
