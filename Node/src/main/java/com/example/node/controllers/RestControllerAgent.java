@@ -3,6 +3,7 @@ package com.example.node.controllers;
 import com.example.node.Client;
 import com.example.node.SyncAgent;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,9 +23,10 @@ public class RestControllerAgent
         this.client = client;
     }
 
-    @PostMapping("/agents/sync")
-    private void Sync(@RequestBody Map<String, Object> request)
+    @GetMapping("/agents/sync")
+    private SyncAgent Sync()
     {
-
+        System.out.println(">> Answering Agent Sync request");
+        return client.getSyncAgent();
     }
 }

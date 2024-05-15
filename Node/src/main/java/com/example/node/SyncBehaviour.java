@@ -9,8 +9,8 @@ import java.util.List;
 
 public class SyncBehaviour extends CyclicBehaviour
 {
-    private Client client;
-    private SyncAgent agent;
+    private final Client client;
+    private final SyncAgent agent;
 
     public SyncBehaviour(Client client, SyncAgent agent)
     {
@@ -21,20 +21,27 @@ public class SyncBehaviour extends CyclicBehaviour
     @Override
     public void action()
     {
-        // REST ask for the sync agent list of the next node
-
-        String ipNextNode = client.requestIP(client.getNextID());
-            // Send Post
-        String getUrl = "http://" + ipNextNode + ":8080/agents/sync";
-        RestTemplate restTemplate = new RestTemplate();
-
-        ResponseEntity<SyncAgent> response = restTemplate.getForEntity(getUrl, SyncAgent.class);
-        SyncAgent nextNodeAgent = response.getBody();
-        List<NodeFileEntry> netNodeList = nextNodeAgent.getAgentFiles();
-
-        // Listing all files owned by the node at which this agent runs,
         System.out.println(">> SYNC AGENT");
         System.out.println(">> --------------------------");
+
+        // REST ask for the sync agent list of the next node
+        System.out.println("** Requesting Agent Files Next Node");
+
+        String ipNextNode = client.requestIP(client.getNextID());
+
+        String getUrl = "http://" + ipNextNode + ":8080/agents/sync"; // Failure Exception?
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<SyncAgent> response = restTemplate.getForEntity(getUrl, SyncAgent.class);
+
+        SyncAgent nextNodeAgent = response.getBody();
+        List<NodeFileEntry> nextNodeList = nextNodeAgent.getAgentFiles();
+
+        for(NodeFileEntry nextNodeEntry : nextNodeList)
+            System.out.println("* File Name: " + nextNodeEntry.getFilename() + " - Locked: " + nextNodeEntry.isLocked());
+
+        agent.setAgentFiles(nextNodeList);
+
+        // Listing all files owned by the node at which this agent runs,
         System.out.println("** All owned files of the client:");
         for(NodeFileEntry e : client.getFileList())
             System.out.println("* File Name: " + e.getFilename() + " - Locked: " + e.isLocked());

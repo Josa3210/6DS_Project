@@ -95,6 +95,8 @@ public class Client implements I_Client {
         this.currentID = computeHash(hostname);
         this.nextID = Integer.MAX_VALUE;
         this.prevID = Integer.MIN_VALUE;
+        syncAgent = new SyncAgent(this);
+        syncAgent.run();
     }
 
     /**

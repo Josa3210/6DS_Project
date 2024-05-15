@@ -5,18 +5,20 @@ import jade.core.Agent;
 
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 public class SyncAgent implements Runnable
 {
     private List<NodeFileEntry> agentFiles;
-    private Client client;
-    private Agent syncAgent;
+    private final Client client;
+    private final Agent syncAgent;
 
     public SyncAgent(Client client)
     {
         this.client = client;
         this.syncAgent = new Agent();
+        this.agentFiles = new ArrayList<>();
     }
 
     @Override
@@ -26,7 +28,6 @@ public class SyncAgent implements Runnable
     }
 
     public List<NodeFileEntry> getAgentFiles() { return agentFiles; }
-    public Agent getSyncAgent() { return syncAgent; }
 
     public void setAgentFiles(List<NodeFileEntry> agentFiles) {
         this.agentFiles = agentFiles;
