@@ -27,4 +27,8 @@ public class SyncAgent implements Runnable
 
     public List<NodeFileEntry> getAgentFiles() { return agentFiles; }
     public Agent getSyncAgent() { return syncAgent; }
+
+    public void setAgentFiles(List<NodeFileEntry> agentFiles) {
+        this.agentFiles = agentFiles;
+    }
 }
