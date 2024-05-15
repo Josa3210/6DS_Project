@@ -87,7 +87,7 @@ public class RestControllerDiscAndBoot {
         // Puts the filehash and the ip address of the node where the file was created in the logger ..
         logger.put(fileHash, ip);
         client.serverSocket = new ServerSocket(5000);
-        String url = "http://"+ip+":8080/OpenTCPConnection";
+        String url = "http://"+ip.getHostAddress()+":8080/OpenTCPConnection";
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -97,7 +97,7 @@ public class RestControllerDiscAndBoot {
         System.out.println(completed);
         client.clientSocket = client.serverSocket.accept();
         DataInputStream dataInputStream = new DataInputStream(client.clientSocket.getInputStream());
-        url = "http://"+ip+":8080/StartFileTransfer";
+        url = "http://"+ip.getHostAddress()+":8080/StartFileTransfer";
         requestBody.clear();
         requestBody.put("filepath", filepath);
         restTemplate.postForEntity(url, requestBody, Void.class);
