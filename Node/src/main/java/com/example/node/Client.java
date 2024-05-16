@@ -460,7 +460,7 @@ public class Client implements I_Client {
     }
 
     @Override
-    public void reportFilenameToNamingServer(String filename, String file_path, int operation) {
+    public void reportFilenameToNamingServer(String filename, int operation) {
 
         System.out.println("namingserver IP: " + namingServerIP.getHostAddress());
         System.out.println("current IP: " + currentIP.getHostAddress());
