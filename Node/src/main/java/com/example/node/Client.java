@@ -475,6 +475,7 @@ public class Client implements I_Client {
 
         requestBody.put("filename", filename);
         requestBody.put("filepath", filePath);
+        System.out.println(filePath);
         requestBody.put("ip", currentIP.getHostAddress());
         requestBody.put("operation", operation);
 
