@@ -38,7 +38,7 @@ public class Client implements I_Client {
     Inet4Address namingServerIP;
     private Integer namingServerPort;
     private String hostname;
-    public String file_path = "Data/node/Files";
+    public String folderPath = "Data/node/Files";
     public int numberNodes = 0;
     public boolean startFileMonitor = false;
 
@@ -57,7 +57,7 @@ public class Client implements I_Client {
             this.config = createConfig();
             this.logger = new Logger(hostname); // We create a logger to keep track of the replication
             logger.load();
-            fileMonitorThread = new Thread(new FileMonitor(this, file_path));
+            fileMonitorThread = new Thread(new FileMonitor(this));
             this.hostname = hostname;
             this.restClient = RestClient.create();
             this.currentIP = (Inet4Address) InetAddress.getLocalHost();
@@ -460,7 +460,7 @@ public class Client implements I_Client {
     }
 
     @Override
-    public void reportFilenameToNamingServer(String filename, int operation) {
+    public void reportFilenameToNamingServer(String filename,String filePath, int operation) {
 
         System.out.println("namingserver IP: " + namingServerIP.getHostAddress());
         System.out.println("current IP: " + currentIP.getHostAddress());
@@ -474,7 +474,7 @@ public class Client implements I_Client {
         System.out.println("operation: " + operation);
 
         requestBody.put("filename", filename);
-        requestBody.put("filepath", file_path);
+        requestBody.put("filepath", filePath);
         requestBody.put("ip", currentIP.getHostAddress());
         requestBody.put("operation", operation);
 

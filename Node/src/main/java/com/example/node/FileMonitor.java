@@ -18,18 +18,17 @@ import java.util.Arrays;
 
 public class FileMonitor implements Runnable {
 
-    String folderPath;
     Client client;
 
-    public FileMonitor(Client client, String folderPath) {
+    public FileMonitor(Client client) {
         this.client = client;
-        this.folderPath = folderPath;
+
     }
 
     public void run() {
 
         // Create a FileAlterationObserver for the specified folder path (specified in the client)
-        FileAlterationObserver observer = new FileAlterationObserver(folderPath);
+        FileAlterationObserver observer = new FileAlterationObserver(client.folderPath);
 
         // Add a listener to handle file system events
         observer.addListener(new FileAlterationListenerAdaptor() {
@@ -39,7 +38,7 @@ public class FileMonitor implements Runnable {
 
                 String filename = file.getName();
                 System.out.println("\nFile created: " + filename);
-                client.reportFilenameToNamingServer(file.getName(), folderPath,1); // Operation 1 --> file CREATE
+                client.reportFilenameToNamingServer(file.getName(),file.getPath(),1); // Operation 1 --> file CREATE
             }
 
             @Override
@@ -52,7 +51,7 @@ public class FileMonitor implements Runnable {
                 logger.load();
                 int hash = client.computeHash(filename);
                 logger.remove(hash);
-                client.reportFilenameToNamingServer(file.getName(), folderPath,2); // Operation 2 --> file DELETE
+                client.reportFilenameToNamingServer(file.getName(),file.getPath(),2); // Operation 2 --> file DELETE
             }
         });
 
