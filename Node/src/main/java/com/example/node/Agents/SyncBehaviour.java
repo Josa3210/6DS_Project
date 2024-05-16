@@ -1,5 +1,7 @@
-package com.example.node;
+package com.example.node.Agents;
 
+import com.example.node.Client;
+import com.example.node.NodeFileEntry;
 import jade.core.behaviours.CyclicBehaviour;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
