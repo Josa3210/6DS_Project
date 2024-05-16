@@ -330,6 +330,7 @@ public class NamingServer implements I_NamingServer {
                 requestBody.put("hashValue", fileHash);
                 requestBody.put("original ip", originalIP);
                 requestBody.put("filepath", filePath);
+                System.out.println("filepath: " + filePath);
 
                 ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
                 HttpStatusCode statusCode = responseEntity.getStatusCode();
