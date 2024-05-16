@@ -92,11 +92,12 @@ public class RestControllerNS {
         if (!filename.endsWith(".swp")) {
 
             String ipAddressString = (String) requestBody.get("ip");
-            String file_path = (String) requestBody.get("filepath");
+            String filepath = (String) requestBody.get("filepath");
+            System.out.println("filepath reveiced: " + filepath);
             Inet4Address originalIP = (Inet4Address) InetAddress.getByName(ipAddressString);
             Integer operation = (Integer) requestBody.get("operation");
             namingServer.reportLogger(filename, originalIP, operation);
-            namingServer.filePath = file_path;
+            namingServer.filePath = filepath;
 
         }
 
