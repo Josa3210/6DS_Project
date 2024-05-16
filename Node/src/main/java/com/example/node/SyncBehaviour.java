@@ -1,7 +1,6 @@
 package com.example.node;
 
 import jade.core.behaviours.CyclicBehaviour;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
@@ -91,21 +90,10 @@ public class SyncBehaviour extends CyclicBehaviour
      */
     private void updateList(String fileName, List<NodeFileEntry> fileList)
     {
-        boolean fileFound = false;
-        for(NodeFileEntry file : fileList)
-        {
-            if(fileName.equals(file.getFilename()))
-            {
-                fileFound = true;
-                break;
-            }
-        }
-
-        if(!fileFound)
+        if(fileList.stream().noneMatch(file -> fileName.equals(file.getFilename())))
         {
             System.out.println("* File not found: " + fileName + " - Adding to List");
-            NodeFileEntry newFile = new NodeFileEntry(fileName);
-            fileList.add(newFile);
+            fileList.add(new NodeFileEntry(fileName));
         }
     }
 }
