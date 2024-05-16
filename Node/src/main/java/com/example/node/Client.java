@@ -41,6 +41,7 @@ public class Client implements I_Client {
     public String folderPath = "Data/node/Files";
     public int numberNodes = 0;
     public boolean startFileMonitor = false;
+    public boolean isReceivedFile = false;
 
     boolean setupCompleted = false;
     private int portNumber = 80;
@@ -89,7 +90,10 @@ public class Client implements I_Client {
     }
 
     public void ReceiveFile(String filepath, DataInputStream dataInputStream){
+
         try {
+
+            isReceivedFile = true;
             int bytes = 0;
             FileOutputStream fileOutputStream
                     = new FileOutputStream(filepath);

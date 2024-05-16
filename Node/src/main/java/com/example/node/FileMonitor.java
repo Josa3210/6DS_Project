@@ -48,9 +48,12 @@ public class FileMonitor implements Runnable {
             @Override
             public void onFileCreate(File file) {
 
-                String filename = file.getName();
-                System.out.println("\nFile created: " + filename);
-                client.reportFilenameToNamingServer(file.getName(),file.getPath(),1); // Operation 1 --> file CREATE
+                if (!client.isReceivedFile){
+                    String filename = file.getName();
+                    System.out.println("\nFile created: " + filename);
+                    client.reportFilenameToNamingServer(file.getName(),file.getPath(),1); // Operation 1 --> file CREATE
+                    client.isReceivedFile = false;
+                }
             }
 
             @Override
