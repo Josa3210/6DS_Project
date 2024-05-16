@@ -6,6 +6,10 @@ import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
 import org.apache.commons.io.monitor.FileAlterationObserver;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 
 
@@ -26,6 +30,14 @@ public class FileMonitor implements Runnable {
     }
 
     public void run() {
+
+        Path path = Paths.get(client.folderPath);
+        try {
+            Files.createDirectories(path);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println("folder created: " + client.folderPath);
 
         // Create a FileAlterationObserver for the specified folder path (specified in the client)
         FileAlterationObserver observer = new FileAlterationObserver(client.folderPath);
