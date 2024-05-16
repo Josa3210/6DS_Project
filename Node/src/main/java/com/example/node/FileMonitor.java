@@ -57,7 +57,6 @@ public class FileMonitor implements Runnable {
 
         while (true) {  // Start monitoring the directory
 
-            System.out.println("loop");
             try {
                 observer.checkAndNotify();
                 Thread.sleep(1000); // Adjust sleep time as needed
