@@ -40,6 +40,7 @@ public class FileMonitor implements Runnable {
                 String filename = file.getName();
                 System.out.println("\nFile created: " + filename);
                 client.reportFilenameToNamingServer(file.getName(),1); // Operation 1 --> file CREATE
+                client.getFileList().add(new NodeFileEntry(filename));
             }
 
             @Override
@@ -53,6 +54,7 @@ public class FileMonitor implements Runnable {
                 int hash = client.computeHash(filename);
                 logger.remove(hash);
                 client.reportFilenameToNamingServer(file.getName(), 2); // Operation 2 --> file DELETE
+                client.getFileList().removeIf(f -> filename.equals(f.getFilename()));
             }
         });
 
