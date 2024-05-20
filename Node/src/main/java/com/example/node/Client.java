@@ -279,7 +279,7 @@ public class Client implements I_Client {
     public void sendLinkID(int nodeID)
     {
         String nodeIP = requestIP(nodeID);
-        String postUrl = "http://" + nodeIP + ":" + namingServerPort + "/shutdown/updateID";
+        String postUrl = "http://" + nodeIP + ":8080/shutdown/updateID";
         System.out.println(">> Sending REST Post (sendLinkID)");
 
         RestTemplate restTemplate = new RestTemplate();
