@@ -311,7 +311,7 @@ public class NamingServer implements I_NamingServer
         Integer fileHash = computeHash(filename);
         isReplicated = true;
 
-        String postUrl = "http://localhost:8080/isReplicatedNode";
+        String postUrl = "http://localhost:9090/isReplicatedNode";
 
         // Create the request entity with headers and body
         HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
