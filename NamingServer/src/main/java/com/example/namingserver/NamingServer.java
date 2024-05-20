@@ -269,7 +269,7 @@ public class NamingServer implements I_NamingServer
         {{
             put("nrNodes", sendNumNodes());
             put("ip", ip);
-            put("port", 8080);
+            put("port", 9090);
         }};
 
         restTemplate.postForEntity(postUrl, requestBody, Void.class);
