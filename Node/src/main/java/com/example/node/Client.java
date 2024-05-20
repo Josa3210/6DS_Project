@@ -392,7 +392,7 @@ public class Client implements I_Client {
     public void reportFilenameToNamingServer(String filename)
     {
         // Prepare the URL for reporting the hash value to the naming server
-        String postUrl = "http://localhost:9090/ns/reportFileName";
+        String postUrl = "http://localhost:8080/ns/reportFileName";
 
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("filename", filename);
