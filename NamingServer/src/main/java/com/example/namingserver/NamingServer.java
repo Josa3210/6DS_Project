@@ -5,7 +5,6 @@ import com.hazelcast.cluster.MembershipListener;
 import com.hazelcast.config.*;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.map.IMap;
 
 
 import com.example.namingserver.database.I_NamingserverDB;
@@ -18,7 +17,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.FileNotFoundException;
 import java.net.Inet4Address;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -275,6 +273,11 @@ public class NamingServer implements I_NamingServer
         }};
 
         restTemplate.postForEntity(postUrl, requestBody, Void.class);
+    }
+
+    public HashMap<Integer, Inet4Address> returnData()
+    {
+        return database.getNodeMap();
     }
 
     /**

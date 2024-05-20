@@ -189,6 +189,9 @@ public class NamingserverDB implements I_NamingserverDB {
         System.out.println(this.nodeMap);
     }
 
+    public HashMap<Integer, Inet4Address> getNodeMap() {
+        return nodeMap;
+    }
 }
 
 
