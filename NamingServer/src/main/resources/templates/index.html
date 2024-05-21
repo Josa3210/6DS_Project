@@ -40,8 +40,11 @@
     <h1>Server Status</h1>
     <p>Data in database</p>
     <ul>
-        <li th:each="entry : ${data}">
-            <span th:text="${entry.key}">Key</span>: <span th:text="${entry.value}">Value</span>
+        <li th:each="entry : ${detailedData}">
+            <span th:text="${entry.value.nodeId}">Node ID</span>:
+            <span th:text="${entry.value.ipAddress}">IP Address</span> |
+            <span th:text="'Prev: ' + ${entry.value.prevId}">Prev ID</span> |
+            <span th:text="'Next: ' + ${entry.value.nextId}">Next ID</span>
         </li>
     </ul>
 </div>
