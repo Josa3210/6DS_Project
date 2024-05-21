@@ -22,9 +22,16 @@
             text-align: center;
             color: #333;
         }
-        p {
-            text-align: center;
-            color: #666;
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background-color: #fafafa;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 3px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
@@ -32,7 +39,11 @@
 <div class="container">
     <h1>Server Status</h1>
     <p>Data in database</p>
-    <p th:text="|${name}!|"></p>
+    <ul>
+        <li th:each="entry : ${data}">
+            <span th:text="${entry.key}">Key</span>: <span th:text="${entry.value}">Value</span>
+        </li>
+    </ul>
 </div>
 </body>
 </html>

@@ -5,7 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+
+import java.net.Inet4Address;
+import java.util.Map;
 
 @Controller
 public class ControllerGUI
@@ -19,9 +21,11 @@ public class ControllerGUI
     }
 
     @GetMapping("/index")
-    public String Dashboard(@RequestParam(name="name", required=false, defaultValue="World") String name, Model model)
+    public String Dashboard(Model model)
     {
-        model.addAttribute("name", namingServer.returnData());
+        // get all nodes
+        Map<Integer, Inet4Address> data = namingServer.returnData();
+        model.addAttribute("data", data);
         return "index";
     }
 }
