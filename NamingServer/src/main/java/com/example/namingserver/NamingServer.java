@@ -342,7 +342,7 @@ public class NamingServer implements I_NamingServer {
                 HttpStatusCode statusCode = responseEntity.getStatusCode();
 
                 if (statusCode == HttpStatus.OK) {
-                    System.out.println("Node list correctly sent to " + replicatedIP.getHostAddress());
+                    System.out.println("Node list correctly sent to " + replicatedIP.getHostAddress() + "from ip" + originalIP.getHostAddress());
                 } else {
                     System.err.println("Sending node list failed with status code: " + statusCode);
                 }
