@@ -337,7 +337,7 @@ public class NamingServer implements I_NamingServer
 
     public String getHostNameClient(int id)
     {
-        String clientIP = getIP(id).toString();
+        String clientIP = getIP(id).getHostAddress();
         String getUrl = "http://" + clientIP + ":8080/host";
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> response = restTemplate.getForEntity(getUrl, String.class);
