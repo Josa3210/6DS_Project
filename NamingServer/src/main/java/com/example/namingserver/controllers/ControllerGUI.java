@@ -46,7 +46,7 @@ public class ControllerGUI
     @PostMapping("/shutdown")
     public String shutdownNode(@RequestParam("nodeId") int nodeId) {
         namingServer.shutdownClient(nodeId);
-        return "index";
+        return "redirect:/index";
     }
 
     public static class NodeDetails {
