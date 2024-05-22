@@ -22,16 +22,21 @@
             text-align: center;
             color: #333;
         }
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        li {
-            background-color: #fafafa;
-            margin: 5px 0;
+        .node {
+            margin-bottom: 20px;
             padding: 10px;
+            background-color: #fafafa;
             border-radius: 3px;
             box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+        .title {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+        }
+        .divider {
+            border-bottom: 1px solid #ddd;
+            margin: 10px 0;
         }
     </style>
 </head>
@@ -39,15 +44,20 @@
 <div class="container">
     <h1>Server Status</h1>
     <p>Data in database</p>
-    <ul>
-        <li th:each="entry : ${detailedData}">
-            <span th:text="${entry.value.getHostName()}">Host Name</span>
-            <span th:text="${entry.value.nodeId}">Node ID</span>:
-            <span th:text="${entry.value.ipAddress}">IP Address</span> |
-            <span th:text="'Prev: ' + ${entry.value.prevId}">Prev ID</span> |
-            <span th:text="'Next: ' + ${entry.value.nextId}">Next ID</span>
-        </li>
-    </ul>
+    <div th:each="entry : ${detailedData}">
+        <div class="node">
+            <div class="title">
+                <span th:text="${entry.value.hostName}">Host Name</span>
+                <span th:text="${entry.value.ipAddress}">IP Address</span>
+            </div>
+            <div class="divider"></div>
+            <div>
+                <p th:text="'Node ID: ' + ${entry.value.nodeId}"></p>
+                <p th:text="'Prev ID: ' + ${entry.value.prevId}"></p>
+                <p th:text="'Next ID: ' + ${entry.value.nextId}"></p>
+            </div>
+        </div>
+    </div>
 </div>
 </body>
 </html>
