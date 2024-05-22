@@ -485,9 +485,9 @@ public class Client implements I_Client {
         requestBody.put("operation", operation);
 
         if(nextID == 0)
-            requestBody.put("nexID",prevID);
+            requestBody.put("ID",prevID);
         else
-            requestBody.put("nextID",nextID);
+            requestBody.put("ID",nextID);
 
         // Make an HTTP POST request to report the hash value
         RestTemplate restTemplate = new RestTemplate();
