@@ -30,6 +30,7 @@ public class ControllerGUI
         Map<Integer, Inet4Address> data = namingServer.returnData();
         Map<Integer, NodeDetails> detailedData = new HashMap<>();
 
+        System.out.println(">> Data for GUI: " + data);
         for (Map.Entry<Integer, Inet4Address> entry : data.entrySet())
         {
             int nodeId = entry.getKey();
