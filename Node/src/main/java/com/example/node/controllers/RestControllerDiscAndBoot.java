@@ -70,6 +70,11 @@ public class RestControllerDiscAndBoot {
         logger.put(fileHash, ip);
     }
 
+    @GetMapping("/host")
+    public String GetHostName()
+    {
+        return client.getHostname();
+    }
 
 
 

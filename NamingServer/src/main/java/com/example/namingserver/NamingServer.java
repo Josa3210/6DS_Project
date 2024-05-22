@@ -335,6 +335,15 @@ public class NamingServer implements I_NamingServer
 
     }
 
+    public String getHostNameClient(int id)
+    {
+        String clientIP = getIP(id).toString();
+        String getUrl = "http://" + clientIP + ":8080/host";
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.getForEntity(getUrl, String.class);
+        return response.getBody();
+    }
+
     public class ClusterMemberShipListener implements MembershipListener {
         I_NamingserverDB database;
 

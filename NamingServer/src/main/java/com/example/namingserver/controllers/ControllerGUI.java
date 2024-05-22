@@ -28,11 +28,13 @@ public class ControllerGUI
         Map<Integer, Inet4Address> data = namingServer.returnData();
         Map<Integer, NodeDetails> detailedData = new HashMap<>();
 
-        for (Map.Entry<Integer, Inet4Address> entry : data.entrySet()) {
+        for (Map.Entry<Integer, Inet4Address> entry : data.entrySet())
+        {
             int nodeId = entry.getKey();
             Inet4Address ipAddress = entry.getValue();
             int[] linkIds = namingServer.giveLinkIds(nodeId);
-            detailedData.put(nodeId, new NodeDetails(nodeId, ipAddress, linkIds[0], linkIds[1]));
+            String hostName = namingServer.getHostNameClient(nodeId);
+            detailedData.put(nodeId, new NodeDetails(nodeId, ipAddress, linkIds[0], linkIds[1], hostName));
         }
 
         model.addAttribute("detailedData", detailedData);
@@ -44,12 +46,18 @@ public class ControllerGUI
         private final Inet4Address ipAddress;
         private final int prevId;
         private final int nextId;
+        private final String hostName;
 
-        public NodeDetails(int nodeId, Inet4Address ipAddress, int prevId, int nextId) {
+        public NodeDetails(int nodeId, Inet4Address ipAddress, int prevId, int nextId, String hostName) {
             this.nodeId = nodeId;
             this.ipAddress = ipAddress;
             this.prevId = prevId;
             this.nextId = nextId;
+            this.hostName = hostName;
+        }
+
+        public String getHostName() {
+            return hostName;
         }
 
         public int getNodeId() {
