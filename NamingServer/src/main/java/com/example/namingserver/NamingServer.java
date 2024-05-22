@@ -344,6 +344,15 @@ public class NamingServer implements I_NamingServer
         return response.getBody();
     }
 
+    public void shutdownClient(int nodeId)
+    {
+        String clientIP = getIP(nodeId).getHostAddress();
+        String postUrl = "http://" + clientIP + ":8080/shutdown/exit";
+        RestTemplate restTemplate = new RestTemplate();
+        Map<String, Object> requestBody = new HashMap<>();
+        restTemplate.postForEntity(postUrl, requestBody, Void.class);
+    }
+
     public class ClusterMemberShipListener implements MembershipListener {
         I_NamingserverDB database;
 

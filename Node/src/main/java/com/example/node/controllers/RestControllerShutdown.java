@@ -28,4 +28,10 @@ public class RestControllerShutdown
         client.setPrevID(ids[0]);
         client.setNextID(ids[1]);
     }
+
+    @PostMapping("shutdown/exit")
+    public void exit()
+    {
+        client.shutDown();
+    }
 }

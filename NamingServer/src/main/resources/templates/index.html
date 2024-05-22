@@ -38,6 +38,21 @@
             border-bottom: 1px solid #ddd;
             margin: 10px 0;
         }
+        .shutdown-btn {
+            margin-top: 10px;
+            display: block;
+            background-color: #d9534f;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            text-align: center;
+            border-radius: 3px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .shutdown-btn:hover {
+            background-color: #c9302c;
+        }
     </style>
 </head>
 <body>
@@ -56,6 +71,10 @@
                 <p th:text="'Prev ID: ' + ${entry.value.prevId}"></p>
                 <p th:text="'Next ID: ' + ${entry.value.nextId}"></p>
             </div>
+            <form th:action="@{/shutdown}" method="post">
+                <input type="hidden" name="nodeId" th:value="${entry.value.nodeId}" />
+                <button type="submit" class="shutdown-btn">Shutdown</button>
+            </form>
         </div>
     </div>
 </div>

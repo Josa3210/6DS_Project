@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.net.Inet4Address;
 import java.util.HashMap;
@@ -39,6 +41,12 @@ public class ControllerGUI
 
         model.addAttribute("detailedData", detailedData);
         return "index";
+    }
+
+    @PostMapping("/shutdown")
+    public String shutdownNode(@RequestParam("nodeId") int nodeId) {
+        namingServer.shutdownClient(nodeId);
+        return "redirect:/index";
     }
 
     public static class NodeDetails {
