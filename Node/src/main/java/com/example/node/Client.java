@@ -29,7 +29,8 @@ public class Client implements I_Client {
     private static final String multicast_address = "224.2.2.5";
     private static ClusterMemberShipListener event_listener;
     RestClient restClient;
-    int currentID, nextID, prevID;
+    int currentID, prevID;
+    int nextID = 0;
     Config config;
     Map<String, Inet4Address> ipMap;
     public Inet4Address currentIP;
@@ -482,7 +483,11 @@ public class Client implements I_Client {
         System.out.println(filePath);
         requestBody.put("ip", currentIP.getHostAddress());
         requestBody.put("operation", operation);
-        requestBody.put("nexID",nextID);
+
+        if(nextID == 0)
+            requestBody.put("nexID",prevID);
+        else
+            requestBody.put("nextID",nextID);
 
         // Make an HTTP POST request to report the hash value
         RestTemplate restTemplate = new RestTemplate();

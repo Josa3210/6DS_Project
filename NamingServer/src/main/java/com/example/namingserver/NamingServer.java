@@ -323,6 +323,7 @@ public class NamingServer implements I_NamingServer {
         if (operation ==1) {
 
             if(originalIP == replicatedIP)
+
                 replicatedIP = getIP(nextID);
 
             System.out.println("\nNode: " + replicatedIP.getCanonicalHostName() + " with IP " + replicatedIP.getHostAddress() + " is the replicated node of file: " + filename);
