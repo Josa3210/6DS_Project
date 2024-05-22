@@ -1,12 +1,14 @@
 package com.example.node;
 
 
+import com.example.node.Agents.FailureAgent;
 import com.hazelcast.config.*;
 import com.hazelcast.core.Hazelcast;
 import jakarta.annotation.PostConstruct;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 import java.io.FileNotFoundException;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -358,7 +360,9 @@ public class Client implements I_Client {
 
             if (!responseEntity.getStatusCode().is2xxSuccessful()) removeFromNetwork(nodeID);
         }
-        catch (Exception e) { removeFromNetwork(nodeID); }
+        catch (Exception e) {
+            removeFromNetwork(nodeID);
+        }
     }
 
 
@@ -380,6 +384,23 @@ public class Client implements I_Client {
         // Send prevID to nextIP and nextID to prevID
         sendLinkID(ids[0]);
         sendLinkID(ids[1]);
+
+        FailureAgent failureAgent = new FailureAgent(failedID,this.currentID,this.namingServerPort, this.namingServerIP);
+
+        try {
+            Inet4Address nextIP = (Inet4Address) InetAddress.getByName(this.requestIP(nextID));
+            String postUrl = "http://" + nextIP + "/agent/passFailureAgent";
+
+            System.out.println("Sending agent to " + postUrl);
+
+            Map<String, Object> requestBody = new HashMap<>();
+            requestBody.put("agent", failureAgent);
+
+            RestTemplate restTemplate = new RestTemplate();
+            restTemplate.postForEntity(postUrl, requestBody, Void.class);
+        } catch (UnknownHostException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 
@@ -411,7 +432,6 @@ public class Client implements I_Client {
         System.out.println("operation: " + operation);
 
         requestBody.put("filename", filename);
-        requestBody.put("ip", currentIP);
         requestBody.put("operation", operation);
 
         // Make an HTTP POST request to report the hash value

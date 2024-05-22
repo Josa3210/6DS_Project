@@ -103,17 +103,30 @@ public class Logger {
 
     public JSONObject get(Integer hash) {
         if (nodeMap != null) {
-            for (int i = 0; i < nodeMap.length(); i++){
+            for (int i = 0; i < nodeMap.length(); i++) {
                 JSONObject obj = nodeMap.getJSONObject(i);
                 int id = (int) obj.get("hash");
                 if (id == hash) return obj;
             }
             System.err.println("No value with " + hash + " found.");
-            return null;
         } else {
             System.err.println("Hashmap is not initialized. Please load the hashmap first.");
-            return null;
         }
+        return null;
+    }
+
+    public JSONObject get(String filename) {
+        if (nodeMap != null) {
+            for (int i = 0; i < nodeMap.length(); i++) {
+                JSONObject obj = nodeMap.getJSONObject(i);
+                String objFilename = (String) obj.get("filename");
+                if (objFilename == filename) return obj;
+            }
+            System.err.println("No value with " + filename + " found.");
+        } else {
+            System.err.println("Hashmap is not initialized. Please load the hashmap first.");
+        }
+        return null;
     }
 
     /**
@@ -127,8 +140,8 @@ public class Logger {
             JSONObject newObj = new JSONObject();
             newObj.put("hash", hash);
             newObj.put("filename", fileName);
-            newObj.put("owner",new JSONObject());
-            newObj.put("original",new JSONObject());
+            newObj.put("owner", new JSONObject());
+            newObj.put("original", new JSONObject());
             nodeMap.put(newObj);
             this.save();
         } else {
@@ -136,15 +149,15 @@ public class Logger {
         }
     }
 
-    public void putOwner(int id, int ownerID, String ownerIP){
+    public void putOwner(int id, int ownerID, String ownerIP) {
         JSONObject obj = get(id);
-        JSONObject ownerObj = new JSONObject().put("ID",ownerID).put("IP",ownerIP);
+        JSONObject ownerObj = new JSONObject().put("ID", ownerID).put("IP", ownerIP);
         obj.put("owner", ownerObj);
     }
 
-    public void putOriginal(int id, int originalID, String originalIP){
+    public void putOriginal(int id, int originalID, String originalIP) {
         JSONObject obj = get(id);
-        JSONObject ownerObj = new JSONObject().put("ID",originalID).put("IP",originalIP);
+        JSONObject ownerObj = new JSONObject().put("ID", originalID).put("IP", originalIP);
         obj.put("original", ownerObj);
     }
 
@@ -153,10 +166,10 @@ public class Logger {
      */
     public void remove(int hash) {
         if (nodeMap != null) {
-            for (int i = 0; i < nodeMap.length(); i++){
+            for (int i = 0; i < nodeMap.length(); i++) {
                 JSONObject obj = nodeMap.getJSONObject(i);
                 int id = (int) obj.get("hash");
-                if (id == hash){
+                if (id == hash) {
                     nodeMap.remove(i);
                     return;
                 }

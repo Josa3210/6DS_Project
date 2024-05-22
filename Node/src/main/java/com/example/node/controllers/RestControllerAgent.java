@@ -39,12 +39,16 @@ public class RestControllerAgent {
         List<NodeFileEntry> fileList = this.client.getFileList();
 
         // Run the agent and wait for thread to finish
-        boolean passOn = agent.activateAgent(this.client.getCurrentID(), fileList);
+        boolean passOn = agent.activateAgent(this.client.getCurrentID(), fileList, this.client.getLogger());
+
+        System.out.println("Pass on to next? " + passOn);
 
         if (passOn) {
             try {
                 Inet4Address nextIP = (Inet4Address) InetAddress.getByName(client.requestIP(nextID));
                 String postUrl = "http://" + nextIP + "/agent/passFailureAgent";
+
+                System.out.println("Sending agent to " + postUrl);
 
                 Map<String, Object> requestBody = new HashMap<>();
                 requestBody.put("agent", agent);
