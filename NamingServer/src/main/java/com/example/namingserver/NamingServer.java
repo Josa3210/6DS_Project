@@ -347,7 +347,6 @@ public class NamingServer implements I_NamingServer
     public void shutdownClient(int nodeId)
     {
         String clientIP = getIP(nodeId).getHostAddress();
-        System.out.println("TESTTESTTEST--------" + clientIP);
         String postUrl = "http://" + clientIP + ":8080/shutdown/exit";
         RestTemplate restTemplate = new RestTemplate();
         Map<String, Object> requestBody = new HashMap<>();
