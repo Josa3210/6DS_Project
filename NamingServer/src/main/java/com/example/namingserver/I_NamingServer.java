@@ -47,5 +47,5 @@ public interface I_NamingServer {
      */
     int[] giveLinkIds(int nodeID);
 
-    void reportLogger(String filename, Inet4Address originalIP, int operation);
+    void reportLogger(String filename, Inet4Address originalIP, int operation,int nextID);
 }

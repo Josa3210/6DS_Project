@@ -482,6 +482,7 @@ public class Client implements I_Client {
         System.out.println(filePath);
         requestBody.put("ip", currentIP.getHostAddress());
         requestBody.put("operation", operation);
+        requestBody.put("nexID",nextID);
 
         // Make an HTTP POST request to report the hash value
         RestTemplate restTemplate = new RestTemplate();

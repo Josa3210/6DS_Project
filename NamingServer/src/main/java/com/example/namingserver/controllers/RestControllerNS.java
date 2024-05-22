@@ -96,8 +96,9 @@ public class RestControllerNS {
             System.out.println("filepath reveiced: " + filepath);
             Inet4Address originalIP = (Inet4Address) InetAddress.getByName(ipAddressString);
             Integer operation = (Integer) requestBody.get("operation");
+            Integer nextID = (Integer) requestBody.get("nextID");
             namingServer.filePath = filepath;
-            namingServer.reportLogger(filename, originalIP, operation);
+            namingServer.reportLogger(filename, originalIP, operation,nextID);
         }
 
     }

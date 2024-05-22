@@ -301,7 +301,7 @@ public class NamingServer implements I_NamingServer {
      * @return
      */
 
-    public void reportLogger(String filename, Inet4Address originalIP, int operation) {
+    public void reportLogger(String filename, Inet4Address originalIP, int operation, int nextID) {
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -315,17 +315,23 @@ public class NamingServer implements I_NamingServer {
 
         // Check for every node in the list if it's a replicated node by checking which node hash in the dataset is
         // the closest to the hashed value of the filename
+
         Inet4Address replicatedIP = getLocationIP(filename);
 
         int fileHash = 0;
 
         if (operation ==1) {
+
+            if(originalIP == replicatedIP)
+                replicatedIP = getIP(nextID);
+
             System.out.println("\nNode: " + replicatedIP.getCanonicalHostName() + " with IP " + replicatedIP.getHostAddress() + " is the replicated node of file: " + filename);
             System.out.println("Computing the hash of the filename");
             fileHash = computeHash(filename);
             String postUrl = "http://" + replicatedIP.getHostAddress() + ":8080/isReplicatedNode";
 
             try {
+
                 // Send the POST request
                 requestBody.put("hashValue", fileHash);
                 requestBody.put("original ip", originalIP);
