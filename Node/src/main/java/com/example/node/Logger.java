@@ -2,8 +2,11 @@ package com.example.node;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -20,31 +23,27 @@ public class Logger {
 
 
     private final String fileName = "logger.json";
-    private final ObjectMapper objectMapper = new ObjectMapper();
     private String filePath;
-    private HashMap<Integer, Inet4Address> nodeMap;
+    private FileWriter JSONWriter;
+    private JSONArray nodeMap = new JSONArray();
 
     /**
      * Constructor to initialize the file path for the logger.
      */
     public Logger(String hostname) {
-
         try {
-
             String currentPath = new java.io.File("").getCanonicalPath();
-            String filepath = currentPath + "/Data/node/logger_" + hostname; // Append nodeName to differentiate logger directories
-            Path path = Paths.get(filepath);
-            System.out.println(filepath);
-            Files.createDirectories(path);
-
-            this.filePath = filepath;
-            System.out.println("Logger will be saved in: " + filePath);
-
+            this.filePath = currentPath + "/Data/node/logger_" + hostname + ".json"; // Append nodeName to differentiate logger directories;
+            this.JSONWriter = new FileWriter(filePath);
         } catch (IOException e) {
-
             System.out.println(e);
         }
+    }
 
+    public static void main(String[] args) {
+        String hostname = "node 1";
+        Logger logger = new Logger(hostname);
+        logger.load();
     }
 
     /**
@@ -53,75 +52,43 @@ public class Logger {
      */
 
     public void load() {
-
         try {
             File file = new File(filePath + "/" + fileName);
-
             if (file.exists()) {
-
                 // Read the JSON file and convert it to HashMap
-                HashMap<String, String> stringKeyMap = objectMapper.readValue(file, new TypeReference<HashMap<String, String>>() {
-                });
-
-                // Convert keys from String to Integer and values from String to Inet4Address
-                nodeMap = new HashMap<>();
-
-                for (Map.Entry<String, String> entry : stringKeyMap.entrySet()) {
-
-                    try {
-
-                        Integer key = Integer.parseInt(entry.getKey());
-                        InetAddress inetAddress = InetAddress.getByName(entry.getValue());
-
-                        if (inetAddress instanceof Inet4Address) {
-
-                            nodeMap.put(key, (Inet4Address) inetAddress);
-
-                        } else {
-
-                            System.err.println("Error: " + entry.getValue() + " is not a valid IPv4 address.");
-                        }
-                    } catch (NumberFormatException | UnknownHostException e) {
-
-                        System.err.println("Error parsing key-value pair: " + entry.getKey() + " - " + entry.getValue());
-                    }
-                }
+                String jsonContent = new String(Files.readAllBytes(Paths.get(this.filePath)));
+                this.nodeMap = new JSONArray(jsonContent);
 
                 System.out.println("Map loaded from file: " + filePath);
 
             } else {
-
                 // Create a new file if it doesn't exist
                 if (file.createNewFile()) {
-
                     System.out.println("File does not exist. Initializing an empty hashmap: " + fileName);
-                    nodeMap = new HashMap<>();
+                    nodeMap = new JSONArray();
                     // Save the empty hashmap
                     save();
                 }
             }
         } catch (IOException e) {
             System.err.println("Error loading hashmap from file: " + e.getMessage());
-            nodeMap = new HashMap<>();
+            nodeMap = new JSONArray();
         }
     }
-
 
     /**
      * Saves the mapping from the logger to the JSON file.
      */
     public void save() {
-
         try {
-
             // Write the JSON string to the file
-            File file = new File(filePath + "/" + fileName);
-            objectMapper.writeValue(file, nodeMap);
 
-            System.out.println("Map saved to file: " + filePath + "/" + fileName);
+            this.nodeMap.write(this.JSONWriter);
 
+            this.JSONWriter.flush();
+            this.JSONWriter.close();
+            System.out.println("Map saved to file: " + filePath);
         } catch (IOException e) {
-
             System.err.println("Error saving map to file: " + e.getMessage());
         }
     }
@@ -134,93 +101,74 @@ public class Logger {
      */
 
 
-    public Inet4Address get(Integer hash) {
-
+    public JSONObject get(Integer hash) {
         if (nodeMap != null) {
-            Inet4Address address = nodeMap.get(hash);
-
-            if (address == null) {
-                System.err.println("Given key: hash. Result: null");
-                return null;
-
-            } else {
-                return address;
-
+            for (int i = 0; i < nodeMap.length(); i++){
+                JSONObject obj = nodeMap.getJSONObject(i);
+                int id = (int) obj.get("hash");
+                if (id == hash) return obj;
             }
-        }
-
-        else {
-
+            System.err.println("No value with " + hash + " found.");
+            return null;
+        } else {
             System.err.println("Hashmap is not initialized. Please load the hashmap first.");
-
             return null;
         }
     }
-
-
-    /**
-     * Retrieves the set of keys from the nodeMap.
-     *
-     * @return A Set of Integer keys from the nodeMap, or an empty Set if nodeMap is not initialized.
-     */
-    public Set<Integer> getKeys() {
-
-        if (nodeMap != null) {
-
-            return nodeMap.keySet(); // Assuming nodeMap is a Map<Integer, Something>
-        }
-
-        else {
-            System.err.println("Hashmap is not initialized. Please load the map first.");
-            return Collections.emptySet(); // Or return null if appropriate
-        }
-    }
-
 
     /**
      * Adds a new entry to the logger with the given hash and IPv4 address.
      *
      * @param hash the hashed integer key.
-     * @param ip4  the IPv4 address to be associated with the hash.
      */
-    public void put(Integer hash, Inet4Address ip4) {
+    public void put(Integer hash, String fileName) {
         if (nodeMap != null) {
-            nodeMap.put(hash, ip4);
+
+            JSONObject newObj = new JSONObject();
+            newObj.put("hash", hash);
+            newObj.put("filename", fileName);
+            newObj.put("owner",new JSONObject());
+            newObj.put("original",new JSONObject());
+            nodeMap.put(newObj);
             this.save();
         } else {
             System.err.println("Map is not initialized. Please load the map first.");
         }
     }
 
+    public void putOwner(int id, int ownerID, String ownerIP){
+        JSONObject obj = get(id);
+        JSONObject ownerObj = new JSONObject().put("ID",ownerID).put("IP",ownerIP);
+        obj.put("owner", ownerObj);
+    }
+
+    public void putOriginal(int id, int originalID, String originalIP){
+        JSONObject obj = get(id);
+        JSONObject ownerObj = new JSONObject().put("ID",originalID).put("IP",originalIP);
+        obj.put("original", ownerObj);
+    }
+
     /**
      * Removes an entry from the logger
-     *
      */
     public void remove(int hash) {
         if (nodeMap != null) {
-
-            if (nodeMap.containsKey(hash)) {
-                nodeMap.remove(hash);
-                System.out.println("Entry with key " + hash + " removed from the database.");
-                this.save();
-
-            } else {
-                System.out.println("Entry has already been removed");
+            for (int i = 0; i < nodeMap.length(); i++){
+                JSONObject obj = nodeMap.getJSONObject(i);
+                int id = (int) obj.get("hash");
+                if (id == hash){
+                    nodeMap.remove(i);
+                    return;
+                }
             }
+            System.err.println("Node not in nodeMap");
         } else {
-            System.err.println("Database is not initialized. Please load the database first.");
+            System.err.println("Hashmap is not initialized. Please load the hashmap first.");
         }
     }
 
-    public static void main(String[] args) {
-        String hostname = "node 1";
-        Logger logger = new Logger(hostname);
-        logger.load();
-
-
-    }
-
 }
+
 
 
 

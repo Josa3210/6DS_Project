@@ -7,7 +7,6 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 import java.io.FileNotFoundException;
-import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -392,6 +391,7 @@ public class Client implements I_Client {
     public String getHostname() { return hostname; }
     public Logger getLogger() { return logger; }
     public String getCurrentIP() { return currentIP; }
+    public int getCurrentID() { return currentID; }
     public List<NodeFileEntry> getFileList() {return fileList;}
 
     public void setFileList(List<NodeFileEntry> newList) {this.fileList = newList;}
@@ -420,6 +420,7 @@ public class Client implements I_Client {
 
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             System.out.println("Hash value: " + filename + " correctly handled by server");
+            this.logger.putOriginal(computeHash(filename),this.currentID,this.currentIP);
         } else {
             System.err.println("Failed to report hash value to naming server for file: " + filename);
         }

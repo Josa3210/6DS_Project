@@ -3,7 +3,6 @@ package com.example.node.controllers;
 import com.example.node.Client;
 import com.example.node.I_Client;
 import com.example.node.Logger;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.hazelcast.config.Config;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
@@ -14,8 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.Inet4Address;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Map;
 
@@ -63,20 +60,19 @@ public class RestControllerDiscAndBoot {
     public Object createHazelcastInstance() { return JSONObject.wrap(Hazelcast.newHazelcastInstance(config)); }
 
     @PostMapping("/isReplicatedNode")
-    public void isReplicatedNode(@RequestBody Map<String, Object> request) throws UnknownHostException {
+    public void isReplicatedNode(@RequestBody Map<String, Object> request){
 
         Integer fileHash = Integer.parseInt(request.get("hashValue").toString());
-        Inet4Address ip = (Inet4Address) InetAddress.getByName((String) request.get("original ip"));
         Logger logger = client.getLogger();
         System.out.println("This is the replicated node for file: " + fileHash);
         logger.load();
 
         // Puts the filehash and the ip address of the node where the file was created in the logger ..
-        logger.put(fileHash, ip);
+        logger.putOwner(fileHash,client.getCurrentID(), client.getCurrentIP());
     }
 
     @PostMapping("/newNodeOwner")
-    public void newNodeOwner(@RequestBody Map<String, Object> request) throws UnknownHostException {
+    public void newNodeOwner(@RequestBody Map<String, Object> request){
 
         Integer fileHash = Integer.parseInt(request.get("hashValue").toString());
         System.out.println("This node becomes the new owner of file with hash: " + fileHash);
@@ -85,13 +81,7 @@ public class RestControllerDiscAndBoot {
         Logger logger = client.getLogger();
         logger.load();
 
-        // We first remove the current entry with the original IP
-        logger.remove(fileHash);
-
-        // We add the current IP nex to the filehash
-        Inet4Address clientIP = (Inet4Address) InetAddress.getByName(client.getCurrentIP());
-        logger.put(fileHash, clientIP);
-
+        // Change the originalOwner to this new client
+        logger.putOriginal(fileHash,client.getCurrentID(), client.getCurrentIP());
     }
-
 }

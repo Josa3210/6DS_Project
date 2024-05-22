@@ -9,7 +9,8 @@ public interface I_NamingServer {
      * @param filename: name of the file to search for
      * @return the ip address of the node that contains the resource {@see Inet4Address}
      */
-    Inet4Address getLocationIP(String filename);
+    String[] getFileOwner(String filename);
+
 
     /**
      * Add a node to the namingServer

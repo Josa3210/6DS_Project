@@ -11,8 +11,7 @@ import java.net.UnknownHostException;
 import java.util.Map;
 
 @RestController
-public class RestControllerNS
-{
+public class RestControllerNS {
     NamingServer namingServer = new NamingServer();
 
     /**
@@ -22,12 +21,9 @@ public class RestControllerNS
      * @return the IP-address of the file location
      */
 
-    @GetMapping("/ns/searchFile")
-    public Inet4Address searchFile(@RequestParam String fileName)
-    {
-        Inet4Address address = namingServer.getLocationIP(fileName);
-        System.out.println(address);
-        return address;
+    @GetMapping("/ns/searchFileOwner")
+    public String[] searchFileIP(@RequestParam String fileName) {
+        return namingServer.getFileOwner(fileName);
     }
 
     /**
@@ -36,8 +32,7 @@ public class RestControllerNS
      * @param request the JSON request body with "ip" as ip address
      */
     @PostMapping("/ns/addNode")
-    public void addNode(@RequestBody Map<String, Object> request) throws UnknownHostException
-    {
+    public void addNode(@RequestBody Map<String, Object> request) throws UnknownHostException {
         String ipAddressString = (String) request.get("ip");
         Inet4Address ipAddress = (Inet4Address) InetAddress.getByName(ipAddressString);
         String nodeName = (String) request.get("name");
@@ -50,21 +45,18 @@ public class RestControllerNS
      * @param request the JSON request body with "ip" as ip address
      */
     @PostMapping("/ns/removeNode")
-    public void removeNode(@RequestBody Map<String, Object> request)
-    {
+    public void removeNode(@RequestBody Map<String, Object> request) {
         int nodeID = Integer.parseInt(request.get("nodeID").toString());
         namingServer.removeNodeIP(nodeID);
     }
 
     @GetMapping("/ns/getIp/{id}")
-    public String getIp(@PathVariable("id") int id)
-    {
+    public String getIp(@PathVariable("id") int id) {
         return namingServer.getIP(id).getHostAddress();
     }
 
     @GetMapping("/test")
-    public String testConnection(@RequestParam String testString)
-    {
+    public String testConnection(@RequestParam String testString) {
         return ("Test Communication : " + testString + "\n");
     }
 
@@ -90,8 +82,6 @@ public class RestControllerNS
             Inet4Address originalIP = (Inet4Address) InetAddress.getByName(ipAddressString);
             Integer operation = (Integer) requestBody.get("operation");
             namingServer.reportLogger(filename, originalIP, operation);
-
         }
-
     }
 }
