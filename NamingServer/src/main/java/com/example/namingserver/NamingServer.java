@@ -17,7 +17,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.FileNotFoundException;
 import java.net.Inet4Address;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -98,7 +97,7 @@ public class NamingServer implements I_NamingServer {
      * @return the IP address of the location associated with the filename
      */
     @Override
-    public String[] getFileOwner(String filename) {
+    public int getFileOwner(String filename) {
 
         // Get hash of the file name
         int hash = computeHash(filename);
@@ -119,9 +118,7 @@ public class NamingServer implements I_NamingServer {
 
         if (node < hash) node = max(keys);
 
-        String nodeIP = String.valueOf(database.get(node));
-
-        return new String[]{String.valueOf(node), nodeIP};
+        return node;
     }
 
     /**
@@ -299,6 +296,8 @@ public class NamingServer implements I_NamingServer {
         } catch (UnknownHostException e) {
             throw new RuntimeException(e);
         }
+
+        Inet4Address replicatedIP = getIP(getFileOwner(filename));
 
         int fileHash = 0;
 

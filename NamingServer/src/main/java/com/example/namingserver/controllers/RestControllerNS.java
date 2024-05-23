@@ -13,19 +13,6 @@ import java.util.Map;
 @RestController
 public class RestControllerNS {
     NamingServer namingServer = new NamingServer();
-
-    /**
-     * Asks the naming server for the location of a file
-     *
-     * @param fileName the name of the file
-     * @return the IP-address of the file location
-     */
-
-    @GetMapping("/ns/searchFileOwner")
-    public String[] searchFileIP(@RequestParam String fileName) {
-        return namingServer.getFileOwner(fileName);
-    }
-
     /**
      * Adds a node via the naming server with it's ip address
      *
