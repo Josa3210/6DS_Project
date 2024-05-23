@@ -17,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.FileNotFoundException;
 import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -290,15 +291,7 @@ public class NamingServer implements I_NamingServer {
 
         // Check for every node in the list if it's a replicated node by checking which node hash in the dataset is
         // the closest to the hashed value of the filename
-        Inet4Address replicatedIP = null;
-        try {
-            replicatedIP = (Inet4Address) InetAddress.getByName(getFileOwner(filename)[1]);
-        } catch (UnknownHostException e) {
-            throw new RuntimeException(e);
-        }
-
-        Inet4Address replicatedIP = getIP(getFileOwner(filename));
-
+        Inet4Address replicatedIP  = (Inet4Address) getIP(getFileOwner(filename));
         int fileHash = 0;
 
         if (operation == 1) {
@@ -367,11 +360,7 @@ public class NamingServer implements I_NamingServer {
         }
 
         // Replicated node gets only changed when a member gets removed from the network
-        public void memberRemoved(MembershipEvent membershipEvent) {
-            String s = membershipEvent.getMember().getSocketAddress().toString();
-            s = s.substring(s.indexOf("/") + 1, s.indexOf(":"));
-
-        }
+        public void memberRemoved(MembershipEvent membershipEvent) {}
     }
 }
 
