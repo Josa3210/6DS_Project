@@ -53,6 +53,12 @@
         .shutdown-btn:hover {
             background-color: #c9302c;
         }
+        .node-ids {
+            text-align: center;
+        }
+        .node-id-bold {
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -66,10 +72,12 @@
                 <span th:text="${entry.value.ipAddress}">IP Address</span>
             </div>
             <div class="divider"></div>
-            <div>
-                <p th:text="'Node ID: ' + ${entry.value.nodeId}"></p>
-                <p th:text="'Prev ID: ' + ${entry.value.prevId}"></p>
-                <p th:text="'Next ID: ' + ${entry.value.nextId}"></p>
+            <div class="node-ids">
+                <span th:text="${entry.value.prevId}"></span>
+                <span> < </span>
+                <span class="node-id-bold" th:text="${entry.value.nodeId}"></span>
+                <span> > </span>
+                <span th:text="${entry.value.nextId}"></span>
             </div>
             <form th:action="@{/shutdown}" method="post">
                 <input type="hidden" name="nodeId" th:value="${entry.value.nodeId}" />
