@@ -278,6 +278,7 @@ public class Client implements I_Client {
     @Override
     public void sendLinkID(int nodeID)
     {
+        System.out.println("!! node id: " + nodeID + ", current: " + this.currentID);
         if(nodeID == currentID) return;
 
         String nodeIP = requestIP(nodeID);
