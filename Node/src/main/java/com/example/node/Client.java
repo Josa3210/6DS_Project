@@ -258,16 +258,20 @@ public class Client implements I_Client {
     @Override
     public void shutDown()
     {
+        System.out.println("FASE 1");
         int[] linkIds = requestLinkIds();
         int prevID = linkIds[0];
         int nextID = linkIds[1];
 
+        System.out.println("FASE 2");
         // Remove from the naming server
         removeFromNS();
 
+        System.out.println("FASE 3");
         sendLinkID(nextID);
         sendLinkID(prevID);
 
+        System.out.println("FASE 4");
         ClientApplication.exitApplication();
     }
 
