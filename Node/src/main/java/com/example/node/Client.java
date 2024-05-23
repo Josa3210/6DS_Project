@@ -278,6 +278,8 @@ public class Client implements I_Client {
     @Override
     public void sendLinkID(int nodeID)
     {
+        if(nodeID == currentID) return;
+
         String nodeIP = requestIP(nodeID);
         String postUrl = "http://" + nodeIP + ":8080/shutdown/updateID";
         System.out.println(">> Sending REST Post (sendLinkID)");

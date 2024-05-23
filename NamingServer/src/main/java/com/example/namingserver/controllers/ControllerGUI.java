@@ -45,19 +45,22 @@ public class ControllerGUI
     }
 
     @PostMapping("/shutdown")
-    public String shutdownNode(@RequestParam("nodeId") int nodeId) {
+    public String shutdownNode(@RequestParam("nodeId") int nodeId)
+    {
         namingServer.shutdownClient(nodeId);
         return "redirect:/index";
     }
 
-    public static class NodeDetails {
+    public static class NodeDetails
+    {
         private final int nodeId;
         private final Inet4Address ipAddress;
         private final int prevId;
         private final int nextId;
         private final String hostName;
 
-        public NodeDetails(int nodeId, Inet4Address ipAddress, int prevId, int nextId, String hostName) {
+        public NodeDetails(int nodeId, Inet4Address ipAddress, int prevId, int nextId, String hostName)
+        {
             this.nodeId = nodeId;
             this.ipAddress = ipAddress;
             this.prevId = prevId;
@@ -65,24 +68,10 @@ public class ControllerGUI
             this.hostName = hostName;
         }
 
-        public String getHostName() {
-            return hostName;
-        }
-
-        public int getNodeId() {
-            return nodeId;
-        }
-
-        public Inet4Address getIpAddress() {
-            return ipAddress;
-        }
-
-        public int getPrevId() {
-            return prevId;
-        }
-
-        public int getNextId() {
-            return nextId;
-        }
+        public String getHostName() { return hostName; }
+        public int getNodeId() { return nodeId; }
+        public Inet4Address getIpAddress() { return ipAddress; }
+        public int getPrevId() { return prevId; }
+        public int getNextId() { return nextId;}
     }
 }
