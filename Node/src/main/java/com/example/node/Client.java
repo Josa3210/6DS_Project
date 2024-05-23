@@ -15,6 +15,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.io.*;
+import java.net.*;
+
+
+
+import java.util.concurrent.TimeUnit;
+
 
 public class Client implements I_Client {
 
@@ -24,22 +31,24 @@ public class Client implements I_Client {
     private Integer namingServerPort;
     private String hostname;
     private String currentIP;
+    private static ClusterMemberShipListener event_listener;
     private Logger logger;
     private Thread fileMonitorThread;
     private String namingServerIP;
     private List<NodeFileEntry> fileList;
+    public String folderPath = "Data/node/Files";
+    public int numberNodes = 0;
+    public boolean startFileMonitor = false;
+    public boolean isReceivedFile = false;
 
-    /**
-     * Constructor of the client
-     * @param hostname the name of the client
-     */
-    public Client(String hostname)
-    {
+    public ServerSocket serverSocket;
+    public Socket clientSocket;
+    public Client(String hostname) {
         try {
             this.config = createConfig();
             this.logger = new Logger(hostname); // We create a logger to keep track of the replication
             logger.load();
-            fileMonitorThread = new Thread(new FileMonitor(this, "Data/node/Files"));
+            fileMonitorThread = new Thread(new FileMonitor(this));
             this.hostname = hostname;
             this.currentIP = String.valueOf(InetAddress.getLocalHost());
             this.fileList = new ArrayList<>();
@@ -64,6 +73,68 @@ public class Client implements I_Client {
         joinConfig.getMulticastConfig().setMulticastPort(54321);
         config.getManagementCenterConfig().setConsoleEnabled(true); // Enables the management center console.
         return config;
+    }
+
+    public void ReceiveFile(String filepath, DataInputStream dataInputStream){
+
+        try {
+
+            isReceivedFile = true;
+            int bytes = 0;
+            FileOutputStream fileOutputStream
+                    = new FileOutputStream(filepath);
+            long size
+                    = dataInputStream.readLong(); // read file size
+            byte[] buffer = new byte[4 * 1024];
+            while (size > 0
+                    && (bytes = dataInputStream.read(
+                    buffer, 0,
+                    (int) Math.min(buffer.length, size)))
+                    != -1) {
+                // Here we write the file using write method
+                fileOutputStream.write(buffer, 0, bytes);
+                size -= bytes; // read upto file size
+            }
+            // Here we received file
+            System.out.println("File is Received");
+            fileOutputStream.close();
+            this.serverSocket.close();
+        }catch(IOException e1){
+            System.err.println(e1.getMessage());
+        }
+    }
+
+
+    public void SendFile(String filepath) {
+        try {
+            DataOutputStream dataOutputStream = new DataOutputStream(this.clientSocket.getOutputStream());
+            int bytes = 0;
+            // Open the File where he located in your pc
+            File file = new File(filepath);
+            FileInputStream fileInputStream
+                    = new FileInputStream(file);
+            // Here we send the File to Server
+            dataOutputStream.writeLong(file.length());
+            // Here we  break file into chunks
+            byte[] buffer = new byte[4 * 1024];
+            while ((bytes = fileInputStream.read(buffer))
+                    != -1) {
+                // Send the file to Server Socket
+                dataOutputStream.write(buffer, 0, bytes);
+                dataOutputStream.flush();
+            }
+            // close the file here
+            System.out.println("File was sent");
+            fileInputStream.close();
+            clientSocket.close();
+        } catch (IOException e1) {
+            System.err.println(e1.getMessage());
+        }
+    }
+
+
+    public Logger getLogger() {
+        return logger;
     }
 
     public Thread getFileMonitorThread() {
@@ -339,6 +410,13 @@ public class Client implements I_Client {
 
         // Send the POST request
         restTemplate.postForEntity(postUrl, requestBody, Void.class);
+
+        // if  a node gets removed from the namingserver, the files replicated on this node should be
+        // moved to  the previous node, that will become the owner of the files
+        // We first remove the current entry with the original IP
+
+
+
     }
 
     /**
@@ -418,7 +496,7 @@ public class Client implements I_Client {
     public void setFileList(List<NodeFileEntry> newList) {this.fileList = newList;}
 
     @Override
-    public void reportFilenameToNamingServer(String filename, int operation) {
+    public void reportFilenameToNamingServer(String filename,String filePath, int operation) {
 
         System.out.println("namingserver IP: " + namingServerIP);
         System.out.println("current IP: " + currentIP);
@@ -432,7 +510,19 @@ public class Client implements I_Client {
         System.out.println("operation: " + operation);
 
         requestBody.put("filename", filename);
+        requestBody.put("filepath", filePath);
+        System.out.println(filePath);
+        requestBody.put("ip", currentIP.getHostAddress());
         requestBody.put("operation", operation);
+
+        if(nextID == 0)
+            requestBody.put("ID",prevID);
+
+        else
+            requestBody.put("ID", nextID);
+
+        System.out.println("prev: " + prevID + "next: " + nextID + "current ID: " + currentID) ;
+
 
         // Make an HTTP POST request to report the hash value
         RestTemplate restTemplate = new RestTemplate();
@@ -443,6 +533,31 @@ public class Client implements I_Client {
             this.logger.putOriginal(computeHash(filename),this.currentID,this.currentIP);
         } else {
             System.err.println("Failed to report hash value to naming server for file: " + filename);
+        }
+    }
+
+    public class ClusterMemberShipListener implements MembershipListener {
+        public void memberAdded(MembershipEvent membershipEvent) {
+            if (startFileMonitor){
+                try {
+                    TimeUnit.SECONDS.sleep(2);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                startFileMonitor = false;
+                Thread filemonitorthread = getFileMonitorThread();
+                filemonitorthread.start();
+            }
+            String s = membershipEvent.getMember().getSocketAddress().toString();
+            s = s.substring(s.indexOf("/") + 1, s.indexOf(":"));
+            int hash = computeHash(s);
+            karibu(hash);
+        }
+
+        public void memberRemoved(MembershipEvent membershipEvent) {
+            String s = membershipEvent.getMember().getSocketAddress().toString();
+            s = s.substring(s.indexOf("/") + 1, s.indexOf(":"));
+
         }
     }
 }

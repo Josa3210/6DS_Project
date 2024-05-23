@@ -63,12 +63,19 @@ public class RestControllerNS {
     public void reportFileName(@RequestBody Map<String, Object> requestBody) throws UnknownHostException {
 
         // Check if the file name does not end with .swp --> temporary files!
+
         String filename = (String) requestBody.get("filename");
+
+
         if (!filename.endsWith(".swp")) {
             String ipAddressString = (String) requestBody.get("ip");
+            String filepath = (String) requestBody.get("filepath");
+            System.out.println("filepath reveiced: " + filepath);
             Inet4Address originalIP = (Inet4Address) InetAddress.getByName(ipAddressString);
             Integer operation = (Integer) requestBody.get("operation");
-            namingServer.reportLogger(filename, originalIP, operation);
+            Integer nextID = (Integer) requestBody.get("ID");
+            namingServer.filePath = filepath;
+            namingServer.reportLogger(filename, originalIP, operation,nextID);
         }
     }
 }

@@ -39,6 +39,7 @@ public class NamingServer implements I_NamingServer {
      */
     private static NamingserverDB database;
     private String ip;
+    public String filePath;
 
     public NamingServer() {
     }
@@ -272,12 +273,17 @@ public class NamingServer implements I_NamingServer {
      * Receives filename. Replication is performed as follows:
      * 1. If the hash of the node is less than the hash of the file and the distance to it is the smallest, indicating that the node is a replicated node,
      * the node becomes the owner of this file and creates a log with information on the file (references for the file).
-     * 2. The node then replicates the file.
      *
-     * @param filename The name of the file that needs to be replicated and the ip address of where it is originated from
+     * 2. The original node then replicates the file using TCP (after receiving a message from the replicated node).
+     *
+     * @param filename The name of the file that needs to be replicated.
+     *
+     *
+     *
+     * @return
      */
 
-    public void reportLogger(String filename, Inet4Address originalIP, int operation) {
+    public void reportLogger(String filename, Inet4Address originalIP, int operation, int nextID) {
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -294,21 +300,33 @@ public class NamingServer implements I_NamingServer {
         Inet4Address replicatedIP  = (Inet4Address) getIP(getFileOwner(filename));
         int fileHash = 0;
 
-        if (operation == 1) {
+        if (operation ==1) {
+
+            if(originalIP == replicatedIP)
+                System.out.println(nextID);
+                replicatedIP = getIP(nextID);
+
             System.out.println("\nNode: " + replicatedIP.getCanonicalHostName() + " with IP " + replicatedIP.getHostAddress() + " is the replicated node of file: " + filename);
             System.out.println("Computing the hash of the filename");
             fileHash = computeHash(filename);
             String postUrl = "http://" + replicatedIP.getHostAddress() + ":8080/isReplicatedNode";
 
             try {
+
                 // Send the POST request
                 requestBody.put("hashValue", fileHash);
+                requestBody.put("original ip", originalIP);
+                requestBody.put("filepath", filePath);
+                System.out.println("filepath: " + filePath);
+
+                System.out.println(replicatedIP.getHostAddress());
+                System.out.println(originalIP.getHostAddress());
 
                 ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
                 HttpStatusCode statusCode = responseEntity.getStatusCode();
 
                 if (statusCode == HttpStatus.OK) {
-                    System.out.println("Node list correctly sent to " + replicatedIP.getHostAddress());
+                    System.out.println("Node list correctly sent to " + replicatedIP.getHostAddress() + "from ip" + originalIP.getHostAddress());
                 } else {
                     System.err.println("Sending node list failed with status code: " + statusCode);
                 }

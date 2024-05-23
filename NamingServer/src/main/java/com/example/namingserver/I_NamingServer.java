@@ -12,6 +12,8 @@ public interface I_NamingServer {
     int getFileOwner(String filename);
 
 
+
+
     /**
      * Add a node to the namingServer
      *
@@ -46,5 +48,5 @@ public interface I_NamingServer {
      */
     int[] giveLinkIds(int nodeID);
 
-    void reportLogger(String filename, Inet4Address originalIP, int operation);
+    void reportLogger(String filename, Inet4Address originalIP, int operation,int nextID);
 }
