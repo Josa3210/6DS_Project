@@ -89,8 +89,9 @@ public class RestControllerNS {
         // Check if the file name does not end with .swp --> temporary files!
 
         String filename = (String) requestBody.get("filename");
-        if (!filename.endsWith(".swp")) {
 
+
+        if (!filename.endsWith(".swp")) {
             String ipAddressString = (String) requestBody.get("ip");
             String filepath = (String) requestBody.get("filepath");
             System.out.println("filepath reveiced: " + filepath);

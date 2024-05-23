@@ -338,6 +338,9 @@ public class NamingServer implements I_NamingServer {
                 requestBody.put("filepath", filePath);
                 System.out.println("filepath: " + filePath);
 
+                System.out.println(replicatedIP.getHostAddress());
+                System.out.println(originalIP.getHostAddress());
+
                 ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
                 HttpStatusCode statusCode = responseEntity.getStatusCode();
 
