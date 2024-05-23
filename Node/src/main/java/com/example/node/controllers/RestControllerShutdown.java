@@ -29,7 +29,7 @@ public class RestControllerShutdown
         client.setNextID(ids[1]);
     }
 
-    @PostMapping("/shutdown/exit")
+    @PostMapping("/shutdown/exit") // problem is that the connection will be interrupted when shutting down between naming server and client
     public void exit()
     {
         client.shutDown();
