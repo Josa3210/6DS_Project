@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 @Controller
 public class ControllerGUI
@@ -51,6 +52,11 @@ public class ControllerGUI
     public String shutdownNode(@RequestParam("nodeId") int nodeId)
     {
         executorService.submit(() ->  namingServer.shutdownClient(nodeId)); // immediate response
+        try {
+            TimeUnit.SECONDS.sleep(2);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         return "redirect:/index"; // Redirect back to index page
     }
 
