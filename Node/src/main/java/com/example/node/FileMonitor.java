@@ -59,15 +59,27 @@ public class FileMonitor implements Runnable {
 
             @Override
             public void onFileDelete(File file) {
+
                 String filename = file.getName();
-                System.out.println("\nFile deleted: " + file.getName());
+                String filepath = file.getPath();
 
                 // We remove the file from the logger
                 Logger logger = client.getLogger();
                 logger.load();
                 int hash = client.computeHash(filename);
-                logger.remove(hash);
-                client.reportFilenameToNamingServer(file.getName(),file.getPath(),2); // Operation 2 --> file DELETE
+                logger.remove(hash); // We remove the hash from the logger.
+                client.reportFilenameToNamingServer(file.getName(),file.getPath(),2); // Operation 2 --> file DELETE on replicated node
+
+                try {
+                    Files.delete(Path.of(filepath));
+                    System.out.println("File" + filename +  "deleted successfully");
+                } catch (IOException e) {
+                    System.err.println("File" + filename +  "could not be deleted successfully");
+                    throw new RuntimeException(e);
+                }
+
+
+
             }
         });
 

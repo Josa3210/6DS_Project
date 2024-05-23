@@ -20,6 +20,9 @@ import org.springframework.web.client.RestTemplate;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -104,22 +107,25 @@ public class RestControllerDiscAndBoot {
         client.ReceiveFile(filepath,dataInputStream);
     }
 
-    @PostMapping("/newNodeOwner")
-    public void newNodeOwner(@RequestBody Map<String, Object> request) throws UnknownHostException {
+    @PostMapping("/deleteReplicatedFile")
+    public void deleteReplicatedFile(@RequestBody Map<String, Object> request) throws UnknownHostException {
+
 
         Integer fileHash = Integer.parseInt(request.get("hashValue").toString());
-        System.out.println("This node becomes the new owner of file with hash: " + fileHash);
+        String filename = (String) request.get("filename");
+        String filepath = (String) request.get("filepath");
 
-        // We change the ip from the original IP --> current IP
-        Logger logger = client.getLogger();
+        System.out.println("Delete file " + filename + " with hash: " + fileHash);
+        Logger logger = client.getLogger(); // We change the ip from the original IP --> current IP
         logger.load();
+        logger.remove(fileHash); // We first remove the current entry with the original IP
 
-        // We first remove the current entry with the original IP
-        logger.remove(fileHash);
-
-        // We add the current IP nex to the filehash
-        logger.put(fileHash, client.currentIP);
-
+        try {
+            Files.delete(Path.of(filepath));
+            System.out.println("File deleted successfully");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @PostMapping("/OpenTCPConnection")

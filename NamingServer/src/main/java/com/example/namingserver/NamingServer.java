@@ -356,14 +356,19 @@ public class NamingServer implements I_NamingServer {
 
         }
 
-        else{ // operation == 2 --> logger in the replicated node becomes the new owner --> the IP inside it gets changed
+        else{ // operation == 2 --> file also gets deleted in the replicated node
 
-            System.out.println("\nNode: " + replicatedIP.getCanonicalHostName() + " with IP " + replicatedIP.getHostAddress() + " becomes the new owner of file: " + filename);
-            String postUrl = "http://" + replicatedIP.getHostAddress() + ":8080/newNodeOwner";
+            System.out.println("\nNode: " + replicatedIP.getHostAddress() + " with IP " + replicatedIP.getHostAddress() + " " +
+                    "will delete the replicated file: " + filename);
+
+            String postUrl = "http://" + replicatedIP.getHostAddress() + ":8080/deleteReplicatedFile";
+
 
             try{
                 // Send the POST request with the replicated IP --> it becomes the new 'original' IP
                 requestBody.put("hashValue", fileHash);
+                requestBody.put("filename", filename);
+                requestBody.put("filepath", filePath);
 
                 ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
                 HttpStatusCode statusCode = responseEntity.getStatusCode();
