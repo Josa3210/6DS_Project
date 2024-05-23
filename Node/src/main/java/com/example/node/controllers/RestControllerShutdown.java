@@ -29,7 +29,7 @@ public class RestControllerShutdown
         client.setNextID(ids[1]);
     }
 
-    @PostMapping("shutdown/exit")
+    @PostMapping("/shutdown/exit")
     public void exit()
     {
         client.shutDown();
