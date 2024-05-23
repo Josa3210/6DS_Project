@@ -2,6 +2,8 @@ package com.example.node;
 
 
 import com.example.node.Agents.FailureAgent;
+import com.hazelcast.cluster.MembershipEvent;
+import com.hazelcast.cluster.MembershipListener;
 import com.hazelcast.config.*;
 import com.hazelcast.core.Hazelcast;
 import jakarta.annotation.PostConstruct;
@@ -130,11 +132,6 @@ public class Client implements I_Client {
         } catch (IOException e1) {
             System.err.println(e1.getMessage());
         }
-    }
-
-
-    public Logger getLogger() {
-        return logger;
     }
 
     public Thread getFileMonitorThread() {
@@ -512,7 +509,7 @@ public class Client implements I_Client {
         requestBody.put("filename", filename);
         requestBody.put("filepath", filePath);
         System.out.println(filePath);
-        requestBody.put("ip", currentIP.getHostAddress());
+        requestBody.put("ip", currentIP);
         requestBody.put("operation", operation);
 
         if(nextID == 0)
@@ -548,16 +545,9 @@ public class Client implements I_Client {
                 Thread filemonitorthread = getFileMonitorThread();
                 filemonitorthread.start();
             }
-            String s = membershipEvent.getMember().getSocketAddress().toString();
-            s = s.substring(s.indexOf("/") + 1, s.indexOf(":"));
-            int hash = computeHash(s);
-            karibu(hash);
         }
 
         public void memberRemoved(MembershipEvent membershipEvent) {
-            String s = membershipEvent.getMember().getSocketAddress().toString();
-            s = s.substring(s.indexOf("/") + 1, s.indexOf(":"));
-
         }
     }
 }
