@@ -1,5 +1,6 @@
 package com.example.node;
 
+import java.io.IOException;
 import java.net.Inet4Address;
 
 public interface I_Client {
@@ -104,4 +105,6 @@ public interface I_Client {
     void getName();
 
     public void reportFilenameToNamingServer(String filename,String filePath, int operation);
+    int getPrevID();
+    void sendReplicatedFile(Inet4Address originalIP, String filepath) throws IOException;
 }

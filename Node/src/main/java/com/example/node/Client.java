@@ -399,9 +399,16 @@ public class Client implements I_Client {
         // if  a node gets removed from the namingserver, the files replicated on this node should be
         // moved to  the previous node, that will become the owner of the files
         // We first remove the current entry with the original IP
-
-
-
+        if(prevID != currentID) {
+            postUrl = "http://" + namingServerIP.getHostAddress() + ":8080/ns/shutdown";
+            restTemplate = new RestTemplate();
+            requestBody.clear();
+            requestBody.put("PrevID", prevID);
+            requestBody.put("nodeMap", this.logger.getNodeMap());
+            requestBody.put("fileMap", this.logger.getFileMap());
+            requestBody.put("originalIP", currentIP);
+            restTemplate.postForEntity(postUrl, requestBody, Void.class);
+        }
     }
 
     /**
@@ -502,6 +509,28 @@ public class Client implements I_Client {
         } else {
             System.err.println("Failed to report hash value to naming server for file: " + filename);
         }
+    }
+    public void sendReplicatedFile(Inet4Address originalIP, String filepath) throws IOException {
+        this.serverSocket = new ServerSocket(5000);
+        String url = "http://"+originalIP.getHostAddress()+":8080/OpenTCPConnection";
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("replicated ip", InetAddress.getLocalHost().getHostAddress());
+        String completed = String.valueOf(restTemplate.postForEntity(url, requestBody, String.class));
+        System.out.println(completed);
+        this.clientSocket = this.serverSocket.accept();
+        DataInputStream dataInputStream = new DataInputStream(this.clientSocket.getInputStream());
+        url = "http://" + originalIP.getHostAddress()+ ":8080/StartFileTransfer";
+        requestBody.clear();
+        requestBody.put("filepath", filepath);
+        restTemplate.postForEntity(url, requestBody, Void.class);
+        this.ReceiveFile(filepath,dataInputStream);
+    }
+
+    public int getPrevID() {
+        return prevID;
     }
 
     public class ClusterMemberShipListener implements MembershipListener {

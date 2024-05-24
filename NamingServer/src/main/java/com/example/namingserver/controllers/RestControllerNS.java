@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -102,5 +103,13 @@ public class RestControllerNS {
             namingServer.reportLogger(filename, originalIP, operation,nextID);
         }
 
+    }
+    @PostMapping("ns/shutdown")
+    public void shutdown(@RequestBody Map<String, Object> request){
+        int PrevID = (Integer) request.get("PrevID");
+        HashMap<Integer, Inet4Address> nodeMap = (HashMap<Integer, Inet4Address>) request.get("nodeMap");
+        HashMap<Integer, String> fileMap = (HashMap<Integer, String>) request.get("fileMap");
+        Inet4Address originalIP = (Inet4Address) request.get("originalIP");
+        namingServer.shutdown_node(PrevID, nodeMap, fileMap, originalIP);
     }
 }

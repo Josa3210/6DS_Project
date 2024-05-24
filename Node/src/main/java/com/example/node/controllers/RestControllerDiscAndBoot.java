@@ -89,22 +89,8 @@ public class RestControllerDiscAndBoot {
         logger.load();
         // Puts the filehash and the ip address of the node where the file was created in the logger ..
         logger.put(fileHash, ip);
-        client.serverSocket = new ServerSocket(5000);
-        String url = "http://"+ip.getHostAddress()+":8080/OpenTCPConnection";
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("replicated ip", InetAddress.getLocalHost().getHostAddress());
-        String completed = String.valueOf(restTemplate.postForEntity(url, requestBody, String.class));
-        System.out.println(completed);
-        client.clientSocket = client.serverSocket.accept();
-        DataInputStream dataInputStream = new DataInputStream(client.clientSocket.getInputStream());
-        url = "http://" + ip.getHostAddress()+ ":8080/StartFileTransfer";
-        requestBody.clear();
-        requestBody.put("filepath", filepath);
-        restTemplate.postForEntity(url, requestBody, Void.class);
-        client.ReceiveFile(filepath,dataInputStream);
+        logger.putFile(fileHash, filepath);
+        client.sendReplicatedFile(ip, filepath);
     }
 
     @PostMapping("/deleteReplicatedFile")

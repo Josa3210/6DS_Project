@@ -23,6 +23,7 @@ public class Logger {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private String filePath;
     private HashMap<Integer, Inet4Address> nodeMap;
+    private HashMap<Integer, String> fileMap = new HashMap<>(); // stores the hash of the filename as a key and the filepath as a value
 
     /**
      * Constructor to initialize the file path for the logger.
@@ -192,6 +193,30 @@ public class Logger {
         }
     }
 
+
+    public String getFile(Integer hash) {
+            String filepath = fileMap.get(hash);
+            if (filepath == null) {
+                System.err.println("Given key: hash. Result: null");
+                return null;
+            } else {
+                return filepath;
+            }
+        }
+
+    public void putFile(Integer hash, String filepath){
+            fileMap.put(hash, filepath);
+            System.out.println("Entry with key " + hash + " added to the fileMap.");
+        }
+    public void removeFile(int hash) {
+            if (fileMap.containsKey(hash)) {
+                fileMap.remove(hash);
+                System.out.println("Entry with key " + hash + " removed from the fileMap.");
+            } else {
+                System.out.println("Entry has already been removed");
+            }
+        }
+
     /**
      * Removes an entry from the logger
      *
@@ -210,6 +235,14 @@ public class Logger {
         } else {
             System.err.println("Database is not initialized. Please load the database first.");
         }
+    }
+
+    public HashMap<Integer, Inet4Address> getNodeMap() {
+        return nodeMap;
+    }
+
+    public HashMap<Integer, String> getFileMap() {
+        return fileMap;
     }
 
     public static void main(String[] args) {

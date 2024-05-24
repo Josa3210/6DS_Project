@@ -43,6 +43,8 @@ public class NamingServer implements I_NamingServer {
     private static I_NamingserverDB database;
     public String filePath;
     InetAddress ip;
+
+    public String folderPath = "Data/node/Files";
     
 
     public NamingServer() {
@@ -322,9 +324,10 @@ public class NamingServer implements I_NamingServer {
 
         if (operation ==1) {
 
-            if(originalIP == replicatedIP)
+            if(originalIP == replicatedIP){
                 System.out.println(nextID);
-                replicatedIP = getIP(nextID);
+                replicatedIP = getIP(nextID);}
+
 
             System.out.println("\nNode: " + replicatedIP.getCanonicalHostName() + " with IP " + replicatedIP.getHostAddress() + " is the replicated node of file: " + filename);
             System.out.println("Computing the hash of the filename");
@@ -358,7 +361,7 @@ public class NamingServer implements I_NamingServer {
 
         else{ // operation == 2 --> file also gets deleted in the replicated node
 
-            System.out.println("\nNode: " + replicatedIP.getHostAddress() + " with IP " + replicatedIP.getHostAddress() + " " +
+            System.out.println("\nNode: " + replicatedIP.getHostName() + " with IP " + replicatedIP.getHostAddress() + " " +
                     "will delete the replicated file: " + filename);
 
             String postUrl = "http://" + replicatedIP.getHostAddress() + ":8080/deleteReplicatedFile";
@@ -374,7 +377,7 @@ public class NamingServer implements I_NamingServer {
                 HttpStatusCode statusCode = responseEntity.getStatusCode();
 
                 if (statusCode == HttpStatus.OK) {
-                    System.out.println("Node list correctly sent to " + replicatedIP.getHostAddress());
+                    System.out.println("Node list correctly sent to " + replicatedIP.getHostAddress() + " from ip " + originalIP.getHostAddress());
                 } else {
                     System.err.println("Sending node list failed with status code: " + statusCode);
                 }
@@ -383,6 +386,17 @@ public class NamingServer implements I_NamingServer {
             }
 
         }
+    }
+    public void shutdown_node(int PrevID, HashMap<Integer, Inet4Address> nodeMap, HashMap<Integer, String> fileMap, Inet4Address originalIP){
+        Inet4Address newReplicatedIP = database.get(PrevID);
+        System.out.println("sending the replicated files to node " + newReplicatedIP.getHostAddress() + " from IP "+ originalIP.getHostAddress());
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "http://" + newReplicatedIP.getHostAddress() +":8080/shutdown/sendFiles";
+        Map<String, Object> requestbody = new HashMap<>();
+        requestbody.put("originalIP", originalIP);
+        requestbody.put("nodeMap", nodeMap);
+        requestbody.put("fileMap", fileMap);
+        restTemplate.postForEntity(url, requestbody, Void.class);
     }
 }
 
