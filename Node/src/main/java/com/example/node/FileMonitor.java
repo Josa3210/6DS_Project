@@ -64,22 +64,24 @@ public class FileMonitor implements Runnable {
                 String filename = file.getName();
                 String filepath = file.getPath();
 
-                // We remove the file from the logger
-                Logger logger = client.getLogger();
-                logger.load();
-                int hash = client.computeHash(filename);
-                logger.remove(hash); // We remove the hash from the logger.
-                client.reportFilenameToNamingServer(file.getName(),file.getPath(),2); // Operation 2 --> file DELETE on replicated node
+                if (!filename.endsWith(".swp")) { // we don't look at temporary files
 
-                try {
-                    Files.delete(Path.of(filepath));
-                    System.out.println("File" + filename +  "deleted successfully");
-                } catch (IOException e) {
-                    System.err.println("File" + filename +  "could not be deleted successfully");
-                    throw new RuntimeException(e);
+                    // We remove the file from the logger
+                    Logger logger = client.getLogger();
+                    logger.load();
+                    int hash = client.computeHash(filename);
+                    logger.remove(hash); // We remove the hash from the logger.
+                    client.reportFilenameToNamingServer(file.getName(), file.getPath(), 2); // Operation 2 --> file DELETE on replicated node
+
+                    try {
+                        Files.delete(Path.of(filepath));
+                        System.out.println("File" + filename + "deleted successfully");
+                    } catch (IOException e) {
+                        System.err.println("File" + filename + "could not be deleted successfully");
+                        throw new RuntimeException(e);
+                    }
+
                 }
-
-
 
             }
         });
