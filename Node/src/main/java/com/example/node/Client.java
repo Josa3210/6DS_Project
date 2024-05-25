@@ -499,7 +499,7 @@ public class Client implements I_Client {
         else
             requestBody.put("ID", nextID);
 
-        System.out.println("prev: " + prevID + "next: " + nextID + "current ID: " + currentID) ;
+        System.out.println("prev: " + prevID + ", next: " + nextID + ", current ID: " + currentID) ;
 
 
         // Make an HTTP POST request to report the hash value
