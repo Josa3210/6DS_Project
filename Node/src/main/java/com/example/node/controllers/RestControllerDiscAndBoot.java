@@ -97,7 +97,7 @@ public class RestControllerDiscAndBoot {
     public void deleteReplicatedFile(@RequestBody Map<String, Object> request) throws UnknownHostException {
 
 
-        Integer fileHash = Integer.parseInt(request.get("hashValue").toString());
+        int fileHash = Integer.parseInt(request.get("hashValue").toString());
         String filename = (String) request.get("filename");
         String filepath = (String) request.get("filepath");
 
