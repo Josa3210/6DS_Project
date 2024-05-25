@@ -63,6 +63,7 @@ public class FileMonitor implements Runnable {
 
                 String filename = file.getName();
                 String filepath = file.getPath();
+                System.out.println("filepath" + filepath);
 
                 if (!filename.endsWith(".swp")) { // we don't look at temporary files
 
