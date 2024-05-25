@@ -399,15 +399,17 @@ public class Client implements I_Client {
         // if  a node gets removed from the namingserver, the files replicated on this node should be
         // moved to  the previous node, that will become the owner of the files
         // We first remove the current entry with the original IP
-        if(prevID != currentID) {
-            postUrl = "http://" + namingServerIP.getHostAddress() + ":8080/ns/shutdown";
-            restTemplate = new RestTemplate();
-            requestBody.clear();
-            requestBody.put("PrevID", prevID);
-            requestBody.put("nodeMap", this.logger.getNodeMap());
-            requestBody.put("fileMap", this.logger.getFileMap());
-            requestBody.put("originalIP", currentIP);
-            restTemplate.postForEntity(postUrl, requestBody, Void.class);
+        if (removeID == currentID) {
+            if (prevID != currentID) {
+                postUrl = "http://" + namingServerIP.getHostAddress() + ":8080/ns/shutdown";
+                restTemplate = new RestTemplate();
+                requestBody.clear();
+                requestBody.put("PrevID", prevID);
+                requestBody.put("nodeMap", this.logger.getNodeMap());
+                requestBody.put("fileMap", this.logger.getFileMap());
+                requestBody.put("originalIP", currentIP);
+                restTemplate.postForEntity(postUrl, requestBody, Void.class);
+            }
         }
     }
 
