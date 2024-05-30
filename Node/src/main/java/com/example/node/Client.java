@@ -493,8 +493,9 @@ public class Client implements I_Client {
         requestBody.put("ip", currentIP.getHostAddress());
         requestBody.put("operation", operation);
 
-        if(nextID == 0)
-            requestBody.put("ID",prevID);
+        if(nextID == 0){
+            System.out.println("there is no next ID!");
+            requestBody.put("ID",prevID);}
 
         else
             requestBody.put("ID", nextID);
