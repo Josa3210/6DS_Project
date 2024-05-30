@@ -99,6 +99,8 @@ public class RestControllerDiscAndBoot {
         int fileHash = Integer.parseInt(request.get("hashValue").toString());
         String filename = (String) request.get("filename");
         String filepath = (String) request.get("filepath");
+        System.out.println("filepath: " + filepath);
+        System.out.println("path of filepath: " + Path.of(filepath));
 
         System.out.println("Delete file " + filename + " with hash: " + fileHash);
         Logger logger = client.getLogger(); // We change the ip from the original IP --> current IP
