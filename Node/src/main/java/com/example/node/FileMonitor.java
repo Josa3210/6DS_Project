@@ -70,8 +70,8 @@ public class FileMonitor implements Runnable {
                     // We remove the file from the logger
                     Logger logger = client.getLogger();
                     logger.load();
-                    int hash = client.computeHash(filename);
-                    logger.remove(hash); // We remove the hash from the logger.
+                    // int hash = client.computeHash(filename);
+                    // logger.remove(hash); // We remove the hash from the logger.
                     client.reportFilenameToNamingServer(file.getName(), file.getPath(), 2); // Operation 2 --> file DELETE on replicated node
 
                     try {
