@@ -321,6 +321,8 @@ public class NamingServer implements I_NamingServer {
         Inet4Address replicatedIP = getLocationIP(filename);
 
         int fileHash = 0;
+        System.out.println("Computing the hash of the filename");
+        fileHash = computeHash(filename);
 
         if (operation ==1) {
 
@@ -330,8 +332,6 @@ public class NamingServer implements I_NamingServer {
 
 
             System.out.println("\nNode: " + replicatedIP.getCanonicalHostName() + " with IP " + replicatedIP.getHostAddress() + " is the replicated node of file: " + filename);
-            System.out.println("Computing the hash of the filename");
-            fileHash = computeHash(filename);
             String postUrl = "http://" + replicatedIP.getHostAddress() + ":8080/isReplicatedNode";
 
             try {
