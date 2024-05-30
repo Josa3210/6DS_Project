@@ -49,12 +49,11 @@ public class FileMonitor implements Runnable {
             @Override
             public void onFileCreate(File file) {
 
-                if (!client.isReceivedFile){
+                if (!client.isReceivedFile) {
                     String filename = file.getName();
                     System.out.println("\nFile created: " + filename);
-                    client.reportFilenameToNamingServer(file.getName(),file.getPath(),1); // Operation 1 --> file CREATE
-                }
-                else
+                    client.reportFilenameToNamingServer(file.getName(), file.getPath(), 1); // Operation 1 --> file CREATE
+                } else
                     client.isReceivedFile = false;
             }
 
@@ -73,22 +72,8 @@ public class FileMonitor implements Runnable {
                     int hash = client.computeHash(filename);
                     logger.remove(hash); // We remove the hash from the logger.
 
-                    if(logger.get(hash) == client.currentIP) // we check if the original IP of the file = current IP
-
-                        // if this is the case, the current IP is the IP where the file got downloaded, so we need to make
-                        // sure that the naming server gets noted about this so it can remove the replicated nodes too.
-                        client.reportFilenameToNamingServer(file.getName(), file.getPath(), 2); // Operation 2 --> file DELETE on replicated node
-
-                    try {
-                        Files.delete(Path.of(filepath));
-                        System.out.println("File" + filename + "deleted successfully");
-                    } catch (IOException e) {
-                        System.err.println("File" + filename + "could not be deleted successfully");
-                        throw new RuntimeException(e);
-                    }
-
+                    client.reportFilenameToNamingServer(file.getName(), file.getPath(), 2); // Operation 2 --> file DELETE on replicated node
                 }
-
             }
         });
 
