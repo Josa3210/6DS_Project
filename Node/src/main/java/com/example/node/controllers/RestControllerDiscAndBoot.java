@@ -109,6 +109,7 @@ public class RestControllerDiscAndBoot {
             Files.delete(Path.of(filepath));
             System.out.println("File deleted successfully");
         } catch (IOException e) {
+            System.out.println("File cannot be deleted successfully .");
             throw new RuntimeException(e);
         }
     }
