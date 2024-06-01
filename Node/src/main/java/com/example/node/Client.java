@@ -418,6 +418,7 @@ public class Client implements I_Client {
      *
      * @param nodeID
      */
+
     @Override
     public void ping(int nodeID) {
         Inet4Address nodeIP = requestIP(nodeID);
@@ -456,7 +457,6 @@ public class Client implements I_Client {
         // Send prevID to nextIP and nextID to prevID
         sendLinkID(ids[0]);
         sendLinkID(ids[1]);
-
 
     }
 
@@ -515,7 +515,7 @@ public class Client implements I_Client {
     }
     public void sendReplicatedFile(Inet4Address originalIP, String filepath) throws IOException {
         this.serverSocket = new ServerSocket(5000);
-        String url = "http://"+originalIP.getHostAddress()+":8080/OpenTCPConnection";
+        String url = "http://" +originalIP.getHostAddress()+":8080/OpenTCPConnection";
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

@@ -70,13 +70,15 @@ public class FileMonitor implements Runnable {
                     Logger logger = client.getLogger();
                     logger.load();
                     int hash = client.computeHash(filename);
-                    logger.remove(hash); // We remove the hash from the logger.
+
 
                     if (logger.get(hash) == client.currentIP) // we check if the original IP of the file = current IP
 
                         // if this is the case, the current IP is the IP where the file got downloaded, so we need to make
                         // sure that the naming server gets noted about this so it can remove the replicated nodes too.
                         client.reportFilenameToNamingServer(file.getName(), file.getPath(), 2); // Operation 2 --> file DELETE on replicated node
+
+                    logger.remove(hash); // We remove the hash from the logger.
                 }
             }
         });
