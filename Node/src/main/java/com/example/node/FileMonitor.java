@@ -79,18 +79,10 @@ public class FileMonitor implements Runnable {
                     Logger logger = client.getLogger();
                     logger.load();
                     int hash = client.computeHash(filename);
-                    String originalIP_String = logger.get(hash).getHostAddress();
+                    String originalIP = logger.get(hash).getHostAddress();
+                    String  currentIP = client.currentIP.getHostAddress();
 
-                    InetAddress originalIP = null;
-                    try {
-                        originalIP = Inet4Address.getByName(originalIP_String);
-                        System.out.println("original IP: " + originalIP);
-
-                    } catch (UnknownHostException e) {
-                        throw new RuntimeException(e);
-                    }
-
-                    if (originalIP== client.currentIP) // we check if the original IP of the file = current IP
+                    if (originalIP.equals(currentIP)) // we check if the original IP of the file = current IP
 
                         // if this is the case, the current IP is the IP where the file got downloaded, so we need to make
                         // sure that the naming server gets noted about this so it can remove the replicated nodes too.
