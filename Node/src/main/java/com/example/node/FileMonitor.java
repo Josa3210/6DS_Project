@@ -70,7 +70,7 @@ public class FileMonitor implements Runnable {
                     Logger logger = client.getLogger();
                     logger.load();
                     int hash = client.computeHash(filename);
-
+                    System.out.println("ip hash: " + logger.get(hash));
 
                     if (logger.get(hash) == client.currentIP) // we check if the original IP of the file = current IP
 
