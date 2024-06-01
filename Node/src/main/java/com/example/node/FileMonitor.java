@@ -7,6 +7,9 @@ import org.apache.commons.io.monitor.FileAlterationObserver;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -68,7 +71,7 @@ public class FileMonitor implements Runnable {
 
                 String filename = file.getName();
                 String filepath = file.getPath();
-                System.out.println("filepath" + filepath);
+                System.out.println("filepath: " + filepath);
 
                 if (!filename.endsWith(".swp")) { // we don't look at temporary files
 
@@ -76,9 +79,18 @@ public class FileMonitor implements Runnable {
                     Logger logger = client.getLogger();
                     logger.load();
                     int hash = client.computeHash(filename);
-                    System.out.println("ip hash: " + logger.get(hash));
+                    String originalIP_String = logger.get(hash).getHostAddress();
 
-                    if (logger.get(hash) == client.currentIP) // we check if the original IP of the file = current IP
+                    InetAddress originalIP = null;
+                    try {
+                        originalIP = Inet4Address.getByName(originalIP_String);
+                        System.out.println("original IP: " + originalIP);
+
+                    } catch (UnknownHostException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    if (originalIP== client.currentIP) // we check if the original IP of the file = current IP
 
                         // if this is the case, the current IP is the IP where the file got downloaded, so we need to make
                         // sure that the naming server gets noted about this so it can remove the replicated nodes too.
