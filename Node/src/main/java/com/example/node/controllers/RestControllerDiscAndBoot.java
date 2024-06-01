@@ -90,6 +90,7 @@ public class RestControllerDiscAndBoot {
         // Puts the filehash and the ip address of the node where the file was created in the logger ..
         logger.put(fileHash, ip);
         logger.putFile(fileHash, filepath);
+        logger.save();
         client.sendReplicatedFile(ip, filepath);
     }
 
@@ -106,6 +107,7 @@ public class RestControllerDiscAndBoot {
         Logger logger = client.getLogger(); // We change the ip from the original IP --> current IP
         logger.load();
         logger.remove(fileHash); // We first remove the current entry with the original IP
+        logger.save();
 
         try {
             Files.delete(Path.of(filepath));

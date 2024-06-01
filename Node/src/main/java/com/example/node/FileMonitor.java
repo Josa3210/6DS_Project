@@ -51,7 +51,13 @@ public class FileMonitor implements Runnable {
 
                 if (!client.isReceivedFile) {
                     String filename = file.getName();
+
                     System.out.println("\nFile created: " + filename);
+                    Logger logger = client.getLogger();
+                    logger.load();
+                    int hash = client.computeHash(filename);
+                    logger.put(hash, client.currentIP);
+                    logger.save();
                     client.reportFilenameToNamingServer(file.getName(), file.getPath(), 1); // Operation 1 --> file CREATE
                 } else
                     client.isReceivedFile = false;
