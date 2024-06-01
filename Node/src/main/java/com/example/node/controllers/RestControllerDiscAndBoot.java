@@ -104,16 +104,12 @@ public class RestControllerDiscAndBoot {
         System.out.println("path of filepath: " + Path.of(filepath));
 
         System.out.println("Delete file " + filename + " with hash: " + fileHash);
-        Logger logger = client.getLogger(); // We change the ip from the original IP --> current IP
-        logger.load();
-        logger.remove(fileHash); // We first remove the current entry with the original IP
-        logger.save();
 
         try {
             Files.delete(Path.of(filepath));
-            System.out.println("File deleted successfully");
+            System.out.println("File entry deleted successfully");
         } catch (IOException e) {
-            System.out.println("File cannot be deleted successfully .");
+            System.out.println("File entry cannot be deleted successfully .");
             throw new RuntimeException(e);
         }
     }
