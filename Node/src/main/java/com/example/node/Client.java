@@ -502,7 +502,7 @@ public class Client implements I_Client {
     }
 
     public void sendReplicatedFile(Inet4Address originalIP, String filepath) throws IOException {
-        this.serverSocket = new ServerSocket(5001);
+        this.serverSocket = new ServerSocket(5000);
         String url = "http://" +originalIP.getHostAddress()+":8080/OpenTCPConnection";
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
