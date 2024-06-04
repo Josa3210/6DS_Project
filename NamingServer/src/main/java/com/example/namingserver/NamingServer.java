@@ -275,7 +275,7 @@ public class NamingServer implements I_NamingServer {
             s = s.substring(s.indexOf("/") + 1, s.indexOf(":"));
             try {
                 Inet4Address ip_address = (Inet4Address) Inet4Address.getByName(s);
-                TimeUnit.SECONDS.sleep(2);
+                TimeUnit.SECONDS.sleep(20);
                 welcomeClient(ip_address);
             } catch (UnknownHostException | InterruptedException e) {
                 throw new RuntimeException(e);
