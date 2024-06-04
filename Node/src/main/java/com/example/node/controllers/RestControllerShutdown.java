@@ -10,6 +10,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,7 +36,10 @@ public class RestControllerShutdown
         String filepath;
         Logger logger = client.getLogger();
         Inet4Address newReplicatedIP;
-        Inet4Address originalIP = (Inet4Address) requestbody.get("originalIP");
+        String originalIP_String = (String) requestbody.get("originalIP");
+        Inet4Address originalIP = (Inet4Address) InetAddress.getByName(originalIP_String);
+
+
         HashMap<Integer, Inet4Address> nodeMap = (HashMap<Integer, Inet4Address>) requestbody.get("nodeMap");
         HashMap<Integer, String> fileMap = (HashMap<Integer, String>) requestbody.get("fileMap");
         for(Map.Entry<Integer, Inet4Address> entry : nodeMap.entrySet()){
