@@ -478,24 +478,17 @@ public class Client implements I_Client {
 
         System.out.println("namingserver IP: " + namingServerIP.getHostAddress());
         System.out.println("current IP: " + currentIP.getHostAddress());
-
         // Prepare the URL for reporting the hash value to the naming server
         String postUrl = "http://" + namingServerIP.getHostAddress() + ":8080/ns/reportFileName";
-
-
         Map<String, Object> requestBody = new HashMap<>();
-
         System.out.println("operation: " + operation);
-
         requestBody.put("filename", filename);
         requestBody.put("filepath", filePath);
         System.out.println(filePath);
         requestBody.put("ip", currentIP.getHostAddress());
         requestBody.put("operation", operation);
         requestBody.put("ID", nextID);
-
         System.out.println("prev: " + prevID + ", current ID: " + currentID + "next ID " + nextID) ;
-
 
         // Make an HTTP POST request to report the hash value
         RestTemplate restTemplate = new RestTemplate();
@@ -535,7 +528,7 @@ public class Client implements I_Client {
         public void memberAdded(MembershipEvent membershipEvent) {
             if (startFileMonitor){
                 try {
-                    TimeUnit.SECONDS.sleep(2);
+                    TimeUnit.SECONDS.sleep(5);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
