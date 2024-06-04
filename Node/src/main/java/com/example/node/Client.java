@@ -493,14 +493,15 @@ public class Client implements I_Client {
         requestBody.put("ip", currentIP.getHostAddress());
         requestBody.put("operation", operation);
 
-        if(nextID == 0){
+        """ if(nextID == ){
             System.out.println("there is no next ID!");
-            requestBody.put("ID",prevID);}
+            requestBody.put("ID",prevID);
+            System.out.println("prev: " + prevID + ", current ID: " + currentID) ;
+        }
+        else"""
+        requestBody.put("ID", nextID);
 
-        else
-            requestBody.put("ID", nextID);
-
-        System.out.println("prev: " + prevID + ", next: " + nextID + ", current ID: " + currentID) ;
+        System.out.println("prev: " + prevID + ", current ID: " + currentID + "next ID " + nextID) ;
 
 
         // Make an HTTP POST request to report the hash value
@@ -513,6 +514,7 @@ public class Client implements I_Client {
             System.err.println("Failed to report hash value to naming server for file: " + filename);
         }
     }
+
     public void sendReplicatedFile(Inet4Address originalIP, String filepath) throws IOException {
         this.serverSocket = new ServerSocket(5000);
         String url = "http://" +originalIP.getHostAddress()+":8080/OpenTCPConnection";
