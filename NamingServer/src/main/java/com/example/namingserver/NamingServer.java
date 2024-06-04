@@ -390,6 +390,7 @@ public class NamingServer implements I_NamingServer {
     }
     public void shutdown_node(int PrevID, HashMap<Integer, Inet4Address> nodeMap, HashMap<Integer, String> fileMap, Inet4Address originalIP){
         Inet4Address newReplicatedIP = database.get(PrevID);
+
         System.out.println("sending the replicated files to node " + newReplicatedIP.getHostAddress() + " from IP "+ originalIP.getHostAddress());
         RestTemplate restTemplate = new RestTemplate();
         String url = "http://" + newReplicatedIP.getHostAddress() +":8080/shutdown/sendFiles";

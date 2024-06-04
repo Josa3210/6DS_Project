@@ -38,10 +38,13 @@ public class RestControllerShutdown
         Inet4Address newReplicatedIP;
         String originalIP_String = (String) requestbody.get("originalIP");
         Inet4Address originalIP = (Inet4Address) InetAddress.getByName(originalIP_String);
-        HashMap<Integer, Inet4Address> nodeMap = (HashMap<Integer, Inet4Address>) requestbody.get("nodeMap");
-        HashMap<Integer, String> fileMap = (HashMap<Integer, String>) requestbody.get("fileMap");
-        for(Map.Entry<Integer, Inet4Address> entry : nodeMap.entrySet()){
-            if(client.currentIP == entry.getValue()){
+        HashMap<String, Inet4Address> nodeMap = (HashMap<String, Inet4Address>) requestbody.get("nodeMap");
+        HashMap<String, String> fileMap = (HashMap<String, String>) requestbody.get("fileMap");
+
+        for(Map.Entry<String, Inet4Address> entry : nodeMap.entrySet()){
+            Integer keyAsInteger = Integer.parseInt(entry.getKey());
+
+            if(client.currentIP.equals(entry.getValue())){
                 newReplicatedIP = client.requestIP(client.getPrevID());
                 RestTemplate restTemplate = new RestTemplate();
                 String url = "http://" + newReplicatedIP.getHostAddress()+":8080/ns/sendFiles";
@@ -51,11 +54,14 @@ public class RestControllerShutdown
                 bodyNewReplicated.put("fileMap", fileMap);
                 restTemplate.postForEntity(url, bodyNewReplicated, Void.class);
                 break;
-            }else{
+
+            }
+            else{
                 filepath = fileMap.get(entry.getKey());
                 logger.load();
-                logger.put(entry.getKey(), entry.getValue());
-                logger.putFile(entry.getKey(), filepath);
+                logger.put(keyAsInteger, entry.getValue());
+                logger.putFile(keyAsInteger, filepath);
+                logger.save();
                 client.sendReplicatedFile(originalIP, filepath);
             }
 
