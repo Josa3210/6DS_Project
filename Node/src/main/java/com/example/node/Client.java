@@ -492,17 +492,6 @@ public class Client implements I_Client {
         System.out.println(filePath);
         requestBody.put("ip", currentIP.getHostAddress());
         requestBody.put("operation", operation);
-        /*
-
-            if(nextID == )
-            {
-                System.out.println("there is no next ID!");
-                requestBody.put("ID",prevID);
-                System.out.println("prev: " + prevID + ", current ID: " + currentID) ;
-            }
-            else
-        */
-
         requestBody.put("ID", nextID);
 
         System.out.println("prev: " + prevID + ", current ID: " + currentID + "next ID " + nextID) ;

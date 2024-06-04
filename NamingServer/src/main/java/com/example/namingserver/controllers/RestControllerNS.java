@@ -103,11 +103,12 @@ public class RestControllerNS {
 
     }
     @PostMapping("ns/shutdown")
-    public void shutdown(@RequestBody Map<String, Object> request){
+    public void shutdown(@RequestBody Map<String, Object> request) throws UnknownHostException{
         int PrevID = (Integer) request.get("PrevID");
         HashMap<Integer, Inet4Address> nodeMap = (HashMap<Integer, Inet4Address>) request.get("nodeMap");
         HashMap<Integer, String> fileMap = (HashMap<Integer, String>) request.get("fileMap");
-        Inet4Address originalIP = (Inet4Address) request.get("originalIP");
+        String originalIPString = (String) request.get("originalIP");
+        Inet4Address originalIP = (Inet4Address) InetAddress.getByName(originalIPString);
         namingServer.shutdown_node(PrevID, nodeMap, fileMap, originalIP);
     }
 }
