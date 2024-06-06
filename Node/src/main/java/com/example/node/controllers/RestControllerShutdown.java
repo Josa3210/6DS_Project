@@ -56,6 +56,7 @@ public class RestControllerShutdown
                 restTemplate.postForEntity(url, bodyNewReplicated, Void.class);
             }
             else{
+                System.out.println("filemap: " +  fileMap);
                 filepath = fileMap.get(entry.getKey());
                 logger.load();
                 logger.put(entry.getKey(), entry.getValue());

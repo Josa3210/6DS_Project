@@ -159,9 +159,9 @@ public class Client implements I_Client {
     @Override
     public void printLinkIds() {
         System.out.println("Link ids");
-        System.out.println("currentID: " + String.valueOf(this.currentID));
-        System.out.println("NextID: " + String.valueOf(this.nextID));
-        System.out.println("PreviousID: " + String.valueOf(this.prevID));
+        System.out.println("currentID: " + this.currentID);
+        System.out.println("NextID: " + this.nextID);
+        System.out.println("PreviousID: " + this.prevID);
         System.out.println("IP + port NS: " + this.namingServerIP + ":" + this.namingServerPort);
     }
 
