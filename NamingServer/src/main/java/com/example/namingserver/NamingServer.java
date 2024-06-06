@@ -395,7 +395,7 @@ public class NamingServer implements I_NamingServer {
         RestTemplate restTemplate = new RestTemplate();
         String url = "http://" + newReplicatedIP.getHostAddress() +":8080/shutdown/sendFiles";
         Map<String, Object> requestbody = new HashMap<>();
-        requestbody.put("originalIP", originalIP);
+        requestbody.put("originalIP", originalIP.getHostAddress());
         requestbody.put("nodeMap", nodeMap);
         requestbody.put("fileMap", fileMap);
         restTemplate.postForEntity(url, requestbody, Void.class);
