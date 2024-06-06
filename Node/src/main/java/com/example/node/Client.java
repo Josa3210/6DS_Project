@@ -407,6 +407,7 @@ public class Client implements I_Client {
                 requestBody.clear();
                 requestBody.put("PrevID", prevID);
                 requestBody.put("nodeMap", logger.getNodeMap());
+                System.out.println("nodemap logger: " + logger.getNodeMap());
                 requestBody.put("fileMap", logger.getFileMap());
                 System.out.println("filemap logger: " + logger.getFileMap());
                 requestBody.put("originalIP", currentIP.getHostAddress());
