@@ -401,12 +401,13 @@ public class Client implements I_Client {
         // We first remove the current entry with the original IP
         if (removeID == currentID) {
             if (prevID != currentID) {
+                logger.load();
                 postUrl = "http://" + namingServerIP.getHostAddress() + ":8080/ns/shutdown";
                 restTemplate = new RestTemplate();
                 requestBody.clear();
                 requestBody.put("PrevID", prevID);
-                requestBody.put("nodeMap", this.logger.getNodeMap());
-                requestBody.put("fileMap", this.logger.getFileMap());
+                requestBody.put("nodeMap", logger.getNodeMap());
+                requestBody.put("fileMap", logger.getFileMap());
                 System.out.println("filemap logger: " + logger.getFileMap());
                 requestBody.put("originalIP", currentIP.getHostAddress());
                 restTemplate.postForEntity(postUrl, requestBody, Void.class);
