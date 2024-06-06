@@ -531,7 +531,7 @@ public class Client implements I_Client {
         public void memberAdded(MembershipEvent membershipEvent) {
             if (startFileMonitor){
                 try {
-                    TimeUnit.SECONDS.sleep(2);
+                    TimeUnit.SECONDS.sleep(10);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
