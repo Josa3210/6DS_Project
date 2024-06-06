@@ -39,6 +39,7 @@ public class RestControllerShutdown
         Inet4Address newReplicatedIP;
         String originalIP_String = (String) requestbody.get("originalIP");
         Inet4Address originalIP = (Inet4Address) InetAddress.getByName(originalIP_String);
+        System.out.println("original ip: " + originalIP);
 
         HashMap<Integer, Inet4Address> nodeMap = (HashMap<Integer, Inet4Address>) requestbody.get("nodeMap");
 
