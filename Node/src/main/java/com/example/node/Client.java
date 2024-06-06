@@ -407,7 +407,7 @@ public class Client implements I_Client {
                 requestBody.put("PrevID", prevID);
                 requestBody.put("nodeMap", this.logger.getNodeMap());
                 requestBody.put("fileMap", this.logger.getFileMap());
-                requestBody.put("originalIP", currentIP.toString());
+                requestBody.put("originalIP", currentIP.getHostAddress());
                 restTemplate.postForEntity(postUrl, requestBody, Void.class);
             }
         }
