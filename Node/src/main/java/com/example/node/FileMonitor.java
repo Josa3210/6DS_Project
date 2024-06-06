@@ -53,23 +53,27 @@ public class FileMonitor implements Runnable {
             public void onFileCreate(File file) {
 
                 if (!client.isReceivedFile) {
+
                     String filename = file.getName();
                     String filepath = file.getPath();
 
-                    System.out.println("\nFile created: " + filename);
-                    Logger logger = client.getLogger();
-                    logger.load();
-                    int hash = client.computeHash(filename);
-                    try { logger.put(hash, (Inet4Address) InetAddress.getByName(client.currentIP.getHostAddress()));
-                    } catch (UnknownHostException e) {
-                        throw new RuntimeException(e);
+                    if (!filename.endsWith(".swp")) {
+                        System.out.println("\nFile created: " + filename);
+                        Logger logger = client.getLogger();
+                        logger.load();
+                        int hash = client.computeHash(filename);
+                        try {
+                            logger.put(hash, (Inet4Address) InetAddress.getByName(client.currentIP.getHostAddress()));
+                        } catch (UnknownHostException e) {
+                            throw new RuntimeException(e);
+                        }
+                        System.out.println("hash: " + hash + " current IP: " + client.currentIP.getHostAddress());
+
+                        logger.putFile(hash, filepath);
+                        logger.save();
+                        client.reportFilenameToNamingServer(file.getName(), filepath, 1); // Operation 1 --> file CREATE
                     }
-                    System.out.println("hash: " + hash + " current IP: " + client.currentIP.getHostAddress());
-                    logger.putFile(hash, filepath);
-                    logger.save();
-                    client.reportFilenameToNamingServer(file.getName(), filepath, 1); // Operation 1 --> file CREATE
-                } else
-                    client.isReceivedFile = false;
+                }
             }
 
             @Override
