@@ -125,6 +125,7 @@ public class RestControllerDiscAndBoot {
     public void StartFileTransfer(@RequestBody Map<String, Object> request) throws UnknownHostException {
         System.out.println("start file transfer");
         String filepath = (String) request.get("filepath");
+        System.out.println("Starting file transfer: " + filepath);
         System.out.println(filepath);
         client.SendFile(filepath);
     }
