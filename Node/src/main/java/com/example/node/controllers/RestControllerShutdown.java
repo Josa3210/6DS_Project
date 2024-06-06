@@ -65,6 +65,7 @@ public class RestControllerShutdown
             }
             else{
                 filepath = fileMap.get(entry.getKey());
+                System.out.println("filepath: " + filepath);
                 logger.load();
                 logger.put(keyAsInteger, entry.getValue());
                 logger.putFile(keyAsInteger, filepath);
