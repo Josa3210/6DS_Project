@@ -60,6 +60,7 @@ public class FileMonitor implements Runnable {
                     logger.load();
                     int hash = client.computeHash(filename);
                     logger.put(hash, client.currentIP);
+                    System.out.println("hash: " + hash + " current IP: " + client.currentIP);
                     logger.save();
                     client.reportFilenameToNamingServer(file.getName(), file.getPath(), 1); // Operation 1 --> file CREATE
                 } else
