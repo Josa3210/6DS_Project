@@ -40,11 +40,13 @@ public class RestControllerShutdown
         Inet4Address originalIP = (Inet4Address) InetAddress.getByName(originalIP_String);
 
         HashMap<String, String> stringNodeMap = (HashMap<String, String>) requestbody.get("nodeMap");
+        System.out.println("StringNodemap:" + stringNodeMap);
 
         HashMap<String, Inet4Address> nodeMap = new HashMap<>();
         for (Map.Entry<String, String> entry : stringNodeMap.entrySet()) {
             nodeMap.put(entry.getKey(), (Inet4Address) InetAddress.getByName(entry.getValue()));
         }
+        System.out.println("nodemap:" + nodeMap);
 
         HashMap<String, String> fileMap = (HashMap<String, String>) requestbody.get("fileMap");
 
