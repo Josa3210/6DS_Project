@@ -398,6 +398,7 @@ public class NamingServer implements I_NamingServer {
         requestbody.put("originalIP", originalIP.getHostAddress());
         requestbody.put("nodeMap", nodeMap);
         requestbody.put("fileMap", fileMap);
+        System.out.println("filemap: " + fileMap);
         restTemplate.postForEntity(url, requestbody, Void.class);
     }
 }
