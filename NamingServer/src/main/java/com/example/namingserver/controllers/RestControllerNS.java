@@ -11,10 +11,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-public class RestControllerNS {
-
+public class RestControllerNS
+{
     NamingServer namingServer = new NamingServer();
-
 
     /**
      * Asks the naming server for the location of a file
@@ -24,7 +23,8 @@ public class RestControllerNS {
      */
 
     @GetMapping("/ns/searchFile")
-    public Inet4Address searchFile(@RequestParam String fileName) {
+    public Inet4Address searchFile(@RequestParam String fileName)
+    {
         Inet4Address address = namingServer.getLocationIP(fileName);
         System.out.println(address);
         return address;
@@ -36,7 +36,8 @@ public class RestControllerNS {
      * @param request the JSON request body with "ip" as ip address
      */
     @PostMapping("/ns/addNode")
-    public void addNode(@RequestBody Map<String, Object> request) throws UnknownHostException {
+    public void addNode(@RequestBody Map<String, Object> request) throws UnknownHostException
+    {
         String ipAddressString = (String) request.get("ip");
         Inet4Address ipAddress = (Inet4Address) InetAddress.getByName(ipAddressString);
         String nodeName = (String) request.get("name");
@@ -49,18 +50,21 @@ public class RestControllerNS {
      * @param request the JSON request body with "ip" as ip address
      */
     @PostMapping("/ns/removeNode")
-    public void removeNode(@RequestBody Map<String, Object> request) {
+    public void removeNode(@RequestBody Map<String, Object> request)
+    {
         int nodeID = Integer.parseInt(request.get("nodeID").toString());
         namingServer.removeNodeIP(nodeID);
     }
 
     @GetMapping("/ns/getIp/{id}")
-    public String getIp(@PathVariable("id") int id) {
+    public String getIp(@PathVariable("id") int id)
+    {
         return namingServer.getIP(id).getHostAddress();
     }
 
     @GetMapping("/test")
-    public String testConnection(@RequestParam String testString) {
+    public String testConnection(@RequestParam String testString)
+    {
         return ("Test Communication : " + testString + "\n");
     }
 
@@ -69,14 +73,6 @@ public class RestControllerNS {
         return namingServer.giveLinkIds(id);
     }
 
-    /**
-     * Sets the naming server for the rest controller
-     *
-     * @param namingServer the naming server
-     */
-    public void setNamingServer(NamingServer namingServer) {
-        this.namingServer = namingServer;
-    }
 
     /**
      * Reports the hash of a newly created file on the node and calculates if there are replicated nodes

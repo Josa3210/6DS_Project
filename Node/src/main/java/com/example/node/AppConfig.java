@@ -9,9 +9,10 @@ import java.util.Scanner;
 public class AppConfig {
 
     @Bean
-    public Client client() {
+    public Client client()
+    {
         Scanner myObj = new Scanner(System.in);  // Create a Scanner object
-        System.out.println("Enter username");
+        System.out.println(">> Enter username: ");
 
         String userName = myObj.nextLine();  // Read user input
         return new Client(userName);

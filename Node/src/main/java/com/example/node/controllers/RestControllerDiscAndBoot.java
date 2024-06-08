@@ -31,32 +31,33 @@ public class RestControllerDiscAndBoot {
     private static final String multicast_address = "224.0.1.1";
     private static Config config;
     private static HazelcastInstance hazelcastInstance;
-    Client client;
+    private final Client client;
 
     @Autowired
-    public RestControllerDiscAndBoot(Client client) {
+    public RestControllerDiscAndBoot(Client client)
+    {
         hazelcastInstance = Hazelcast.newHazelcastInstance();
         this.client = client;
     }
 
+    /**
+     * This REST request will set up the client
+     * @param request the IP, Port and nr of nodes of the naming server
+     */
     @PostMapping("/welcome")
-    public void welcome(@RequestBody Map<String, Object> request) {
-        System.out.println("Welcome --------------");
-        int nrNodes = Integer.parseInt(request.get("nrNodes").toString());
-        client.numberNodes = nrNodes;
-        System.out.println("nrNodes: " + nrNodes);
-        Inet4Address ipAddress = null;
-        try {
-            ipAddress = (Inet4Address) InetAddress.getByName((String) request.get("ip"));
-            System.out.println("ipAddr: " + ipAddress);
-        } catch (UnknownHostException e) {
-            throw new RuntimeException(e);
-        }
-        int port = Integer.parseInt(request.get("port").toString());
-        System.out.println("port: " + port);
-        client.setupClient(nrNodes, ipAddress, port);
+    public void welcome(@RequestBody Map<String, Object> request)
+    {
+        int nrNodes =  Integer.parseInt(request.get("nrNodes").toString());
+        String ipNamingServer = request.get("ip").toString();
+        int portNamingServer = Integer.parseInt(request.get("port").toString());
 
-        System.out.println("hello");
+        client.setupClient(nrNodes, ipNamingServer, portNamingServer);
+
+        System.out.println(">> Welcome " + client.getHostname() + "!");
+        System.out.println("* Nr nodes: " + nrNodes);
+        System.out.println("* IP Naming Server: " + ipNamingServer);
+        System.out.println("* Port Naming Server: " + portNamingServer);
+
         // We start the filemonitorthread from here
 
         if (nrNodes > 1) {
@@ -69,14 +70,10 @@ public class RestControllerDiscAndBoot {
     }
 
     @GetMapping("/multicastaddress")
-    public String getMulticastAddress() {
-        return multicast_address;
-    }
+    public String getMulticastAddress() { return multicast_address; }
 
     @GetMapping("/createinstance")
-    public Object createHazelcastInstance() throws JsonProcessingException {
-        return JSONObject.wrap((Object) Hazelcast.newHazelcastInstance(config));
-    }
+    public Object createHazelcastInstance() { return JSONObject.wrap(Hazelcast.newHazelcastInstance(config)); }
 
     @PostMapping("/isReplicatedNode")
     public void isReplicatedNode(@RequestBody Map<String, Object> request) throws IOException {
