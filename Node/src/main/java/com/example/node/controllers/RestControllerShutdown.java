@@ -56,7 +56,7 @@ public class RestControllerShutdown
         for(Map.Entry<String, Inet4Address> entry : nodeMap.entrySet()){
             Integer keyAsInteger = Integer.parseInt(entry.getKey());
 
-            if(client.getCurrentIP().equals(entry.getValue().toString())) //TODO : Probably not going to work
+            if(client.getCurrentIP().equals(entry.getValue().getHostAddress())) //TODO : Probably not going to work
             {
                 newReplicatedIP = client.requestIP(client.getPrevID());
                 RestTemplate restTemplate = new RestTemplate();
