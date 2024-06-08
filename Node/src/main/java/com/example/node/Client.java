@@ -495,7 +495,7 @@ public class Client implements I_Client {
     }
 
     @Override
-    public void reportFilenameToNamingServer(String filename)
+    public void reportFilenameToNamingServer(String filename, String filePath, int operation)
     {
         // Prepare the URL for reporting the hash value to the naming server
         String postUrl = "http://" + namingServerIP + ":8080/ns/reportFileName";

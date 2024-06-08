@@ -63,11 +63,11 @@ public class FileMonitor implements Runnable {
                         logger.load();
                         int hash = client.computeHash(filename);
                         try {
-                            logger.put(hash, (Inet4Address) InetAddress.getByName(client.currentIP.getHostAddress()));
+                            logger.put(hash, (Inet4Address) InetAddress.getByName(client.getCurrentIP()));
                         } catch (UnknownHostException e) {
                             throw new RuntimeException(e);
                         }
-                        System.out.println("hash: " + hash + " current IP: " + client.currentIP.getHostAddress());
+                        System.out.println("hash: " + hash + " current IP: " + client.getCurrentIP());
 
                         logger.putFile(hash, filepath);
                         logger.save();
@@ -91,7 +91,7 @@ public class FileMonitor implements Runnable {
                     logger.load();
                     int hash = client.computeHash(filename);
                     String originalIP = logger.get(hash).getHostAddress();
-                    String  currentIP = client.currentIP.getHostAddress();
+                    String currentIP = client.getCurrentIP();
 
                     if (originalIP.equals(currentIP)) // we check if the original IP of the file = current IP
 
