@@ -38,7 +38,7 @@ public class RestControllerShutdown
     public void sendFiles(@RequestBody Map<String, Object> requestbody) throws IOException {
         String filepath;
         Logger logger = client.getLogger();
-        Inet4Address newReplicatedIP;
+        String newReplicatedIP;
         String originalIP_String = (String) requestbody.get("originalIP");
         Inet4Address originalIP = (Inet4Address) InetAddress.getByName(originalIP_String);
 
@@ -56,10 +56,11 @@ public class RestControllerShutdown
         for(Map.Entry<String, Inet4Address> entry : nodeMap.entrySet()){
             Integer keyAsInteger = Integer.parseInt(entry.getKey());
 
-            if(client.currentIP.equals(entry.getValue())){
+            if(client.getCurrentIP().equals(entry.getValue().toString())) //TODO : Probably not going to work
+            {
                 newReplicatedIP = client.requestIP(client.getPrevID());
                 RestTemplate restTemplate = new RestTemplate();
-                String url = "http://" + newReplicatedIP.getHostAddress()+":8080/ns/sendFiles";
+                String url = "http://" + newReplicatedIP + ":8080/ns/sendFiles";
                 Map<String, Object> bodyNewReplicated = new HashMap<>();
                 bodyNewReplicated.put("originalIP", originalIP);
                 bodyNewReplicated.put("nodeMap", nodeMap);

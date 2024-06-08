@@ -40,21 +40,18 @@ public class Client implements I_Client {
     public int numberNodes = 0;
     public boolean startFileMonitor = false;
     public boolean isReceivedFile = false;
-
     boolean setupCompleted = false;
     private int portNumber = 80;
-
     public ServerSocket serverSocket;
-
     public Socket clientSocket;
+    private Thread fileMonitorThread;
 
 
     /**
      * Constructor of the client
      * @param hostname the name of the client
      */
-    public Client(String hostname)
-    {
+    public Client(String hostname) {
         try {
             event_listener = new ClusterMemberShipListener();
             this.config = createConfig();
@@ -144,11 +141,6 @@ public class Client implements I_Client {
         } catch (IOException e1) {
             System.err.println(e1.getMessage());
         }
-    }
-
-
-    public Logger getLogger() {
-        return logger;
     }
 
     public Thread getFileMonitorThread() {
@@ -251,9 +243,6 @@ public class Client implements I_Client {
 
         sendLinkID(nextID);
         sendLinkID(prevID);
-
-        //TODO : werkt bijna prefect, enkel de eerste node nexId wordt nooit geupdate omdat de twee volgende nodes
-        //TODO : hun ID lager zijn dan de eerste.
     }
 
     /**
@@ -436,7 +425,7 @@ public class Client implements I_Client {
         if (removeID == currentID) {
             if (prevID != currentID) {
                 logger.load();
-                postUrl = "http://" + namingServerIP.getHostAddress() + ":8080/ns/shutdown";
+                postUrl = "http://" + namingServerIP + ":8080/ns/shutdown";
                 restTemplate = new RestTemplate();
                 requestBody.clear();
                 requestBody.put("PrevID", prevID);
@@ -444,7 +433,7 @@ public class Client implements I_Client {
                 System.out.println("nodemap logger: " + logger.getNodeMap());
                 requestBody.put("fileMap", logger.getFileMap());
                 System.out.println("filemap logger: " + logger.getFileMap());
-                requestBody.put("originalIP", currentIP.getHostAddress());
+                requestBody.put("originalIP", currentIP);
                 restTemplate.postForEntity(postUrl, requestBody, Void.class);
             }
         }
@@ -501,18 +490,21 @@ public class Client implements I_Client {
     public void setPrevID(int prevID) { this.prevID = prevID; }
     public String getHostname() { return hostname; }
     public Logger getLogger() { return logger; }
+    public String getCurrentIP() {
+        return currentIP;
+    }
 
     @Override
     public void reportFilenameToNamingServer(String filename)
     {
         // Prepare the URL for reporting the hash value to the naming server
-        String postUrl = "http://" + namingServerIP.getHostAddress() + ":8080/ns/reportFileName";
+        String postUrl = "http://" + namingServerIP + ":8080/ns/reportFileName";
         Map<String, Object> requestBody = new HashMap<>();
         System.out.println("operation: " + operation);
         requestBody.put("filename", filename);
         requestBody.put("filepath", filePath);
         System.out.println(filePath);
-        requestBody.put("ip", currentIP.getHostAddress());
+        requestBody.put("ip", currentIP);
         requestBody.put("operation", operation);
         requestBody.put("ID", nextID);
         System.out.println("prev: " + prevID + ", current ID: " + currentID + "next ID " + nextID) ;
