@@ -58,7 +58,7 @@ public class RestControllerDiscAndBoot {
         //}
 
         //else
-        //    client.startFileMonitor = true;
+        client.startFileMonitor = true;
     }
 
     @GetMapping("/multicastaddress")
