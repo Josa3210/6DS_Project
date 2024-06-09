@@ -549,7 +549,7 @@ public class Client implements I_Client {
         public void memberAdded(MembershipEvent membershipEvent) {
             if (startFileMonitor){
                 try {
-                    TimeUnit.SECONDS.sleep(30);
+                    TimeUnit.SECONDS.sleep(40);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
