@@ -54,24 +54,19 @@ public class RestControllerDiscAndBoot {
         // We start the filemonitorthread from here
 
         if (nrNodes > 1) {
+            // the number of clients > 1
+
+            System.out.println("Number of nodes > 1, there are replicated nodes ..");
+            client.startFileMonitor = true;
             System.out.println("number of nodes is bigger then 1");
             Thread filemonitorthread = client.getFileMonitorThread();
             filemonitorthread.start();
+
         }
 
         else {
-            //client.startFileMonitor = true;
-            try {
-                TimeUnit.SECONDS.sleep(20);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-
-            Thread filemonitorthread = client.getFileMonitorThread();
-            filemonitorthread.start();
-
-            //client.startFileMonitor = false;
-
+            System.out.println("Number of nodes < 1, no replicated nodes ..");
+            client.startFileMonitor = false;
         }
     }
 
