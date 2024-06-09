@@ -52,10 +52,10 @@ public class RestControllerDiscAndBoot {
 
         // We start the filemonitorthread from here
 
-        //if (nrNodes > 1) {
+        if (nrNodes >= 1) {
         Thread filemonitorthread = client.getFileMonitorThread();
         filemonitorthread.start();
-        //}
+        }
 
         //else
         client.startFileMonitor = true;
