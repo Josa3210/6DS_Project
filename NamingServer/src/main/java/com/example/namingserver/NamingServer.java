@@ -349,7 +349,7 @@ public class NamingServer implements I_NamingServer
 
             if(originalIP == replicatedIP){
                 System.out.println("Replicated ip = original IP");
-                System.out.println(nextID);
+                System.out.println("next ID: " + nextID);
                 replicatedIP = getIP(nextID);}
 
 
@@ -364,7 +364,7 @@ public class NamingServer implements I_NamingServer
                 requestBody.put("filepath", filePath);
                 System.out.println("filepath: " + filePath);
 
-                System.out.println(replicatedIP.getHostAddress());
+                System.out.println("ID of the replicated node: " + replicatedIP.getHostAddress());
                 System.out.println(originalIP.getHostAddress());
 
                 ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
