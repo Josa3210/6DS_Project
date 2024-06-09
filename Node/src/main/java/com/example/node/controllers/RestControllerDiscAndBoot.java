@@ -55,12 +55,9 @@ public class RestControllerDiscAndBoot {
 
         if (nrNodes > 1) {
             // the number of clients > 1
-
             System.out.println("Number of nodes > 1, there are replicated nodes ..");
             client.startFileMonitor = true;
             System.out.println("number of nodes is bigger then 1");
-            Thread filemonitorthread = client.getFileMonitorThread();
-            filemonitorthread.start();
 
         }
 
