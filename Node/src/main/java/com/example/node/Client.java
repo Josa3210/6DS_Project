@@ -77,10 +77,14 @@ public class Client implements I_Client {
         networkConfig.setPortAutoIncrement(true); // Allows automatic increment of port numbers if necessary.
         networkConfig.addOutboundPortDefinition("5900-5915");
         networkConfig.getRestApiConfig().setEnabled(true); // Enables the REST API for the network configuration.
+
+
         JoinConfig joinConfig = networkConfig.getJoin();
         joinConfig.getMulticastConfig().setEnabled(true); // Enables multicast for node discovery
         joinConfig.getMulticastConfig().setMulticastGroup(multicast_address); // Sets the multicast group address.
         joinConfig.getMulticastConfig().setMulticastPort(54321);
+
+
         config.getManagementCenterConfig().setConsoleEnabled(true); // Enables the management center console.
         config.addListenerConfig(new ListenerConfig(event_listener));
         return config;
@@ -545,7 +549,7 @@ public class Client implements I_Client {
         public void memberAdded(MembershipEvent membershipEvent) {
             if (startFileMonitor){
                 try {
-                    TimeUnit.SECONDS.sleep(10);
+                    TimeUnit.SECONDS.sleep(20);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
