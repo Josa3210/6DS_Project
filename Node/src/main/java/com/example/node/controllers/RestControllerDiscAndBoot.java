@@ -1,29 +1,21 @@
 package com.example.node.controllers;
 
 import com.example.node.Client;
-import com.example.node.I_Client;
 import com.example.node.Logger;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.hazelcast.config.Config;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.shaded.org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -60,13 +52,13 @@ public class RestControllerDiscAndBoot {
 
         // We start the filemonitorthread from here
 
-        if (nrNodes > 1) {
-            Thread filemonitorthread = client.getFileMonitorThread();
-            filemonitorthread.start();
-        }
+        //if (nrNodes > 1) {
+        Thread filemonitorthread = client.getFileMonitorThread();
+        filemonitorthread.start();
+        //}
 
-        else
-            client.startFileMonitor = true;
+        //else
+        //    client.startFileMonitor = true;
     }
 
     @GetMapping("/multicastaddress")
