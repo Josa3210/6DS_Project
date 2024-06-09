@@ -109,6 +109,7 @@ public class FileMonitor implements Runnable {
             try {
                 observer.checkAndNotify();
                 Thread.sleep(1000); // Adjust sleep time as needed
+                System.out.println("no");
 
             } catch (InterruptedException e) {
                 System.err.println(e.getMessage());
