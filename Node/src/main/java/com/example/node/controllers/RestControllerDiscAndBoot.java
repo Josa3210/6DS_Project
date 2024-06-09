@@ -17,6 +17,7 @@ import java.net.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 public class RestControllerDiscAndBoot {
@@ -58,8 +59,20 @@ public class RestControllerDiscAndBoot {
             filemonitorthread.start();
         }
 
-        else
-            client.startFileMonitor = true;
+        else {
+            //client.startFileMonitor = true;
+            try {
+                TimeUnit.SECONDS.sleep(20);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+            Thread filemonitorthread = client.getFileMonitorThread();
+            filemonitorthread.start();
+
+            //client.startFileMonitor = false;
+
+        }
     }
 
     @GetMapping("/multicastaddress")
