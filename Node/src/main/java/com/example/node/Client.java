@@ -58,6 +58,11 @@ public class Client implements I_Client {
             this.hostname = hostname;
             this.restClient = RestClient.create();
             this.currentIP = Inet4Address.getByName(Inet4Address.getLocalHost().getHostAddress()).getHostAddress();
+
+            // We make a new logger file that keeps track of changes in the 'Files' map
+            this.logger = new Logger(hostname); // We create a logger to keep track of the replication
+            logger.load();
+            fileMonitorThread = new Thread(new FileMonitor(this));
             }
         catch (FileNotFoundException | UnknownHostException e) { throw new RuntimeException(e); }
     }
@@ -167,12 +172,7 @@ public class Client implements I_Client {
         this.nextID = Integer.MAX_VALUE;
         this.prevID = Integer.MIN_VALUE;
 
-        Thread.sleep(2000);  // Wait for the network to stabilize
-
-        // We make a new logger file that keeps track of changes in the 'Files' map
-        this.logger = new Logger(hostname); // We create a logger to keep track of the replication
-        logger.load();
-        fileMonitorThread = new Thread(new FileMonitor(this));
+        //Thread.sleep(2000);  // Wait for the network to stabilize
     }
 
     /**
