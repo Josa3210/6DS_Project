@@ -99,6 +99,7 @@ public class FileMonitor implements Runnable {
                     logger.load();
                     int hash = client.computeHash(filename);
                     String originalIP = logger.get(hash).getHostAddress();
+                    System.out.println("original IP");
                     String currentIP = client.getCurrentIP();
 
                     if (originalIP.equals(currentIP)) // we check if the original IP of the file = current IP
