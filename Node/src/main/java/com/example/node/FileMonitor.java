@@ -53,33 +53,37 @@ public class FileMonitor implements Runnable {
             @Override
             public void onFileCreate(File file) {
 
-                if (!client.isReceivedFile) {
+                String filename = file.getName();
+                String filepath = file.getPath();
 
-                    String filename = file.getName();
-                    String filepath = file.getPath();
+                if (!filename.endsWith(".swp")) {
+                    System.out.println("\nFile created: " + filename);
+                    Logger logger = client.getLogger();
+                    logger.load();
+                    int hash = client.computeHash(filename);
 
-                    if (!filename.endsWith(".swp")) {
-                        System.out.println("\nFile created: " + filename);
-                        Logger logger = client.getLogger();
-                        logger.load();
-                        int hash = client.computeHash(filename);
-                        try {
-                            logger.put(hash, (Inet4Address) InetAddress.getByName(client.getCurrentIP()));
-                        } catch (UnknownHostException e) {
-                            throw new RuntimeException(e);
-                        }
-                        System.out.println("hash: " + hash + " current IP: " + client.getCurrentIP());
+                    try {
+                        logger.put(hash, (Inet4Address) InetAddress.getByName(client.getCurrentIP()));
+                    } catch (UnknownHostException e) {
+                        throw new RuntimeException(e);
+                    }
 
-                        logger.putFile(hash, filepath);
-                        logger.save();
+                    System.out.println("hash: " + hash + " current IP: " + client.getCurrentIP());
 
+                    logger.putFile(hash, filepath);
+                    logger.save();
+
+                    if (!client.isReceivedFile) { // if the file is locally made, we let the namingserver know
                         client.reportFilenameToNamingServer(file.getName(), filepath, 1); // Operation 1 --> file CREATE
                     }
+
                 }
+
             }
 
             @Override
             public void onFileDelete(File file) {
+
                 String filename = file.getName();
 
                 if (!filename.endsWith(".swp")) { // we don't look at temporary files
@@ -111,7 +115,6 @@ public class FileMonitor implements Runnable {
             try {
                 observer.checkAndNotify();
                 Thread.sleep(1000); // Adjust sleep time as needed
-                System.out.println("lol");
 
             } catch (InterruptedException e) {
                 System.err.println(e.getMessage());
