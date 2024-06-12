@@ -548,15 +548,11 @@ public class Client implements I_Client {
     public class ClusterMemberShipListener implements MembershipListener {
         public void memberAdded(MembershipEvent membershipEvent) {
 
-            if (startFileMonitor) {
-                Thread filemonitorthread = getFileMonitorThread();
-                filemonitorthread.start();
+            String s = membershipEvent.getMember().getSocketAddress().toString();
+            s = s.substring(s.indexOf("/") + 1, s.indexOf(":"));
+            int hash = computeHash(s);
+            karibu(hash);
 
-                String s = membershipEvent.getMember().getSocketAddress().toString();
-                s = s.substring(s.indexOf("/") + 1, s.indexOf(":"));
-                int hash = computeHash(s);
-                karibu(hash);
-            }
         }
 
         public void memberRemoved(MembershipEvent membershipEvent) {
