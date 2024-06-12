@@ -95,8 +95,6 @@ public class FileMonitor implements Runnable {
                     String originalIP = logger.get(hash).getHostAddress();
                     String currentIP = client.getCurrentIP();
 
-                    System.out.println("number of clients: " + );
-
                     if (originalIP.equals(currentIP)) // we check if the original IP of the file = current IP
 
                         // if this is the case, the current IP is the IP where the file got downloaded, so we need to make
