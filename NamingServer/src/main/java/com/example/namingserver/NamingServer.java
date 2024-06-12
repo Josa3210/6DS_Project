@@ -387,6 +387,13 @@ public class NamingServer implements I_NamingServer
             System.out.println("\nNode with IP " + replicatedIP.getHostAddress() + "will delete the replicated file: " + filename);
 
             System.out.println("Replicated IP: " + replicatedIP.getHostAddress() + " original IP: " + originalIP.getHostAddress());
+
+            if (replicatedIP.getHostAddress().equals(originalIP.getHostAddress())){
+
+                replicatedIP = getIP(nextID); // if the replicated ip == original ip, then the replicated file is store on the node with nextID!
+                System.out.println("Replicated file is stored on the node with nextID, deleting it there ..");
+            }
+
             String postUrl = "http://" + replicatedIP.getHostAddress() + ":8080/deleteReplicatedFile";
 
 
