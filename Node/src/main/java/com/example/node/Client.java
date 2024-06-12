@@ -117,7 +117,7 @@ public class Client implements I_Client {
         }catch(IOException e1){
             System.err.println(e1.getMessage());
         }
-        isReceivedFile = false;  // Reset flag to false after file is received
+
     }
 
 

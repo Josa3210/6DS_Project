@@ -79,6 +79,8 @@ public class FileMonitor implements Runnable {
 
                 }
 
+                client.isReceivedFile = false;  // Reset flag to false after file is received
+
             }
 
             @Override
