@@ -384,9 +384,9 @@ public class NamingServer implements I_NamingServer
 
         else{ // operation == 2 --> file also gets deleted in the replicated node
 
-            System.out.println("\nNode: " + replicatedIP.getHostName() + " with IP " + replicatedIP.getHostAddress() + " " +
-                    "will delete the replicated file: " + filename);
+            System.out.println("\nNode with IP " + replicatedIP.getHostAddress() + "will delete the replicated file: " + filename);
 
+            System.out.println("Replicated IP: " + replicatedIP.getHostAddress() + " original IP: " + originalIP.getHostAddress());
             String postUrl = "http://" + replicatedIP.getHostAddress() + ":8080/deleteReplicatedFile";
 
 
