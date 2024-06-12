@@ -73,6 +73,8 @@ public class FileMonitor implements Runnable {
                         logger.putFile(hash, filepath);
                         logger.save();
 
+                        System.out.println("number of clients: " + client.numberNodes);
+
                         if(client.numberNodes > 1)
                             client.reportFilenameToNamingServer(file.getName(), filepath, 1); // Operation 1 --> file CREATE
                     }
@@ -95,6 +97,8 @@ public class FileMonitor implements Runnable {
                     int hash = client.computeHash(filename);
                     String originalIP = logger.get(hash).getHostAddress();
                     String currentIP = client.getCurrentIP();
+
+                    System.out.println("number of clients: " + client.numberNodes);
 
                     if (originalIP.equals(currentIP) && client.numberNodes > 1) // we check if the original IP of the file = current IP
 
