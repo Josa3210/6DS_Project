@@ -348,7 +348,7 @@ public class NamingServer implements I_NamingServer
 
         if (operation ==1) {
 
-            if(originalIP == replicatedIP){
+            if(originalIP.getHostAddress().equals(replicatedIP.getHostAddress())){
                 System.out.println("Replicated ip = original IP");
                 System.out.println("next ID: " + nextID);
                 replicatedIP = getIP(nextID);}
