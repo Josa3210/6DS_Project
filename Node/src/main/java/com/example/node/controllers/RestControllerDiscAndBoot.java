@@ -52,8 +52,9 @@ public class RestControllerDiscAndBoot {
         System.out.println("* Port Naming Server: " + portNamingServer);
 
         // We start the filemonitorthread from here
+        client.startFileMonitor = true;
 
-        if (nrNodes > 1) {
+        /*if (nrNodes > 1) {
             // the number of clients > 1
             System.out.println("Number of nodes > 1, there are replicated nodes ..");
             client.startFileMonitor = true;
@@ -64,7 +65,7 @@ public class RestControllerDiscAndBoot {
         else {
             System.out.println("Number of nodes < 1, no replicated nodes ..");
             client.startFileMonitor = false;
-        }
+        }*/
     }
 
     @GetMapping("/multicastaddress")

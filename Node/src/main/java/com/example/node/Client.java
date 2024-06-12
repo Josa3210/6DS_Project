@@ -549,7 +549,6 @@ public class Client implements I_Client {
         public void memberAdded(MembershipEvent membershipEvent) {
 
             if (startFileMonitor) {
-                System.out.println("djklmfqjklmfdjqklmfqjklmfqjklmfq");
                 Thread filemonitorthread = getFileMonitorThread();
                 filemonitorthread.start();
 
