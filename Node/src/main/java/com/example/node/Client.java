@@ -45,6 +45,7 @@ public class Client implements I_Client {
     public ServerSocket serverSocket;
     public Socket clientSocket;
     private Thread fileMonitorThread;
+    public boolean isReplicatedFile;
 
 
     /**

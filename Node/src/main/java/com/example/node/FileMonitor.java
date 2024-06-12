@@ -102,7 +102,7 @@ public class FileMonitor implements Runnable {
                     System.out.println("original IP" + originalIP);
                     String currentIP = client.getCurrentIP();
 
-                    if (originalIP.equals(currentIP)) // we check if the original IP of the file = current IP
+                    if (originalIP.equals(currentIP) & !client.isReplicatedFile) // we check if the original IP of the file = current IP
 
                         // if this is the case, the current IP is the IP where the file got downloaded, so we need to make
                         // sure that the naming server gets noted about this so it can remove the replicated files too.
@@ -110,6 +110,7 @@ public class FileMonitor implements Runnable {
 
                     logger.remove(hash); // We remove the hash from the logger.
                 }
+                client.isReplicatedFile = false;
             }
         });
 

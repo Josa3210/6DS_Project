@@ -103,8 +103,10 @@ public class RestControllerDiscAndBoot {
         System.out.println("Delete file " + filename + " with hash: " + fileHash);
 
         try {
+            client.isReplicatedFile = true;
             Files.delete(Path.of(filepath));
             System.out.println("File entry deleted successfully");
+
         } catch (IOException e) {
             System.out.println("File entry cannot be deleted successfully .");
             throw new RuntimeException(e);
