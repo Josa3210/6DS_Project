@@ -73,10 +73,7 @@ public class FileMonitor implements Runnable {
                         logger.putFile(hash, filepath);
                         logger.save();
 
-                        System.out.println("number of clients: " + (client.numberNodes - 1)); // we don't recognise the namingserver as a client
-
-                        if(client.numberNodes - 1 > 1)
-                            client.reportFilenameToNamingServer(file.getName(), filepath, 1); // Operation 1 --> file CREATE
+                        client.reportFilenameToNamingServer(file.getName(), filepath, 1); // Operation 1 --> file CREATE
                     }
                 }
             }
@@ -98,9 +95,9 @@ public class FileMonitor implements Runnable {
                     String originalIP = logger.get(hash).getHostAddress();
                     String currentIP = client.getCurrentIP();
 
-                    System.out.println("number of clients: " + client.numberNodes);
+                    System.out.println("number of clients: " + );
 
-                    if (originalIP.equals(currentIP) && (client.numberNodes - 1) > 1) // we check if the original IP of the file = current IP
+                    if (originalIP.equals(currentIP)) // we check if the original IP of the file = current IP
 
                         // if this is the case, the current IP is the IP where the file got downloaded, so we need to make
                         // sure that the naming server gets noted about this so it can remove the replicated files too.
@@ -116,6 +113,7 @@ public class FileMonitor implements Runnable {
             try {
                 observer.checkAndNotify();
                 Thread.sleep(1000); // Adjust sleep time as needed
+                System.out.println("lol");
 
             } catch (InterruptedException e) {
                 System.err.println(e.getMessage());

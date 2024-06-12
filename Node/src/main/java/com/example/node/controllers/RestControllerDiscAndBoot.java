@@ -52,8 +52,10 @@ public class RestControllerDiscAndBoot {
         System.out.println("* Port Naming Server: " + portNamingServer);
 
         // We start the filemonitorthread from here
-        Thread filemonitorthread = client.getFileMonitorThread();
-        filemonitorthread.start();
+        if (nrNodes > 1) {
+            Thread filemonitorthread = client.getFileMonitorThread();
+            filemonitorthread.start();
+        }
 
         /*if (nrNodes > 1) {
             // the number of clients > 1
