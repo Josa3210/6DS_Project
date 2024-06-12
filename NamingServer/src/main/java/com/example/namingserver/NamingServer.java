@@ -340,6 +340,7 @@ public class NamingServer implements I_NamingServer
         // the closest to the hashed value of the filename
 
         Inet4Address replicatedIP = getLocationIP(filename);
+        System.out.println("original IP: " + originalIP + "; replicated IP: " + replicatedIP);
 
         int fileHash = 0;
         System.out.println("Computing the hash of the filename");
