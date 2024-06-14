@@ -60,7 +60,7 @@ public class RestControllerShutdown
             {
                 newReplicatedIP = client.requestIP(client.getPrevID());
                 RestTemplate restTemplate = new RestTemplate();
-                String url = "http://" + newReplicatedIP + ":8080/ns/sendFiles";
+                String url = "http://" + newReplicatedIP + ":8080/isReplicatedNode";
                 Map<String, Object> bodyNewReplicated = new HashMap<>();
                 bodyNewReplicated.put("originalIP", originalIP);
                 bodyNewReplicated.put("nodeMap", nodeMap);
