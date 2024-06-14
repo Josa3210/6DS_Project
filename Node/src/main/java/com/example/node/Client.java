@@ -1,5 +1,6 @@
 package com.example.node;
 
+import com.example.node.Agents.SyncAgent;
 import com.hazelcast.cluster.MembershipEvent;
 import com.hazelcast.cluster.MembershipListener;
 import com.hazelcast.config.*;
@@ -7,6 +8,7 @@ import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import jakarta.annotation.PostConstruct;
 import org.springframework.http.*;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.FileNotFoundException;
@@ -47,25 +49,33 @@ public class Client implements I_Client {
     public Socket clientSocket;
     private Thread fileMonitorThread;
     public boolean isReplicatedFile;
-
+    private SyncAgent syncAgent;
+    private List<NodeFileEntry> fileList;
 
     /**
      * Constructor of the client
      * @param hostname the name of the client
      */
     public Client(String hostname) {
-        try {
+        try
+        {
             event_listener = new ClusterMemberShipListener();
             this.config = createConfig();
             this.hostname = hostname;
             this.restClient = RestClient.create();
             this.currentIP = Inet4Address.getByName(Inet4Address.getLocalHost().getHostAddress()).getHostAddress();
-
+            this.fileList = new ArrayList<>();
             // We make a new logger file that keeps track of changes in the 'Files' map
             this.logger = new Logger(hostname); // We create a logger to keep track of the replication
             logger.load();
             fileMonitorThread = new Thread(new FileMonitor(this));
-            }
+
+            //Sync Agent
+
+            System.out.println("^^^^Debugging Run Sync Agent in Client");
+            syncAgent = new SyncAgent(this);
+            syncAgent.run();
+        }
         catch (FileNotFoundException | UnknownHostException e) { throw new RuntimeException(e); }
     }
 
@@ -396,6 +406,8 @@ public class Client implements I_Client {
         System.out.println(">> Updating prev and next ID : current:" + currentID + ", next ID: " + nextID + ", prev ID: " + prevID);
         this.nextID = prevID == currentID ? nextID : this.nextID;
         this.prevID = nextID == currentID ? prevID : this.prevID;
+
+        syncAgent.setActive(nextID!=currentID);
     }
 
     /**
@@ -503,6 +515,9 @@ public class Client implements I_Client {
     public String getCurrentIP() {
         return currentIP;
     }
+    public SyncAgent getSyncAgent() { return syncAgent; }
+    public int getNextID() { return nextID; }
+    public List<NodeFileEntry> getFileList() { return fileList; }
 
     public void setFileList(List<NodeFileEntry> newList) {this.fileList = newList;}
 

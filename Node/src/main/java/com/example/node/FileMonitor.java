@@ -71,6 +71,7 @@ public class FileMonitor implements Runnable {
                     System.out.println("hash: " + hash + " current IP: " + client.getCurrentIP());
 
                     logger.putFile(hash, filepath);
+                    client.getFileList().add(new NodeFileEntry(filename));
                     logger.save();
 
                     if (!client.isReceivedFile) { // if the file is locally made, we let the namingserver know
@@ -108,6 +109,7 @@ public class FileMonitor implements Runnable {
                         // sure that the naming server gets noted about this so it can remove the replicated files too.
                         client.reportFilenameToNamingServer(filename, filepath, 2); // Operation 2 --> file DELETE on replicated node
 
+                    client.getFileList().removeIf(entry -> filename.equals(entry.getFilename()));
                     logger.remove(hash); // We remove the hash from the logger.
                 }
                 client.isReplicatedFile = false;
