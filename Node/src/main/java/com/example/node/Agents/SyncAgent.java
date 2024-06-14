@@ -3,6 +3,8 @@ package com.example.node.Agents;
 import com.example.node.Client;
 import com.example.node.NodeFileEntry;
 import jade.core.Agent;
+import jade.core.behaviours.CyclicBehaviour;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,21 +20,15 @@ public class SyncAgent implements Runnable
         System.out.println("^^^^Debugging created syncAgent");
         this.client = client;
         SyncAgent sync = this;
-        this.syncAgent = new Agent()
-        {
-            @Override
-            protected void setup()
-            {
-                System.out.println("^^^^Debugging Added Behaviour");
-                addBehaviour(new SyncBehaviour(client, sync));
-            }
-        };
+        this.syncAgent = new Agent();
         this.agentFiles = new ArrayList<>();
     }
 
     @Override
     public void run()
     {
+        CyclicBehaviour behaviour = new SyncBehaviour(client, this);
+        syncAgent.addBehaviour(behaviour);
         isActive = true;
         System.out.println("^^^^Debugging Run()");
     }
