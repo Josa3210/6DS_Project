@@ -19,7 +19,6 @@ public class SyncAgent implements Runnable
     {
         System.out.println("^^^^Debugging created syncAgent");
         this.client = client;
-        SyncAgent sync = this;
         this.syncAgent = new Agent();
         this.agentFiles = new ArrayList<>();
     }
@@ -31,6 +30,7 @@ public class SyncAgent implements Runnable
         syncAgent.addBehaviour(behaviour);
         isActive = true;
         System.out.println("^^^^Debugging Run()");
+        syncAgent.run();
     }
 
     public List<NodeFileEntry> getAgentFiles() { return agentFiles; }
