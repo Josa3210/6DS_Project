@@ -28,7 +28,6 @@ public class SyncAgent implements Runnable
     {
         CyclicBehaviour behaviour = new SyncBehaviour(client, this);
         syncAgent.addBehaviour(behaviour);
-        isActive = true;
         System.out.println("^^^^Debugging Run()");
         syncAgent.run();
     }

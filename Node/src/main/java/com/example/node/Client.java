@@ -406,6 +406,8 @@ public class Client implements I_Client {
         System.out.println(">> Updating prev and next ID : current:" + currentID + ", next ID: " + nextID + ", prev ID: " + prevID);
         this.nextID = prevID == currentID ? nextID : this.nextID;
         this.prevID = nextID == currentID ? prevID : this.prevID;
+
+        syncAgent.setActive(nextID!=currentID);
     }
 
     /**
