@@ -15,6 +15,7 @@ public class SyncAgent implements Runnable
 
     public SyncAgent(Client client)
     {
+        System.out.println("^^^^Debugging created syncAgent");
         this.client = client;
         SyncAgent sync = this;
         this.syncAgent = new Agent()
@@ -22,6 +23,7 @@ public class SyncAgent implements Runnable
             @Override
             protected void setup()
             {
+                System.out.println("^^^^Debugging Added Behaviour");
                 addBehaviour(new SyncBehaviour(client, sync));
             }
         };
@@ -32,6 +34,7 @@ public class SyncAgent implements Runnable
     public void run()
     {
         isActive = true;
+        System.out.println("^^^^Debugging Run()");
     }
 
     public List<NodeFileEntry> getAgentFiles() { return agentFiles; }

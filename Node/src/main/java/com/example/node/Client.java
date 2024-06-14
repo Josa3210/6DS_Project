@@ -183,6 +183,7 @@ public class Client implements I_Client {
         this.prevID = Integer.MIN_VALUE;
 
         //Thread.sleep(2000);  // Wait for the network to stabilize
+        System.out.println("^^^^Debugging Run Sync Agent in Client");
         syncAgent = new SyncAgent(this);
         syncAgent.run();
     }

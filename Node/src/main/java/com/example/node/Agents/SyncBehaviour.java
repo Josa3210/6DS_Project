@@ -15,6 +15,7 @@ public class SyncBehaviour extends CyclicBehaviour
 
     public SyncBehaviour(Client client, SyncAgent agent)
     {
+        System.out.println("^^^^Debugging Created SyncBehaviour");
         this.client = client;
         this.agent = agent;
     }
