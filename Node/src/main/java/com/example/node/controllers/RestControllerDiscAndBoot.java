@@ -1,26 +1,23 @@
 package com.example.node.controllers;
 
 import com.example.node.Client;
-import com.example.node.I_Client;
 import com.example.node.Logger;
 import com.hazelcast.config.Config;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.shaded.org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.*;
-import java.util.HashMap;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 public class RestControllerDiscAndBoot {
@@ -55,14 +52,23 @@ public class RestControllerDiscAndBoot {
         System.out.println("* Port Naming Server: " + portNamingServer);
 
         // We start the filemonitorthread from here
-
         if (nrNodes > 1) {
             Thread filemonitorthread = client.getFileMonitorThread();
             filemonitorthread.start();
         }
 
-        else
+        /*if (nrNodes > 1) {
+            // the number of clients > 1
+            System.out.println("Number of nodes > 1, there are replicated nodes ..");
             client.startFileMonitor = true;
+            System.out.println("number of nodes is bigger then 1");
+
+        }
+
+        else {
+            System.out.println("Number of nodes < 1, no replicated nodes ..");
+            client.startFileMonitor = false;
+        }*/
     }
 
     @GetMapping("/multicastaddress")
@@ -81,37 +87,30 @@ public class RestControllerDiscAndBoot {
         System.out.println("This is the replicated node for file: " + fileHash);
         logger.load();
         // Puts the filehash and the ip address of the node where the file was created in the logger ..
-        logger.putOwner(fileHash,client.getCurrentID(), client.getCurrentIP());
-        client.serverSocket = new ServerSocket(5000);
-        String url = "http://"+ip.getHostAddress()+":8080/OpenTCPConnection";
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("replicated ip", InetAddress.getLocalHost().getHostAddress());
-        String completed = String.valueOf(restTemplate.postForEntity(url, requestBody, String.class));
-        System.out.println(completed);
-        client.clientSocket = client.serverSocket.accept();
-        DataInputStream dataInputStream = new DataInputStream(client.clientSocket.getInputStream());
-        url = "http://" + ip.getHostAddress()+ ":8080/StartFileTransfer";
-        requestBody.clear();
-        requestBody.put("filepath", filepath);
-        restTemplate.postForEntity(url, requestBody, Void.class);
-        client.ReceiveFile(filepath,dataInputStream);
+        logger.put(fileHash, ip);
+        logger.putFile(fileHash, filepath);
+        logger.save();
+        client.sendReplicatedFile(ip, filepath);
     }
 
-    @PostMapping("/newNodeOwner")
-    public void newNodeOwner(@RequestBody Map<String, Object> request){
+    @PostMapping("/deleteReplicatedFile")
+    public void deleteReplicatedFile(@RequestBody Map<String, Object> request) throws UnknownHostException {
 
-        Integer fileHash = Integer.parseInt(request.get("hashValue").toString());
-        System.out.println("This node becomes the new owner of file with hash: " + fileHash);
+        int fileHash = Integer.parseInt(request.get("hashValue").toString());
+        String filename = (String) request.get("filename");
+        String filepath = (String) request.get("filepath");
+        System.out.println("filepath: " + filepath);
+        System.out.println("Delete file " + filename + " with hash: " + fileHash);
 
-        // We change the ip from the original IP --> current IP
-        Logger logger = client.getLogger();
-        logger.load();
+        try {
+            client.isReplicatedFile = true;
+            Files.delete(Path.of(filepath));
+            System.out.println("File entry deleted successfully");
 
-        // Change the originalOwner to this new client
-        logger.putOriginal(fileHash,client.getCurrentID(), client.getCurrentIP());
+        } catch (IOException e) {
+            System.out.println("File entry cannot be deleted successfully .");
+            throw new RuntimeException(e);
+        }
     }
 
     @PostMapping("/OpenTCPConnection")
@@ -125,6 +124,7 @@ public class RestControllerDiscAndBoot {
     public void StartFileTransfer(@RequestBody Map<String, Object> request) throws UnknownHostException {
         System.out.println("start file transfer");
         String filepath = (String) request.get("filepath");
+        System.out.println("Starting file transfer: " + filepath);
         System.out.println(filepath);
         client.SendFile(filepath);
     }

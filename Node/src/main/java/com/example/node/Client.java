@@ -1,14 +1,14 @@
 package com.example.node;
 
-
-import com.example.node.Agents.FailureAgent;
 import com.hazelcast.cluster.MembershipEvent;
 import com.hazelcast.cluster.MembershipListener;
 import com.hazelcast.config.*;
 import com.hazelcast.core.Hazelcast;
+import com.hazelcast.core.HazelcastInstance;
 import jakarta.annotation.PostConstruct;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
+
 import java.io.FileNotFoundException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -28,39 +28,49 @@ import java.util.concurrent.TimeUnit;
 public class Client implements I_Client {
 
     private static final String multicast_address = "224.2.2.5";
+    private static ClusterMemberShipListener event_listener;
+    private RestClient restClient;
     int currentID, nextID, prevID;
     private Config config;
+    private Map<String, Inet4Address> ipMap;
+    private String currentIP, namingServerIP;
     private Integer namingServerPort;
     private String hostname;
-    private String currentIP;
-    private static ClusterMemberShipListener event_listener;
     private Logger logger;
-    private Thread fileMonitorThread;
-    private String namingServerIP;
-    private List<NodeFileEntry> fileList;
     public String folderPath = "Data/node/Files";
     public int numberNodes = 0;
     public boolean startFileMonitor = false;
     public boolean isReceivedFile = false;
-
+    boolean setupCompleted = false;
+    private int portNumber = 80;
     public ServerSocket serverSocket;
     public Socket clientSocket;
+    private Thread fileMonitorThread;
+    public boolean isReplicatedFile;
+
+
+    /**
+     * Constructor of the client
+     * @param hostname the name of the client
+     */
     public Client(String hostname) {
         try {
+            event_listener = new ClusterMemberShipListener();
             this.config = createConfig();
+            this.hostname = hostname;
+            this.restClient = RestClient.create();
+            this.currentIP = Inet4Address.getByName(Inet4Address.getLocalHost().getHostAddress()).getHostAddress();
+
+            // We make a new logger file that keeps track of changes in the 'Files' map
             this.logger = new Logger(hostname); // We create a logger to keep track of the replication
             logger.load();
             fileMonitorThread = new Thread(new FileMonitor(this));
-            this.hostname = hostname;
-            this.currentIP = String.valueOf(InetAddress.getLocalHost());
-            this.fileList = new ArrayList<>();
-        } catch (FileNotFoundException | UnknownHostException e) {
-            System.err.println(e.getMessage());
-        }
+            }
+        catch (FileNotFoundException | UnknownHostException e) { throw new RuntimeException(e); }
     }
 
-    private Config createConfig() throws FileNotFoundException
-    {
+    private Config createConfig() throws FileNotFoundException {
+
         Config config = new Config();
         config.getJetConfig().setEnabled(true);
         config.setClusterName("testCluster");
@@ -69,11 +79,16 @@ public class Client implements I_Client {
         networkConfig.setPortAutoIncrement(true); // Allows automatic increment of port numbers if necessary.
         networkConfig.addOutboundPortDefinition("5900-5915");
         networkConfig.getRestApiConfig().setEnabled(true); // Enables the REST API for the network configuration.
+
+
         JoinConfig joinConfig = networkConfig.getJoin();
         joinConfig.getMulticastConfig().setEnabled(true); // Enables multicast for node discovery
         joinConfig.getMulticastConfig().setMulticastGroup(multicast_address); // Sets the multicast group address.
         joinConfig.getMulticastConfig().setMulticastPort(54321);
+
+
         config.getManagementCenterConfig().setConsoleEnabled(true); // Enables the management center console.
+        config.addListenerConfig(new ListenerConfig(event_listener));
         return config;
     }
 
@@ -104,6 +119,7 @@ public class Client implements I_Client {
         }catch(IOException e1){
             System.err.println(e1.getMessage());
         }
+
     }
 
 
@@ -157,12 +173,13 @@ public class Client implements I_Client {
      * Post Constructor of the client
      */
     @PostConstruct
-    public void init()
-    {
+    public void init() throws InterruptedException {
         habari();
         this.currentID = computeHash(hostname);
         this.nextID = Integer.MAX_VALUE;
         this.prevID = Integer.MIN_VALUE;
+
+        //Thread.sleep(2000);  // Wait for the network to stabilize
     }
 
     /**
@@ -211,7 +228,7 @@ public class Client implements I_Client {
     public void habari()
     {
         // Joins multicast group
-        Hazelcast.newHazelcastInstance(this.config); // Creates a new Hazelcast instance with the provided configuration.
+        HazelcastInstance hazelcastInstance = Hazelcast.newHazelcastInstance(this.config); // Creates a new Hazelcast instance with the provided configuration.
     }
 
     /**
@@ -262,6 +279,8 @@ public class Client implements I_Client {
         // Send the POST request
         restTemplate.postForEntity(postUrl, requestBody, Void.class);
     }
+
+    /*Discovery + Bootstrap*/
 
     /**
      * Reply to "Habari" of other node
@@ -411,9 +430,21 @@ public class Client implements I_Client {
         // if  a node gets removed from the namingserver, the files replicated on this node should be
         // moved to  the previous node, that will become the owner of the files
         // We first remove the current entry with the original IP
-
-
-
+        if (removeID == currentID) {
+            if (prevID != currentID) {
+                logger.load();
+                postUrl = "http://" + namingServerIP + ":8080/ns/shutdown";
+                restTemplate = new RestTemplate();
+                requestBody.clear();
+                requestBody.put("PrevID", prevID);
+                requestBody.put("nodeMap", logger.getNodeMap());
+                System.out.println("nodemap logger: " + logger.getNodeMap());
+                requestBody.put("fileMap", logger.getFileMap());
+                System.out.println("filemap logger: " + logger.getFileMap());
+                requestBody.put("originalIP", currentIP);
+                restTemplate.postForEntity(postUrl, requestBody, Void.class);
+            }
+        }
     }
 
     /**
@@ -460,23 +491,6 @@ public class Client implements I_Client {
         sendLinkID(ids[0]);
         sendLinkID(ids[1]);
 
-        FailureAgent failureAgent = new FailureAgent(failedID,this.currentID,this.namingServerPort, this.namingServerIP);
-
-        try {
-            Inet4Address nextIP = (Inet4Address) InetAddress.getByName(this.requestIP(nextID));
-            String postUrl = "http://" + nextIP + "/agent/passFailureAgent";
-
-            System.out.println("Sending agent to " + postUrl);
-
-            Map<String, Object> requestBody = new HashMap<>();
-            requestBody.put("agent", failureAgent);
-
-            RestTemplate restTemplate = new RestTemplate();
-            restTemplate.postForEntity(postUrl, requestBody, Void.class);
-        } catch (UnknownHostException e) {
-            throw new RuntimeException(e);
-        }
-
     }
 
     @Override
@@ -486,68 +500,73 @@ public class Client implements I_Client {
     public void setPrevID(int prevID) { this.prevID = prevID; }
     public String getHostname() { return hostname; }
     public Logger getLogger() { return logger; }
-    public String getCurrentIP() { return currentIP; }
-    public int getCurrentID() { return currentID; }
-    public List<NodeFileEntry> getFileList() {return fileList;}
+    public String getCurrentIP() {
+        return currentIP;
+    }
 
     public void setFileList(List<NodeFileEntry> newList) {this.fileList = newList;}
 
     @Override
-    public void reportFilenameToNamingServer(String filename,String filePath, int operation) {
-
-        System.out.println("namingserver IP: " + namingServerIP);
-        System.out.println("current IP: " + currentIP);
-
+    public void reportFilenameToNamingServer(String filename, String filePath, int operation)
+    {
         // Prepare the URL for reporting the hash value to the naming server
         String postUrl = "http://" + namingServerIP + ":8080/ns/reportFileName";
-
-
         Map<String, Object> requestBody = new HashMap<>();
-
         System.out.println("operation: " + operation);
-
         requestBody.put("filename", filename);
         requestBody.put("filepath", filePath);
         System.out.println(filePath);
         requestBody.put("ip", currentIP);
         requestBody.put("operation", operation);
-
-        if(nextID == 0)
-            requestBody.put("ID",prevID);
-
-        else
-            requestBody.put("ID", nextID);
-
-        System.out.println("prev: " + prevID + "next: " + nextID + "current ID: " + currentID) ;
-
+        requestBody.put("ID", nextID);
+        System.out.println("prev: " + prevID + ", current ID: " + currentID + "next ID " + nextID) ;
 
         // Make an HTTP POST request to report the hash value
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestBody, Void.class);
 
-        if (responseEntity.getStatusCode().is2xxSuccessful()) {
-            System.out.println("Hash value: " + filename + " correctly handled by server");
-            this.logger.putOriginal(computeHash(filename),this.currentID,this.currentIP);
-        } else {
-            System.err.println("Failed to report hash value to naming server for file: " + filename);
-        }
+        if (responseEntity.getStatusCode().is2xxSuccessful()) System.out.println("Hash value reported to naming server for file: " + filename);
+        else System.err.println("Failed to report hash value to naming server for file: " + filename);
+    }
+
+    public void sendReplicatedFile(Inet4Address originalIP, String filepath) throws IOException {
+        this.serverSocket = new ServerSocket(5000);
+        String url = "http://" +originalIP.getHostAddress()+":8080/OpenTCPConnection";
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("replicated ip", InetAddress.getLocalHost().getHostAddress());
+        String completed = String.valueOf(restTemplate.postForEntity(url, requestBody, String.class));
+        System.out.println(completed);
+        this.clientSocket = this.serverSocket.accept();
+        DataInputStream dataInputStream = new DataInputStream(this.clientSocket.getInputStream());
+        url = "http://" + originalIP.getHostAddress()+ ":8080/StartFileTransfer";
+        requestBody.clear();
+        requestBody.put("filepath", filepath);
+        restTemplate.postForEntity(url, requestBody, Void.class);
+        this.ReceiveFile(filepath,dataInputStream);
+    }
+
+    public int getPrevID() {
+        return prevID;
     }
 
     public class ClusterMemberShipListener implements MembershipListener {
         public void memberAdded(MembershipEvent membershipEvent) {
-            if (startFileMonitor){
-                try {
-                    TimeUnit.SECONDS.sleep(2);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-                startFileMonitor = false;
-                Thread filemonitorthread = getFileMonitorThread();
-                filemonitorthread.start();
-            }
+            numberNodes++;
+            String s = membershipEvent.getMember().getSocketAddress().toString();
+            s = s.substring(s.indexOf("/") + 1, s.indexOf(":"));
+            int hash = computeHash(s);
+            karibu(hash);
+
         }
 
         public void memberRemoved(MembershipEvent membershipEvent) {
+            numberNodes --;
+            String s = membershipEvent.getMember().getSocketAddress().toString();
+            s = s.substring(s.indexOf("/") + 1, s.indexOf(":"));
+
         }
     }
 }

@@ -2,17 +2,19 @@ package com.example.namingserver.controllers;
 
 import com.example.namingserver.I_NamingServer;
 import com.example.namingserver.NamingServer;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-public class RestControllerNS {
+public class RestControllerNS
+{
     NamingServer namingServer = new NamingServer();
+
     /**
      * Adds a node via the naming server with it's ip address
      *
@@ -65,8 +67,6 @@ public class RestControllerNS {
         // Check if the file name does not end with .swp --> temporary files!
 
         String filename = (String) requestBody.get("filename");
-
-
         if (!filename.endsWith(".swp")) {
             String ipAddressString = (String) requestBody.get("ip");
             String filepath = (String) requestBody.get("filepath");
@@ -77,5 +77,15 @@ public class RestControllerNS {
             namingServer.filePath = filepath;
             namingServer.reportLogger(filename, originalIP, operation,nextID);
         }
+
+    }
+    @PostMapping("ns/shutdown")
+    public void shutdown(@RequestBody Map<String, Object> request) throws UnknownHostException{
+        int PrevID = (Integer) request.get("PrevID");
+        HashMap<Integer, Inet4Address> nodeMap = (HashMap<Integer, Inet4Address>) request.get("nodeMap");
+        HashMap<Integer, String> fileMap = (HashMap<Integer, String>) request.get("fileMap");
+        String originalIPString = (String) request.get("originalIP");
+        Inet4Address originalIP = (Inet4Address) InetAddress.getByName(originalIPString);
+        namingServer.shutdown_node(PrevID, nodeMap, fileMap, originalIP);
     }
 }

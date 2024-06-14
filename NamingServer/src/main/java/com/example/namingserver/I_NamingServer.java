@@ -1,6 +1,7 @@
 package com.example.namingserver;
 
 import java.net.Inet4Address;
+import java.util.HashMap;
 
 public interface I_NamingServer {
     /**
@@ -49,4 +50,5 @@ public interface I_NamingServer {
     int[] giveLinkIds(int nodeID);
 
     void reportLogger(String filename, Inet4Address originalIP, int operation,int nextID);
+    void shutdown_node(int PrevID, HashMap<Integer, Inet4Address> nodeMap, HashMap<Integer, String> fileMap, Inet4Address originalIP);
 }

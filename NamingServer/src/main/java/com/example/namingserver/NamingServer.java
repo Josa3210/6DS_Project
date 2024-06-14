@@ -30,19 +30,24 @@ import static java.util.Collections.max;
 
 @Component
 
-public class NamingServer implements I_NamingServer {
-    private static final String multicast_address = "224.2.2.5";
+public class NamingServer implements I_NamingServer
+{
+    private static String multicast_address = "224.2.2.5";
+    private static Config config;
     private static HazelcastInstance hazelcastInstance;
+    private static IMap<String, String> mapIP;
     private static ClusterMemberShipListener event_listener;
     /**
      * Database containing the IP's of the different nodes {@see I_NamingserverDB}
      */
-    private static NamingserverDB database;
-    private String ip;
+    private static I_NamingserverDB database;
     public String filePath;
+    private String ip;
 
-    public NamingServer() {
-    }
+    public String folderPath = "Data/node/Files";
+
+
+    public NamingServer() {}
 
     /**
      * this method sets up a Hazelcast instance with clustering enabled, specific network configurations including
@@ -51,8 +56,10 @@ public class NamingServer implements I_NamingServer {
      *
      * @throws FileNotFoundException
      */
+
     private static void CreateConfig() throws FileNotFoundException {
-        Config config = new Config();
+
+        config = new Config();
         config.getJetConfig().setEnabled(true);
         config.setClusterName("testCluster");
         NetworkConfig networkConfig = config.getNetworkConfig();
@@ -74,18 +81,18 @@ public class NamingServer implements I_NamingServer {
      * Creating a new database
      */
     @PostConstruct
-    public void init() {
-        try {
+    public void init()
+    {
+        try
+        {
             System.out.println(">> Initializing NamingServer");
-
             this.ip = Inet4Address.getByName(Inet4Address.getLocalHost().getHostAddress()).getHostAddress();
-            database = new NamingserverDB();
-            database.load();
-            database.print();
-            event_listener = new ClusterMemberShipListener(database);
+            this.database = new NamingserverDB();
+            this.database.load();
+            this.database.print();
+            event_listener = new ClusterMemberShipListener((NamingserverDB) this.database);
             NamingServer.CreateConfig();
-        } catch (FileNotFoundException | UnknownHostException e) {
-            throw new RuntimeException(e);
+            mapIP = hazelcastInstance.getMap("mapIP");
         }
     }
 
@@ -190,6 +197,11 @@ public class NamingServer implements I_NamingServer {
         return hash_value;
     }
 
+    public Inet4Address getIp(int id) {
+        return database.get(id);
+    }
+
+
     /**
      * Returns the size of the cluster of nodes in the network
      *
@@ -269,95 +281,6 @@ public class NamingServer implements I_NamingServer {
         restTemplate.postForEntity(postUrl, requestBody, Void.class);
     }
 
-    /**
-     * Receives filename. Replication is performed as follows:
-     * 1. If the hash of the node is less than the hash of the file and the distance to it is the smallest, indicating that the node is a replicated node,
-     * the node becomes the owner of this file and creates a log with information on the file (references for the file).
-     *
-     * 2. The original node then replicates the file using TCP (after receiving a message from the replicated node).
-     *
-     * @param filename The name of the file that needs to be replicated.
-     *
-     *
-     *
-     * @return
-     */
-
-    public void reportLogger(String filename, Inet4Address originalIP, int operation, int nextID) {
-
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        // Create the request body
-        Map<String, Object> requestBody = new HashMap<>();
-
-        // Create the request entity with headers and body
-        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
-
-        // Check for every node in the list if it's a replicated node by checking which node hash in the dataset is
-        // the closest to the hashed value of the filename
-        Inet4Address replicatedIP  = (Inet4Address) getIP(getFileOwner(filename));
-        int fileHash = 0;
-
-        if (operation ==1) {
-
-            if(originalIP == replicatedIP)
-                System.out.println(nextID);
-                replicatedIP = getIP(nextID);
-
-            System.out.println("\nNode: " + replicatedIP.getCanonicalHostName() + " with IP " + replicatedIP.getHostAddress() + " is the replicated node of file: " + filename);
-            System.out.println("Computing the hash of the filename");
-            fileHash = computeHash(filename);
-            String postUrl = "http://" + replicatedIP.getHostAddress() + ":8080/isReplicatedNode";
-
-            try {
-
-                // Send the POST request
-                requestBody.put("hashValue", fileHash);
-                requestBody.put("original ip", originalIP);
-                requestBody.put("filepath", filePath);
-                System.out.println("filepath: " + filePath);
-
-                System.out.println(replicatedIP.getHostAddress());
-                System.out.println(originalIP.getHostAddress());
-
-                ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
-                HttpStatusCode statusCode = responseEntity.getStatusCode();
-
-                if (statusCode == HttpStatus.OK) {
-                    System.out.println("Node list correctly sent to " + replicatedIP.getHostAddress() + "from ip" + originalIP.getHostAddress());
-                } else {
-                    System.err.println("Sending node list failed with status code: " + statusCode);
-                }
-            } catch (RestClientException e) {
-                System.err.println("Failed to send node list to " + replicatedIP + ": " + e.getMessage());
-            }
-
-        } else { // operation == 2 --> logger in the replicated node becomes the new owner --> the IP inside it gets changed
-
-            System.out.println("\nNode: " + replicatedIP.getCanonicalHostName() + " with IP " + replicatedIP.getHostAddress() + " becomes the new owner of file: " + filename);
-            String postUrl = "http://" + replicatedIP.getHostAddress() + ":8080/newNodeOwner";
-
-            try {
-                // Send the POST request with the replicated IP --> it becomes the new 'original' IP
-                requestBody.put("hashValue", fileHash);
-
-                ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
-                HttpStatusCode statusCode = responseEntity.getStatusCode();
-
-                if (statusCode == HttpStatus.OK) {
-                    System.out.println("Node list correctly sent to " + replicatedIP.getHostAddress());
-                } else {
-                    System.err.println("Sending node list failed with status code: " + statusCode);
-                }
-            } catch (RestClientException e) {
-                System.err.println("Failed to send node list to " + replicatedIP + ": " + e.getMessage());
-            }
-
-        }
-    }
-
     public class ClusterMemberShipListener implements MembershipListener {
         I_NamingserverDB database;
 
@@ -378,7 +301,126 @@ public class NamingServer implements I_NamingServer {
         }
 
         // Replicated node gets only changed when a member gets removed from the network
-        public void memberRemoved(MembershipEvent membershipEvent) {}
+        public void memberRemoved(MembershipEvent membershipEvent) {
+            String s = membershipEvent.getMember().getSocketAddress().toString();
+            s = s.substring(s.indexOf("/") + 1, s.indexOf(":"));
+
+        }
+    }
+    /**
+     * Receives filename. Replication is performed as follows:
+     * 1. If the hash of the node is less than the hash of the file and the distance to it is the smallest, indicating that the node is a replicated node,
+     * the node becomes the owner of this file and creates a log with information on the file (references for the file).
+     * 2. The node then replicates the file.
+     *
+     * @param filename The name of the file that needs to be replicated and the ip address of where it is originated from
+     */
+
+    public void reportLogger(String filename, Inet4Address originalIP, int operation, int nextID) {
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        // Create the request body
+        Map<String, Object> requestBody = new HashMap<>();
+
+        // Create the request entity with headers and body
+        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
+
+        // Check for every node in the list if it's a replicated node by checking which node hash in the dataset is
+        // the closest to the hashed value of the filename
+
+        Inet4Address replicatedIP = getLocationIP(filename);
+        System.out.println("original IP: " + originalIP + "; replicated IP: " + replicatedIP);
+
+        int fileHash = 0;
+        System.out.println("Computing the hash of the filename");
+        fileHash = computeHash(filename);
+
+        if (operation ==1) {
+
+            if(originalIP.getHostAddress().equals(replicatedIP.getHostAddress())){
+                System.out.println("Replicated ip = original IP");
+                System.out.println("next ID: " + nextID);
+                replicatedIP = getIP(nextID);}
+
+
+            System.out.println("\nNode: " + replicatedIP.getCanonicalHostName() + " with IP " + replicatedIP.getHostAddress() + " is the replicated node of file: " + filename);
+            String postUrl = "http://" + replicatedIP.getHostAddress() + ":8080/isReplicatedNode";
+
+            try {
+
+                // Send the POST request
+                requestBody.put("hashValue", fileHash);
+                requestBody.put("original ip", originalIP);
+                requestBody.put("filepath", filePath);
+                System.out.println("filepath: " + filePath);
+
+                System.out.println("ID of the replicated node: " + replicatedIP.getHostAddress());
+                System.out.println(originalIP.getHostAddress());
+
+                ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
+                HttpStatusCode statusCode = responseEntity.getStatusCode();
+
+                if (statusCode == HttpStatus.OK) {
+                    System.out.println("Node list correctly sent to " + replicatedIP.getHostAddress() + "from ip" + originalIP.getHostAddress());
+                } else {
+                    System.err.println("Sending node list failed with status code: " + statusCode);
+                }
+            } catch (RestClientException e) {
+                System.err.println("Failed to send node list to " + replicatedIP + ": " + e.getMessage());
+            }
+
+        } else { // operation == 2 --> logger in the replicated node becomes the new owner --> the IP inside it gets changed
+
+        else{ // operation == 2 --> file also gets deleted in the replicated node
+
+            System.out.println("\nNode with IP " + replicatedIP.getHostAddress() + " will delete the replicated file: " + filename);
+
+            System.out.println("Replicated IP: " + replicatedIP.getHostAddress() + " original IP: " + originalIP.getHostAddress());
+
+            if (replicatedIP.getHostAddress().equals(originalIP.getHostAddress())){
+
+                replicatedIP = getIP(nextID); // if the replicated ip == original ip, then the replicated file is store on the node with nextID!
+                System.out.println("Replicated file is stored on the node with nextID, deleting it there ..");
+            }
+
+            String postUrl = "http://" + replicatedIP.getHostAddress() + ":8080/deleteReplicatedFile";
+
+
+            try{
+                // Send the POST request with the replicated IP --> it becomes the new 'original' IP
+                requestBody.put("hashValue", fileHash);
+                requestBody.put("filename", filename);
+                requestBody.put("filepath", filePath);
+
+                ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
+                HttpStatusCode statusCode = responseEntity.getStatusCode();
+
+                if (statusCode == HttpStatus.OK) {
+                    System.out.println("Node list correctly sent to " + replicatedIP.getHostAddress() + " from ip " + originalIP.getHostAddress());
+                } else {
+                    System.err.println("Sending node list failed with status code: " + statusCode);
+                }
+            } catch (RestClientException e) {
+                System.err.println("Failed to send node list to " + replicatedIP + ": " + e.getMessage());
+            }
+
+        }
+    }
+    public void shutdown_node(int PrevID, HashMap<Integer, Inet4Address> nodeMap, HashMap<Integer, String> fileMap, Inet4Address originalIP){
+        Inet4Address newReplicatedIP = database.get(PrevID);
+
+        System.out.println("sending the replicated files to node " + newReplicatedIP.getHostAddress() + " from IP "+ originalIP.getHostAddress());
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "http://" + newReplicatedIP.getHostAddress() +":8080/shutdown/sendFiles";
+        Map<String, Object> requestbody = new HashMap<>();
+        requestbody.put("originalIP", originalIP.getHostAddress());
+        requestbody.put("nodeMap", nodeMap);
+        requestbody.put("fileMap", fileMap);
+        System.out.println("filemap: " + fileMap);
+        restTemplate.postForEntity(url, requestbody, Void.class);
     }
 }
 
