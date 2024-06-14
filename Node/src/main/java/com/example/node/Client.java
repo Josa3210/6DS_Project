@@ -57,7 +57,8 @@ public class Client implements I_Client {
      * @param hostname the name of the client
      */
     public Client(String hostname) {
-        try {
+        try
+        {
             event_listener = new ClusterMemberShipListener();
             this.config = createConfig();
             this.hostname = hostname;
@@ -68,7 +69,13 @@ public class Client implements I_Client {
             this.logger = new Logger(hostname); // We create a logger to keep track of the replication
             logger.load();
             fileMonitorThread = new Thread(new FileMonitor(this));
-            }
+
+            //Sync Agent
+
+            System.out.println("^^^^Debugging Run Sync Agent in Client");
+            syncAgent = new SyncAgent(this);
+            syncAgent.run();
+        }
         catch (FileNotFoundException | UnknownHostException e) { throw new RuntimeException(e); }
     }
 
@@ -183,9 +190,6 @@ public class Client implements I_Client {
         this.prevID = Integer.MIN_VALUE;
 
         //Thread.sleep(2000);  // Wait for the network to stabilize
-        System.out.println("^^^^Debugging Run Sync Agent in Client");
-        syncAgent = new SyncAgent(this);
-        syncAgent.run();
     }
 
     /**
