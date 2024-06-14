@@ -1,5 +1,6 @@
 package com.example.node;
 
+import com.example.node.Agents.SyncAgent;
 import com.hazelcast.cluster.MembershipEvent;
 import com.hazelcast.cluster.MembershipListener;
 import com.hazelcast.config.*;
@@ -46,7 +47,7 @@ public class Client implements I_Client {
     public Socket clientSocket;
     private Thread fileMonitorThread;
     public boolean isReplicatedFile;
-
+    private SyncAgent syncAgent;
 
     /**
      * Constructor of the client
@@ -179,6 +180,8 @@ public class Client implements I_Client {
         this.prevID = Integer.MIN_VALUE;
 
         //Thread.sleep(2000);  // Wait for the network to stabilize
+        syncAgent = new SyncAgent(this);
+        syncAgent.run();
     }
 
     /**
@@ -500,6 +503,7 @@ public class Client implements I_Client {
     public String getCurrentIP() {
         return currentIP;
     }
+    public SyncAgent getSyncAgent() { return syncAgent; }
 
     @Override
     public void reportFilenameToNamingServer(String filename, String filePath, int operation)
