@@ -11,23 +11,40 @@ public class SyncAgent implements Runnable
     private List<NodeFileEntry> agentFiles;
     private final Client client;
     private final Agent syncAgent;
+    private boolean isActive = false;
 
     public SyncAgent(Client client)
     {
         this.client = client;
-        this.syncAgent = new Agent();
+        SyncAgent sync = this;
+        this.syncAgent = new Agent()
+        {
+            @Override
+            protected void setup()
+            {
+                addBehaviour(new SyncBehaviour(client, sync));
+            }
+        };
         this.agentFiles = new ArrayList<>();
     }
 
     @Override
     public void run()
     {
-        syncAgent.addBehaviour(new SyncBehaviour(client, this));
+        isActive = true;
     }
 
     public List<NodeFileEntry> getAgentFiles() { return agentFiles; }
 
     public void setAgentFiles(List<NodeFileEntry> agentFiles) {
         this.agentFiles = agentFiles;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 }

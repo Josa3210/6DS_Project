@@ -22,50 +22,58 @@ public class SyncBehaviour extends CyclicBehaviour
     @Override
     public void action()
     {
-        System.out.println(">> SYNC AGENT");
-        System.out.println(">> --------------------------");
+        if(agent.isActive())
+        {
+            System.out.println(">> SYNC AGENT");
+            System.out.println(">> --------------------------");
 
-        // REST ask for the sync agent list of the next node
-        System.out.println("** Requesting Agent Files Next Node");
+            // REST ask for the sync agent list of the next node
+            System.out.println("** Requesting Agent Files Next Node");
 
-        String ipNextNode = client.requestIP(client.getNextID());
+            String ipNextNode = client.requestIP(client.getNextID());
 
-        String getUrl = "http://" + ipNextNode + ":8080/agents/sync"; // Failure Exception?
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<SyncAgent> response = restTemplate.getForEntity(getUrl, SyncAgent.class);
+            String getUrl = "http://" + ipNextNode + ":8080/agents/sync"; // Failure Exception?
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<SyncAgent> response = restTemplate.getForEntity(getUrl, SyncAgent.class);
 
-        SyncAgent nextNodeAgent = response.getBody();
-        List<NodeFileEntry> nextNodeList = nextNodeAgent.getAgentFiles();
+            SyncAgent nextNodeAgent = response.getBody();
+            List<NodeFileEntry> nextNodeList = nextNodeAgent.getAgentFiles();
 
-        for(NodeFileEntry nextNodeEntry : nextNodeList)
-            System.out.println("* File Name: " + nextNodeEntry.getFilename() + " - Locked: " + nextNodeEntry.isLocked());
+            for(NodeFileEntry nextNodeEntry : nextNodeList)
+                System.out.println("* File Name: " + nextNodeEntry.getFilename() + " - Locked: " + nextNodeEntry.isLocked());
 
-        agent.setAgentFiles(nextNodeList);
+            agent.setAgentFiles(nextNodeList);
 
-        // Listing all files owned by the node at which this agent runs,
-        System.out.println("** All owned files of the client:");
-        for(NodeFileEntry e : client.getFileList())
-            System.out.println("* File Name: " + e.getFilename() + " - Locked: " + e.isLocked());
+            // Listing all files owned by the node at which this agent runs,
+            System.out.println("** All owned files of the client:");
+            for(NodeFileEntry e : client.getFileList())
+                System.out.println("* File Name: " + e.getFilename() + " - Locked: " + e.isLocked());
 
-        // If one of the owned files is not added to the list, the list needs to be updated
-        System.out.println("** Updating Agent List");
-        for(NodeFileEntry entry : client.getFileList())
-            updateList(entry.getFilename(), agent.getAgentFiles());
+            // If one of the owned files is not added to the list, the list needs to be updated
+            System.out.println("** Updating Agent List");
+            for(NodeFileEntry entry : client.getFileList())
+                updateList(entry.getFilename(), agent.getAgentFiles());
 
-        // Update the list stored by the node based on the agent’s list
-        System.out.println("** Updating Client List");
-        for(NodeFileEntry entry : agent.getAgentFiles())
-            updateList(entry.getFilename(), client.getFileList());
+            // Update the list stored by the node based on the agent’s list
+            System.out.println("** Updating Client List");
+            for(NodeFileEntry entry : agent.getAgentFiles())
+                updateList(entry.getFilename(), client.getFileList());
 
-        // If there is a lock request on the current node, and the file is not locked on the agent’s list, locking should be
-        // enabled on the node and the list should be synchronized accordingly
-        // Remove the lock when it is not needed anymore, and update local file list accordingly
-        System.out.println("** Update Lock on files agent list");
-        for(NodeFileEntry entry : client.getFileList())
-            updateLock(entry, agent.getAgentFiles());
+            // If there is a lock request on the current node, and the file is not locked on the agent’s list, locking should be
+            // enabled on the node and the list should be synchronized accordingly
+            // Remove the lock when it is not needed anymore, and update local file list accordingly
+            System.out.println("** Update Lock on files agent list");
+            for(NodeFileEntry entry : client.getFileList())
+                updateLock(entry, agent.getAgentFiles());
 
 
-        System.out.println(">> --------------------------");
+            System.out.println(">> --------------------------");
+        }
+        else
+        {
+            System.out.println("##Blocking##");
+            block(1000);
+        }
     }
 
     /**
