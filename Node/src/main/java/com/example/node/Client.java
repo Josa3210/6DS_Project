@@ -15,7 +15,9 @@ import java.io.FileNotFoundException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.io.*;
 import java.net.*;
@@ -48,6 +50,7 @@ public class Client implements I_Client {
     private Thread fileMonitorThread;
     public boolean isReplicatedFile;
     private SyncAgent syncAgent;
+    private List<NodeFileEntry> fileList;
 
     /**
      * Constructor of the client
@@ -60,7 +63,7 @@ public class Client implements I_Client {
             this.hostname = hostname;
             this.restClient = RestClient.create();
             this.currentIP = Inet4Address.getByName(Inet4Address.getLocalHost().getHostAddress()).getHostAddress();
-
+            this.fileList = new ArrayList<>();
             // We make a new logger file that keeps track of changes in the 'Files' map
             this.logger = new Logger(hostname); // We create a logger to keep track of the replication
             logger.load();
@@ -504,6 +507,8 @@ public class Client implements I_Client {
         return currentIP;
     }
     public SyncAgent getSyncAgent() { return syncAgent; }
+    public int getNextID() { return nextID; }
+    public List<NodeFileEntry> getFileList() { return fileList; }
 
     @Override
     public void reportFilenameToNamingServer(String filename, String filePath, int operation)
