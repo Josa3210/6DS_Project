@@ -70,11 +70,6 @@ public class SyncBehaviour extends CyclicBehaviour
 
             System.out.println(">> --------------------------");
         }
-        else
-        {
-            System.out.println("##Blocking##");
-            block(1000);
-        }
     }
 
     /**
