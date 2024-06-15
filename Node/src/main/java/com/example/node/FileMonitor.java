@@ -40,7 +40,6 @@ public class FileMonitor implements Runnable {
             Files.createDirectories(path);
         } catch (IOException e) {
             System.err.println(e.getMessage());
-
             throw new RuntimeException(e);
         }
         System.out.println("folder created: " + client.folderPath);

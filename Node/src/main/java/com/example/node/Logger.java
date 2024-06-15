@@ -32,6 +32,7 @@ public class Logger {
             String currentPath = new java.io.File("").getCanonicalPath();
             this.filePath = currentPath + "/Data/node/logger_" + hostname + ".json"; // Append nodeName to differentiate logger directories;
             this.JSONWriter = new FileWriter(filePath);
+            save();
         } catch (IOException e) {
             System.out.println(e);
         }
