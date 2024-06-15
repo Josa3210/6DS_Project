@@ -63,8 +63,11 @@ public class FileMonitor implements Runnable {
                     System.out.println("hash: " + hash + " current IP: " + client.getCurrentIP());
 
                     // Add file to the client logger
+                    System.out.println("^^^^Putting file in logger");
                     client.getLogger().put(hash, filename);
+                    System.out.println("^^^^Putting Original in logger");
                     client.getLogger().putOriginal(hash,client.currentID, client.getCurrentIP());
+                    System.out.println("^^^^Save logger");
                     client.getLogger().save();
 
                     // Add file to the file list
