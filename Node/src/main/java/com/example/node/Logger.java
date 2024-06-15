@@ -19,8 +19,9 @@ import java.util.*;
 public class Logger {
 
 
-    private final String fileName = "logger.json";
+    private String fileName = "logger.json";
     private String filePath;
+    private String tempPath;
     private FileWriter JSONWriter;
     private JSONArray nodeMap = new JSONArray();
 
@@ -34,7 +35,9 @@ public class Logger {
             new File(directoryPath).mkdirs();
 
             // Create file
-            this.filePath = directoryPath + "/" + "logger_" + hostname + ".json"; // Append nodeName to differentiate logger directories;
+            this.fileName = "logger_" + hostname + ".json";
+            this.filePath = directoryPath + "/" + this.fileName; // Append nodeName to differentiate logger directories;
+            this.tempPath = directoryPath + "/" + "logger_temp.json";
             load();
 
         } catch (IOException e) {
@@ -70,7 +73,6 @@ public class Logger {
                 if (file.createNewFile()) {
                     System.out.println("File does not exist. Initializing an empty file: " + fileName);
                     nodeMap = new JSONArray();
-                    this.JSONWriter = new FileWriter(filePath);
 
                     // Save the empty hashmap
                     save();
@@ -87,12 +89,23 @@ public class Logger {
      */
     public void save() {
         try {
-            // Write the JSON string to the file
+            File tempFile = new File(this.tempPath);
+            File loggerFile = new File(this.filePath);
 
+            // Create temp file
+            tempFile.createNewFile();
+
+            // Write in temp file
+            this.JSONWriter = new FileWriter(this.tempPath);
             this.nodeMap.write(this.JSONWriter);
-
-            this.JSONWriter.flush();
             this.JSONWriter.close();
+
+            // Delete old file
+            loggerFile.delete();
+
+            // Rename temp file
+            tempFile.renameTo(loggerFile);
+
             System.out.println("Map saved to file: " + filePath);
         } catch (IOException e) {
             System.err.println("Error saving map to file: " + e.getMessage());
@@ -142,14 +155,13 @@ public class Logger {
      */
     public void put(Integer hash, String fileName) {
         if (nodeMap != null) {
-
             JSONObject newObj = new JSONObject();
             newObj.put("hash", hash);
             newObj.put("filename", fileName);
             newObj.put("owner", new JSONObject());
             newObj.put("original", new JSONObject());
             nodeMap.put(newObj);
-            this.save();
+            save();
         } else {
             System.err.println("Map is not initialized. Please load the map first.");
         }
@@ -159,22 +171,26 @@ public class Logger {
         JSONObject obj = get(id);
         JSONObject ownerObj = new JSONObject().put("ID", ownerID).put("IP", ownerIP);
         obj.put("owner", ownerObj);
+        save();
     }
 
     public void putOriginal(int id, int originalID, String originalIP) {
         JSONObject obj = get(id);
         JSONObject ownerObj = new JSONObject().put("ID", originalID).put("IP", originalIP);
         obj.put("original", ownerObj);
+        save();
     }
 
     public void removeOwner(int id) {
         JSONObject obj = get(id);
         obj.remove("owner");
+        save();
     }
 
     public void removeOriginal(int id) {
         JSONObject obj = get(id);
         obj.remove("original");
+        save();
     }
 
     /**
@@ -187,6 +203,7 @@ public class Logger {
                 int id = (int) obj.get("hash");
                 if (id == hash) {
                     nodeMap.remove(i);
+                    save();
                     return;
                 }
             }
@@ -204,8 +221,9 @@ public class Logger {
             for (int i = 0; i < nodeMap.length(); i++) {
                 JSONObject obj = nodeMap.getJSONObject(i);
                 String id = (String) obj.get("filename");
-                if (id == filename) {
+                if (Objects.equals(id, filename)) {
                     nodeMap.remove(i);
+                    save();
                     return;
                 }
             }

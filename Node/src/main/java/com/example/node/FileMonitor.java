@@ -27,10 +27,11 @@ import java.util.Arrays;
 public class FileMonitor implements Runnable {
 
     Client client;
+    Logger logger;
 
     public FileMonitor(Client client) {
         this.client = client;
-
+        this.logger = client.getLogger();
     }
 
     public void run() {
@@ -64,11 +65,11 @@ public class FileMonitor implements Runnable {
 
                     // Add file to the client logger
                     System.out.println("^^^^Putting file in logger");
-                    client.getLogger().put(hash, filename);
+                    logger.put(hash, filename);
                     System.out.println("^^^^Putting Original in logger");
-                    client.getLogger().putOriginal(hash,client.currentID, client.getCurrentIP());
+                    logger.putOriginal(hash,client.currentID, client.getCurrentIP());
                     System.out.println("^^^^Save logger");
-                    client.getLogger().save();
+                    logger.save();
 
                     // Add file to the file list
                     client.getFileList().add(new NodeFileEntry(filename));
