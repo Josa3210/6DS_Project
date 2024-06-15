@@ -14,10 +14,7 @@ import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class Logger {
 
@@ -120,7 +117,7 @@ public class Logger {
             for (int i = 0; i < nodeMap.length(); i++) {
                 JSONObject obj = nodeMap.getJSONObject(i);
                 String objFilename = (String) obj.get("filename");
-                if (objFilename == filename) return obj;
+                if (Objects.equals(objFilename, filename)) return obj;
             }
             System.err.println("No value with " + filename + " found.");
         } else {
@@ -161,6 +158,16 @@ public class Logger {
         obj.put("original", ownerObj);
     }
 
+    public void removeOwner(int id) {
+        JSONObject obj = get(id);
+        obj.remove("owner");
+    }
+
+    public void removeOriginal(int id) {
+        JSONObject obj = get(id);
+        obj.remove("original");
+    }
+
     /**
      * Removes an entry from the logger
      */
@@ -180,6 +187,28 @@ public class Logger {
         }
     }
 
+    /**
+     * Removes an entry from the logger
+     */
+    public void remove(String filename) {
+        if (nodeMap != null) {
+            for (int i = 0; i < nodeMap.length(); i++) {
+                JSONObject obj = nodeMap.getJSONObject(i);
+                String id = (String) obj.get("filename");
+                if (id == filename) {
+                    nodeMap.remove(i);
+                    return;
+                }
+            }
+            System.err.println("Node not in nodeMap");
+        } else {
+            System.err.println("Hashmap is not initialized. Please load the hashmap first.");
+        }
+    }
+
+    public JSONArray getNodeMap() {
+        return nodeMap;
+    }
 }
 
 

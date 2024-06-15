@@ -23,42 +23,38 @@ import java.io.*;
 import java.net.*;
 
 
-
-import java.util.concurrent.TimeUnit;
-
-
 public class Client implements I_Client {
 
     private static final String multicast_address = "224.2.2.5";
     private static ClusterMemberShipListener event_listener;
-    private RestClient restClient;
+    public String folderPath = "Data/node/Files";
+    public int numberNodes = 0;
+    public boolean startFileMonitor = false;
+    public boolean isReceivedFile = false;
+    public ServerSocket serverSocket;
+    public Socket clientSocket;
+    public boolean isReplicatedFile;
     int currentID, nextID, prevID;
+    boolean setupCompleted = false;
+    private RestClient restClient;
     private Config config;
     private Map<String, Inet4Address> ipMap;
     private String currentIP, namingServerIP;
     private Integer namingServerPort;
     private String hostname;
     private Logger logger;
-    public String folderPath = "Data/node/Files";
-    public int numberNodes = 0;
-    public boolean startFileMonitor = false;
-    public boolean isReceivedFile = false;
-    boolean setupCompleted = false;
     private int portNumber = 80;
-    public ServerSocket serverSocket;
-    public Socket clientSocket;
     private Thread fileMonitorThread;
-    public boolean isReplicatedFile;
     private SyncAgent syncAgent;
     private List<NodeFileEntry> fileList;
 
     /**
      * Constructor of the client
+     *
      * @param hostname the name of the client
      */
     public Client(String hostname) {
-        try
-        {
+        try {
             event_listener = new ClusterMemberShipListener();
             this.config = createConfig();
             this.hostname = hostname;
@@ -75,8 +71,9 @@ public class Client implements I_Client {
             System.out.println("^^^^Debugging Run Sync Agent in Client");
             syncAgent = new SyncAgent(this);
             syncAgent.run();
+        } catch (FileNotFoundException | UnknownHostException e) {
+            throw new RuntimeException(e);
         }
-        catch (FileNotFoundException | UnknownHostException e) { throw new RuntimeException(e); }
     }
 
     private Config createConfig() throws FileNotFoundException {
@@ -102,22 +99,16 @@ public class Client implements I_Client {
         return config;
     }
 
-    public void ReceiveFile(String filepath, DataInputStream dataInputStream){
+    public void ReceiveFile(String filepath, DataInputStream dataInputStream) {
 
         try {
 
             isReceivedFile = true;
             int bytes = 0;
-            FileOutputStream fileOutputStream
-                    = new FileOutputStream(filepath);
-            long size
-                    = dataInputStream.readLong(); // read file size
+            FileOutputStream fileOutputStream = new FileOutputStream(filepath);
+            long size = dataInputStream.readLong(); // read file size
             byte[] buffer = new byte[4 * 1024];
-            while (size > 0
-                    && (bytes = dataInputStream.read(
-                    buffer, 0,
-                    (int) Math.min(buffer.length, size)))
-                    != -1) {
+            while (size > 0 && (bytes = dataInputStream.read(buffer, 0, (int) Math.min(buffer.length, size))) != -1) {
                 // Here we write the file using write method
                 fileOutputStream.write(buffer, 0, bytes);
                 size -= bytes; // read upto file size
@@ -126,7 +117,7 @@ public class Client implements I_Client {
             System.out.println("File is Received");
             fileOutputStream.close();
             this.serverSocket.close();
-        }catch(IOException e1){
+        } catch (IOException e1) {
             System.err.println(e1.getMessage());
         }
 
@@ -139,14 +130,12 @@ public class Client implements I_Client {
             int bytes = 0;
             // Open the File where he located in your pc
             File file = new File(filepath);
-            FileInputStream fileInputStream
-                    = new FileInputStream(file);
+            FileInputStream fileInputStream = new FileInputStream(file);
             // Here we send the File to Server
             dataOutputStream.writeLong(file.length());
             // Here we  break file into chunks
             byte[] buffer = new byte[4 * 1024];
-            while ((bytes = fileInputStream.read(buffer))
-                    != -1) {
+            while ((bytes = fileInputStream.read(buffer)) != -1) {
                 // Send the file to Server Socket
                 dataOutputStream.write(buffer, 0, bytes);
                 dataOutputStream.flush();
@@ -170,8 +159,7 @@ public class Client implements I_Client {
      * - IP and Port of the naming server
      */
     @Override
-    public void printLinkIds()
-    {
+    public void printLinkIds() {
         System.out.println(">> Client ID's");
         System.out.println("* Current ID: " + this.currentID);
         System.out.println("* Next ID: " + this.nextID);
@@ -202,15 +190,13 @@ public class Client implements I_Client {
      * @return the computed hash value for the input string
      */
     @Override
-    public int computeHash(String s)
-    {
+    public int computeHash(String s) {
         int p = 59;
         int m = 10000009;
         int hash_value = 0;
         int p_pow = 1;
 
-        for (char c : s.toCharArray())
-        {
+        for (char c : s.toCharArray()) {
             if (Character.isDigit(c)) hash_value = (hash_value + Integer.parseInt(String.valueOf(c)) * p_pow) % m;
             else hash_value = (hash_value + (c - 'a' + 1) * p_pow) % m;
 
@@ -235,8 +221,7 @@ public class Client implements I_Client {
      * </p>
      */
     @Override
-    public void habari()
-    {
+    public void habari() {
         // Joins multicast group
         HazelcastInstance hazelcastInstance = Hazelcast.newHazelcastInstance(this.config); // Creates a new Hazelcast instance with the provided configuration.
     }
@@ -244,20 +229,20 @@ public class Client implements I_Client {
     /**
      * This method will set the previous and next node ID's
      * and ask for the naming server to add the client
-     * @param nrNodes the size of the cluster in the network
-     * @param namingServerIP the IP of the naming server
+     *
+     * @param nrNodes          the size of the cluster in the network
+     * @param namingServerIP   the IP of the naming server
      * @param namingServerPort the port of the naming server
      */
-    public void setupClient(int nrNodes, String namingServerIP, int namingServerPort)
-    {
+    public void setupClient(int nrNodes, String namingServerIP, int namingServerPort) {
         this.namingServerIP = namingServerIP;
         this.namingServerPort = namingServerPort;
 
         addNameToNS();
 
         int[] ids = requestLinkIds();
-        nextID = nrNodes == 1 ? currentID :  ids[1];
-        prevID = nrNodes == 1 ? currentID :  ids[0];
+        nextID = nrNodes == 1 ? currentID : ids[1];
+        prevID = nrNodes == 1 ? currentID : ids[0];
 
         sendLinkID(nextID);
         sendLinkID(prevID);
@@ -267,8 +252,7 @@ public class Client implements I_Client {
      * This method sends a Post REST request to the naming server
      * asking to add itself to the network
      */
-    private void addNameToNS()
-    {
+    private void addNameToNS() {
         String postUrl = "http://" + namingServerIP + ":" + namingServerPort + "/ns/addNode";
 
         System.out.println(">> Sending REST Post (addNameToNS)");
@@ -278,8 +262,7 @@ public class Client implements I_Client {
         RestTemplate restTemplate = new RestTemplate();
 
         // Create the request body
-        Map<String, Object> requestBody = new HashMap<>()
-        {{
+        Map<String, Object> requestBody = new HashMap<>() {{
             put("ip", currentIP);
             put("name", hostname);
         }};
@@ -305,27 +288,29 @@ public class Client implements I_Client {
      * <p>
      */
     @Override
-    public void karibu(int hash)
-    {
+    public void karibu(int hash) {
         if ((this.currentID < hash) && (hash < this.nextID)) this.nextID = hash;
         else if ((this.prevID < hash) && (hash < this.currentID)) this.prevID = hash;
     }
 
     /**
      * Returns the previous and next ID of the client itself
+     *
      * @return previous ID (int[0]) and next ID (int[1])
      */
     @Override
-    public int[] requestLinkIds() { return requestLinkIds(currentID); }
+    public int[] requestLinkIds() {
+        return requestLinkIds(currentID);
+    }
 
     /**
      * Returns the previous and next ID of the requested client
+     *
      * @param requestID the ID of the requested client
      * @return previous ID (int[0]) and next ID (int[1])
      */
     @Override
-    public int[] requestLinkIds(int requestID)
-    {
+    public int[] requestLinkIds(int requestID) {
         String getUrl = "http://" + namingServerIP + ":" + namingServerPort + "/ns/giveLinkID/" + requestID;
         RestTemplate restTemplate = new RestTemplate();
 
@@ -338,12 +323,12 @@ public class Client implements I_Client {
 
     /**
      * Returns the IP of a node using the ID
+     *
      * @param nodeID the ID of the requested node
      * @return the IP of the requested node in a string
      */
     @Override
-    public String requestIP(int nodeID)
-    {
+    public String requestIP(int nodeID) {
         String getUrl = "http://" + namingServerIP + ":" + namingServerPort + "/ns/getIp/" + nodeID;
 
         RestTemplate restTemplate = new RestTemplate();
@@ -358,8 +343,7 @@ public class Client implements I_Client {
      * and sending the previous and next ID to the corresponding nodes
      */
     @Override
-    public void shutDown()
-    {
+    public void shutDown() {
         int[] linkIds = requestLinkIds();
         int prevID = linkIds[0];
         int nextID = linkIds[1];
@@ -375,11 +359,11 @@ public class Client implements I_Client {
 
     /**
      * Requests a node to update it's previous and next ID
+     *
      * @param nodeID the requested nodes ID
      */
     @Override
-    public void sendLinkID(int nodeID)
-    {
+    public void sendLinkID(int nodeID) {
         String nodeIP = requestIP(nodeID);
         String postUrl = "http://" + nodeIP + ":" + namingServerPort + "/shutdown/updateID";
         System.out.println(">> Sending REST Post (sendLinkID)");
@@ -387,27 +371,27 @@ public class Client implements I_Client {
         RestTemplate restTemplate = new RestTemplate();
         Map<String, Object> requestBody = new HashMap<>();
 
-        try
-        {
+        try {
             ResponseEntity<Void> requestEntity = restTemplate.postForEntity(postUrl, requestBody, Void.class);
             if (!requestEntity.getStatusCode().is2xxSuccessful()) removeFromNetwork(nodeID);
+        } catch (Exception e) {
+            removeFromNetwork(nodeID);
         }
-        catch (Exception e){ removeFromNetwork(nodeID); }
     }
 
     /**
      * This method will update the client's previous and next ID
+     *
      * @param prevID the previous ID or current ID
      * @param nextID the next ID or current ID
      */
     @Override
-    public void receiveLinkID(int prevID, int nextID)
-    {
+    public void receiveLinkID(int prevID, int nextID) {
         System.out.println(">> Updating prev and next ID : current:" + currentID + ", next ID: " + nextID + ", prev ID: " + prevID);
         this.nextID = prevID == currentID ? nextID : this.nextID;
         this.prevID = nextID == currentID ? prevID : this.prevID;
 
-        syncAgent.setActive(nextID!=currentID);
+        syncAgent.setActive(nextID != currentID);
     }
 
     /**
@@ -417,12 +401,27 @@ public class Client implements I_Client {
      * </p>
      */
     @Override
-    public void removeFromNS() {removeFromNS(currentID);}
+    public void removeFromNS() {
+        // Remove itself from the naming server
+        removeFromNS(currentID);
+
+        // Files replicated on this node should be moved to  the previous node,
+        // that will become the owner of the files
+        // We first remove the current entry with the original IP
+        logger.load();
+        String postUrl = "http://" + namingServerIP + ":8080/ns/shutdown";
+        RestTemplate restTemplate = new RestTemplate();
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("PrevID", prevID);
+        requestBody.put("nodeMap", logger.getNodeMap());
+        requestBody.put("originalIP", currentIP);
+        restTemplate.postForEntity(postUrl, requestBody, Void.class);
+    }
+
 
     @Override
-    public void removeFromNS(int removeID)
-    {
-        String postUrl = "http://" + namingServerIP + ":" + namingServerPort+ "/ns/removeNode";
+    public void removeFromNS(int removeID) {
+        String postUrl = "http://" + namingServerIP + ":" + namingServerPort + "/ns/removeNode";
 
         System.out.println(">> Sending REST Post (removeFromNS)");
         System.out.println("* Post URL: " + postUrl);
@@ -431,54 +430,32 @@ public class Client implements I_Client {
         RestTemplate restTemplate = new RestTemplate();
 
         // Create the request body
-        Map<String, Object> requestBody = new HashMap<>()
-        {{
+        Map<String, Object> requestBody = new HashMap<>() {{
             put("nodeID", removeID);
         }};
 
         // Send the POST request
         restTemplate.postForEntity(postUrl, requestBody, Void.class);
-
-        // if  a node gets removed from the namingserver, the files replicated on this node should be
-        // moved to  the previous node, that will become the owner of the files
-        // We first remove the current entry with the original IP
-        if (removeID == currentID) {
-            if (prevID != currentID) {
-                logger.load();
-                postUrl = "http://" + namingServerIP + ":8080/ns/shutdown";
-                restTemplate = new RestTemplate();
-                requestBody.clear();
-                requestBody.put("PrevID", prevID);
-                requestBody.put("nodeMap", logger.getNodeMap());
-                System.out.println("nodemap logger: " + logger.getNodeMap());
-                requestBody.put("fileMap", logger.getFileMap());
-                System.out.println("filemap logger: " + logger.getFileMap());
-                requestBody.put("originalIP", currentIP);
-                restTemplate.postForEntity(postUrl, requestBody, Void.class);
-            }
-        }
     }
 
     /**
      * Check for connection with other host
+     *
      * @param nodeID
      */
     @Override
-    public void ping(int nodeID)
-    {
+    public void ping(int nodeID) {
         String nodeIP = requestIP(nodeID);
 
         String uri = "http://" + nodeIP + ":8080/test" + "?testString=test";
         System.out.println(">> Pinging: " + uri);
         RestTemplate restTemplate = new RestTemplate();
-        try
-        {
+        try {
             ResponseEntity<String> responseEntity = restTemplate.getForEntity(uri, String.class);
             System.out.println("* Response: " + responseEntity.getBody());
 
             if (!responseEntity.getStatusCode().is2xxSuccessful()) removeFromNetwork(nodeID);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             removeFromNetwork(nodeID);
         }
     }
@@ -490,8 +467,7 @@ public class Client implements I_Client {
      * @param failedID
      */
     @Override
-    public void removeFromNetwork(int failedID)
-    {
+    public void removeFromNetwork(int failedID) {
         System.out.println(">> Removing client from network");
 
         int[] ids = requestLinkIds(failedID);
@@ -506,35 +482,73 @@ public class Client implements I_Client {
     }
 
     @Override
-    public void getName() { System.out.println(this.hostname); }
+    public void getName() {
+        System.out.println(this.hostname);
+    }
 
-    public void setNextID(int nextID) { this.nextID = nextID; }
-    public void setPrevID(int prevID) { this.prevID = prevID; }
-    public String getHostname() { return hostname; }
-    public Logger getLogger() { return logger; }
+    public String getHostname() {
+        return hostname;
+    }
+
+    public Logger getLogger() {
+        return logger;
+    }
+
     public String getCurrentIP() {
         return currentIP;
     }
-    public SyncAgent getSyncAgent() { return syncAgent; }
-    public int getNextID() { return nextID; }
-    public List<NodeFileEntry> getFileList() { return fileList; }
 
-    public void setFileList(List<NodeFileEntry> newList) {this.fileList = newList;}
+    public SyncAgent getSyncAgent() {
+        return syncAgent;
+    }
+
+    public int getNextID() {
+        return nextID;
+    }
+
+    public void setNextID(int nextID) {
+        this.nextID = nextID;
+    }
+
+    public List<NodeFileEntry> getFileList() {
+        return fileList;
+    }
+
+    public void setFileList(List<NodeFileEntry> newList) {
+        this.fileList = newList;
+    }
 
     @Override
-    public void reportFilenameToNamingServer(String filename, String filePath, int operation)
-    {
+    public void deleteReplicatedFile(String filename, String filePath) {
         // Prepare the URL for reporting the hash value to the naming server
-        String postUrl = "http://" + namingServerIP + ":8080/ns/reportFileName";
+        String postUrl = "http://" + namingServerIP + ":8080/ns/deleteReplicatedFile";
         Map<String, Object> requestBody = new HashMap<>();
-        System.out.println("operation: " + operation);
         requestBody.put("filename", filename);
         requestBody.put("filepath", filePath);
         System.out.println(filePath);
         requestBody.put("ip", currentIP);
-        requestBody.put("operation", operation);
         requestBody.put("ID", nextID);
-        System.out.println("prev: " + prevID + ", current ID: " + currentID + "next ID " + nextID) ;
+        System.out.println("prev: " + prevID + ", current ID: " + currentID + "next ID " + nextID);
+
+        // Make an HTTP POST request to report the hash value
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestBody, Void.class);
+
+        if (responseEntity.getStatusCode().is2xxSuccessful()) System.out.println("Hash value reported to naming server for file: " + filename);
+        else System.err.println("Failed to report hash value to naming server for file: " + filename);
+    }
+
+    @Override
+    public void createReplicatedFile(String filename, String filePath) {
+        // Prepare the URL for reporting the hash value to the naming server
+        String postUrl = "http://" + namingServerIP + ":8080/ns/createReplicatedFile";
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("filename", filename);
+        requestBody.put("filepath", filePath);
+        System.out.println(filePath);
+        requestBody.put("ip", currentIP);
+        requestBody.put("ID", nextID);
+        System.out.println("prev: " + prevID + ", current ID: " + currentID + "next ID " + nextID);
 
         // Make an HTTP POST request to report the hash value
         RestTemplate restTemplate = new RestTemplate();
@@ -546,7 +560,7 @@ public class Client implements I_Client {
 
     public void sendReplicatedFile(Inet4Address originalIP, String filepath) throws IOException {
         this.serverSocket = new ServerSocket(5000);
-        String url = "http://" +originalIP.getHostAddress()+":8080/OpenTCPConnection";
+        String url = "http://" + originalIP.getHostAddress() + ":8080/OpenTCPConnection";
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -556,15 +570,24 @@ public class Client implements I_Client {
         System.out.println(completed);
         this.clientSocket = this.serverSocket.accept();
         DataInputStream dataInputStream = new DataInputStream(this.clientSocket.getInputStream());
-        url = "http://" + originalIP.getHostAddress()+ ":8080/StartFileTransfer";
+        url = "http://" + originalIP.getHostAddress() + ":8080/StartFileTransfer";
         requestBody.clear();
         requestBody.put("filepath", filepath);
         restTemplate.postForEntity(url, requestBody, Void.class);
-        this.ReceiveFile(filepath,dataInputStream);
+        this.ReceiveFile(filepath, dataInputStream);
+    }
+
+    @Override
+    public int getCurrentID() {
+        return currentID;
     }
 
     public int getPrevID() {
         return prevID;
+    }
+
+    public void setPrevID(int prevID) {
+        this.prevID = prevID;
     }
 
     public class ClusterMemberShipListener implements MembershipListener {
@@ -578,7 +601,7 @@ public class Client implements I_Client {
         }
 
         public void memberRemoved(MembershipEvent membershipEvent) {
-            numberNodes --;
+            numberNodes--;
             String s = membershipEvent.getMember().getSocketAddress().toString();
             s = s.substring(s.indexOf("/") + 1, s.indexOf(":"));
 

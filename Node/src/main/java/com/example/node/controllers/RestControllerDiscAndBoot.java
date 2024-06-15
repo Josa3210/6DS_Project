@@ -83,28 +83,21 @@ public class RestControllerDiscAndBoot {
         Integer fileHash = Integer.parseInt(request.get("hashValue").toString());
         String filepath = (String) request.get("filepath");
         Inet4Address ip = (Inet4Address) InetAddress.getByName((String) request.get("original ip"));
-        Logger logger = client.getLogger();
         System.out.println("This is the replicated node for file: " + fileHash);
-        logger.load();
-        // Puts the filehash and the ip address of the node where the file was created in the logger ..
-        logger.put(fileHash, ip);
-        logger.putFile(fileHash, filepath);
-        logger.save();
         client.sendReplicatedFile(ip, filepath);
     }
 
     @PostMapping("/deleteReplicatedFile")
     public void deleteReplicatedFile(@RequestBody Map<String, Object> request) throws UnknownHostException {
 
-        int fileHash = Integer.parseInt(request.get("hashValue").toString());
         String filename = (String) request.get("filename");
         String filepath = (String) request.get("filepath");
         System.out.println("filepath: " + filepath);
-        System.out.println("Delete file " + filename + " with hash: " + fileHash);
 
         try {
             client.isReplicatedFile = true;
             Files.delete(Path.of(filepath));
+            client.getLogger().remove(filename);
             System.out.println("File entry deleted successfully");
 
         } catch (IOException e) {

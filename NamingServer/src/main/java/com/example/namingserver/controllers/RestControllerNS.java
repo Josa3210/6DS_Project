@@ -2,6 +2,7 @@ package com.example.namingserver.controllers;
 
 import com.example.namingserver.I_NamingServer;
 import com.example.namingserver.NamingServer;
+import com.hazelcast.shaded.org.json.JSONArray;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.Inet4Address;
@@ -61,31 +62,47 @@ public class RestControllerNS
      * @param requestBody the JSON request body with "ip" as ip address
      */
 
-    @PostMapping("/ns/reportFileName")
-    public void reportFileName(@RequestBody Map<String, Object> requestBody) throws UnknownHostException {
+    @PostMapping("/ns/deleteReplicatedFile")
+    public void deleteReplicatedFile(@RequestBody Map<String, Object> requestBody) throws UnknownHostException {
 
         // Check if the file name does not end with .swp --> temporary files!
-
         String filename = (String) requestBody.get("filename");
         if (!filename.endsWith(".swp")) {
-            String ipAddressString = (String) requestBody.get("ip");
             String filepath = (String) requestBody.get("filepath");
-            System.out.println("filepath reveiced: " + filepath);
+            String ipAddressString = (String) requestBody.get("ip");
             Inet4Address originalIP = (Inet4Address) InetAddress.getByName(ipAddressString);
-            Integer operation = (Integer) requestBody.get("operation");
             Integer nextID = (Integer) requestBody.get("ID");
-            namingServer.filePath = filepath;
-            namingServer.reportLogger(filename, originalIP, operation,nextID);
-        }
 
+            System.out.println("filepath received: " + filepath);
+
+            namingServer.deleteReplicatedFile(filename, filepath, originalIP, nextID);
+        }
     }
+
+    @PostMapping("/ns/createReplicatedFile")
+    public void createReplicatedFile(@RequestBody Map<String, Object> requestBody) throws UnknownHostException {
+
+        // Check if the file name does not end with .swp --> temporary files!
+        String filename = (String) requestBody.get("filename");
+        if (!filename.endsWith(".swp")) {
+
+            String filepath = (String) requestBody.get("filepath");
+            String ipAddressString = (String) requestBody.get("ip");
+            Inet4Address originalIP = (Inet4Address) InetAddress.getByName(ipAddressString);
+            Integer nextID = (Integer) requestBody.get("ID");
+
+            System.out.println("filepath received: " + filepath);
+
+            namingServer.replicate(filename, filepath, originalIP, nextID);
+        }
+    }
+
     @PostMapping("ns/shutdown")
     public void shutdown(@RequestBody Map<String, Object> request) throws UnknownHostException{
         int PrevID = (Integer) request.get("PrevID");
-        HashMap<Integer, Inet4Address> nodeMap = (HashMap<Integer, Inet4Address>) request.get("nodeMap");
-        HashMap<Integer, String> fileMap = (HashMap<Integer, String>) request.get("fileMap");
+        JSONArray nodeMap = (JSONArray) request.get("nodeMap");
         String originalIPString = (String) request.get("originalIP");
         Inet4Address originalIP = (Inet4Address) InetAddress.getByName(originalIPString);
-        namingServer.shutdown_node(PrevID, nodeMap, fileMap, originalIP);
+        namingServer.shutdown_node(PrevID, nodeMap, originalIP);
     }
 }
