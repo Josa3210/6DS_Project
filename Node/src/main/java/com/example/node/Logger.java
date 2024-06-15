@@ -51,9 +51,9 @@ public class Logger {
      */
 
     public void load() {
+        System.out.println("^^^^Trying to load from: " + filePath);
         try {
             File file = new File(filePath);
-            System.out.println("^^^^Trying to load from: " + file.getAbsolutePath());
             if (file.exists()) {
                 // Read the JSON file and convert it to HashMap
                 String jsonContent = new String(Files.readAllBytes(Paths.get(this.filePath)));
