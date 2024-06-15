@@ -35,6 +35,7 @@ public class Logger {
             System.out.println("^^^^Hashmap on: " + this.filePath);
             load();
         } catch (IOException e) {
+            System.out.println("^^^^Error");
             System.out.println(e);
         }
     }
