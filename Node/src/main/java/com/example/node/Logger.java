@@ -31,8 +31,8 @@ public class Logger {
         try {
             String currentPath = new java.io.File("").getCanonicalPath();
             this.filePath = currentPath + "/Data/node/logger_" + hostname + ".json"; // Append nodeName to differentiate logger directories;
-            System.out.println("^^^^Hashmap on: " + currentPath);
             this.JSONWriter = new FileWriter(filePath);
+            System.out.println("^^^^Hashmap on: " + this.filePath);
             load();
         } catch (IOException e) {
             System.out.println(e);
@@ -52,7 +52,8 @@ public class Logger {
 
     public void load() {
         try {
-            File file = new File(filePath + "/" + fileName);
+            File file = new File(filePath);
+            System.out.println("^^^^Trying to load from: " + file.getAbsolutePath());
             if (file.exists()) {
                 // Read the JSON file and convert it to HashMap
                 String jsonContent = new String(Files.readAllBytes(Paths.get(this.filePath)));

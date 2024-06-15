@@ -63,7 +63,6 @@ public class Client implements I_Client {
             this.fileList = new ArrayList<>();
             // We make a new logger file that keeps track of changes in the 'Files' map
             this.logger = new Logger(hostname); // We create a logger to keep track of the replication
-            logger.load();
             fileMonitorThread = new Thread(new FileMonitor(this));
 
             //Sync Agent
