@@ -29,11 +29,14 @@ public class Logger {
      */
     public Logger(String hostname) {
         try {
-            String currentPath = new java.io.File("").getCanonicalPath();
-            this.filePath = currentPath + "/Data/node/logger_" + hostname + ".json"; // Append nodeName to differentiate logger directories;
-            this.JSONWriter = new FileWriter(filePath);
-            System.out.println("^^^^Hashmap on: " + this.filePath);
+            // Create directories
+            String directoryPath = new java.io.File("").getCanonicalPath()+"\\Data\\node";
+            new File(directoryPath).mkdirs();
+
+            // Create file
+            this.filePath = directoryPath + "\\" + "logger_" + hostname + ".json"; // Append nodeName to differentiate logger directories;
             load();
+
         } catch (IOException e) {
             System.out.println("^^^^Error");
             System.out.println(e);
@@ -41,7 +44,7 @@ public class Logger {
     }
 
     public static void main(String[] args) {
-        String hostname = "node 1";
+        String hostname = "node1";
         Logger logger = new Logger(hostname);
         logger.load();
     }
@@ -65,8 +68,10 @@ public class Logger {
             } else {
                 // Create a new file if it doesn't exist
                 if (file.createNewFile()) {
-                    System.out.println("File does not exist. Initializing an empty hashmap: " + fileName);
+                    System.out.println("File does not exist. Initializing an empty file: " + fileName);
                     nodeMap = new JSONArray();
+                    this.JSONWriter = new FileWriter(filePath);
+
                     // Save the empty hashmap
                     save();
                 }
