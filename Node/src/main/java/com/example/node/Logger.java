@@ -30,11 +30,11 @@ public class Logger {
     public Logger(String hostname) {
         try {
             // Create directories
-            String directoryPath = new java.io.File("").getCanonicalPath()+"\\Data\\node";
+            String directoryPath = new java.io.File("").getCanonicalPath()+"/Data/node";
             new File(directoryPath).mkdirs();
 
             // Create file
-            this.filePath = directoryPath + "\\" + "logger_" + hostname + ".json"; // Append nodeName to differentiate logger directories;
+            this.filePath = directoryPath + "/" + "logger_" + hostname + ".json"; // Append nodeName to differentiate logger directories;
             load();
 
         } catch (IOException e) {
