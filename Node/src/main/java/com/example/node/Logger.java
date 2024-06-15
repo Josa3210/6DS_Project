@@ -31,6 +31,7 @@ public class Logger {
         try {
             String currentPath = new java.io.File("").getCanonicalPath();
             this.filePath = currentPath + "/Data/node/logger_" + hostname + ".json"; // Append nodeName to differentiate logger directories;
+            System.out.println("^^^^Hashmap on: " + currentPath);
             this.JSONWriter = new FileWriter(filePath);
             load();
         } catch (IOException e) {
