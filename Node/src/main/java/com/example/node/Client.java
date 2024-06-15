@@ -69,8 +69,8 @@ public class Client implements I_Client {
             //Sync Agent
 
             System.out.println("^^^^Debugging Run Sync Agent in Client");
-            syncAgent = new SyncAgent(this);
-            syncAgent.run();
+            //syncAgent = new SyncAgent(this);
+            //syncAgent.run();
         } catch (FileNotFoundException | UnknownHostException e) {
             throw new RuntimeException(e);
         }
