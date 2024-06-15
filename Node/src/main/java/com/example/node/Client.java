@@ -223,6 +223,7 @@ public class Client implements I_Client {
     @Override
     public void habari() {
         // Joins multicast group
+        System.out.println("Joining hazelcast instance");
         HazelcastInstance hazelcastInstance = Hazelcast.newHazelcastInstance(this.config); // Creates a new Hazelcast instance with the provided configuration.
     }
 
