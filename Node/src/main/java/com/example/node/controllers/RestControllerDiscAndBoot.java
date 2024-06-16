@@ -51,12 +51,6 @@ public class RestControllerDiscAndBoot {
         System.out.println("* IP Naming Server: " + ipNamingServer);
         System.out.println("* Port Naming Server: " + portNamingServer);
 
-        // We start the filemonitorthread from here
-        if (nrNodes > 1) {
-            Thread filemonitorthread = client.getFileMonitorThread();
-            filemonitorthread.start();
-        }
-
         /*if (nrNodes > 1) {
             // the number of clients > 1
             System.out.println("Number of nodes > 1, there are replicated nodes ..");
