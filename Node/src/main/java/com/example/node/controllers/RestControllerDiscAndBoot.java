@@ -88,10 +88,6 @@ public class RestControllerDiscAndBoot {
         try {
             client.isReplicatedFile = true;
             Files.delete(Path.of(filepath));
-            if(client.getLogger().remove(filename)){
-                System.out.println("File entry deleted successfully");
-            }
-
         } catch (IOException e) {
             System.out.println("File entry cannot be deleted successfully .");
             throw new RuntimeException(e);

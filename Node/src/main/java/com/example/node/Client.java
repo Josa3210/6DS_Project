@@ -9,8 +9,6 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.spi.exception.RestClientException;
 import jakarta.annotation.PostConstruct;
 import org.springframework.http.*;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.FileNotFoundException;
@@ -29,22 +27,18 @@ public class Client implements I_Client {
     private static ClusterMemberShipListener event_listener;
     public String folderPath = "Data/node/Files";
     public int numberNodes = 0;
-    public boolean startFileMonitor = false;
     public boolean isReceivedFile = false;
     public ServerSocket serverSocket;
     public Socket clientSocket;
     public boolean isReplicatedFile;
     int currentID, nextID, prevID;
-    boolean setupCompleted = false;
-    private RestClient restClient;
-    private Config config;
-    private Map<String, Inet4Address> ipMap;
-    private String currentIP, namingServerIP;
+    private final Config config;
+    private final String currentIP;
+    private String namingServerIP;
     private Integer namingServerPort;
-    private String hostname;
-    private Logger logger;
-    private int portNumber = 80;
-    private Thread fileMonitorThread;
+    private final String hostname;
+    private final Logger logger;
+    private final Thread fileMonitorThread;
     private SyncAgent syncAgent;
     private List<NodeFileEntry> fileList;
 
@@ -58,7 +52,6 @@ public class Client implements I_Client {
             event_listener = new ClusterMemberShipListener();
             this.config = createConfig();
             this.hostname = hostname;
-            this.restClient = RestClient.create();
             this.currentIP = Inet4Address.getByName(Inet4Address.getLocalHost().getHostAddress()).getHostAddress();
             this.fileList = new ArrayList<>();
             // We make a new logger file that keeps track of changes in the 'Files' map
@@ -414,7 +407,7 @@ public class Client implements I_Client {
         RestTemplate restTemplate = new RestTemplate();
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("PrevID", prevID);
-        requestBody.put("nodeMap", logger.getNodeMap());
+        requestBody.put("nodeMap", logger.getFileArray());
         requestBody.put("originalIP", currentIP);
         restTemplate.postForEntity(postUrl, requestBody, Void.class);
     }

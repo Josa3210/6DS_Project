@@ -89,19 +89,20 @@ public class FileMonitor implements Runnable {
                     String originalIP = String.valueOf(originalJSON.get("IP"));
                     String currentIP = client.getCurrentIP();
 
+
                     if (originalIP.equals(currentIP) & !client.isReplicatedFile) { // we check if the original IP of the file = current IP
 
                         // if this is the case, the current IP is the IP where the file got downloaded, so we need to make
                         // sure that the naming server gets noted about this so it can remove the replicated files too.
                         client.deleteReplicatedFile(filename, filepath);
 
-                        if(client.getLogger().remove(hash)){
-                            System.out.println("^^^^Succesfully deleted file from logger");
-                        }
-                        // Remove the hash from the logger.
-                        client.getFileList().removeIf(entry -> filename.equals(entry.getFilename()));
                     }
 
+                    if(client.getLogger().remove(hash)){
+                        System.out.println("^^^^Succesfully deleted file from logger");
+                    }
+                    // Remove the hash from the logger.
+                    client.getFileList().removeIf(entry -> filename.equals(entry.getFilename()));
                 }
                 client.isReplicatedFile = false;
             }
