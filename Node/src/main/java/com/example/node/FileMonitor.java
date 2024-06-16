@@ -90,7 +90,7 @@ public class FileMonitor implements Runnable {
                     // Remove the file from the logger
                     int hash = client.computeHash(filename);
                     JSONObject originalJSON = (JSONObject) client.getLogger().get(hash).get("original");
-                    Inet4Address originalIP = (Inet4Address) originalJSON.get("IP");
+                    String originalIP = String.valueOf(originalJSON.get("IP"));
                     String currentIP = client.getCurrentIP();
 
                     if (originalIP.equals(currentIP) & !client.isReplicatedFile) // we check if the original IP of the file = current IP
