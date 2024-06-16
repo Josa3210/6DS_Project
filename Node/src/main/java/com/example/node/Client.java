@@ -25,6 +25,11 @@ public class Client implements I_Client {
 
     private static final String multicast_address = "224.2.2.5";
     private static ClusterMemberShipListener event_listener;
+    private final Config config;
+    private final String currentIP;
+    private final String hostname;
+    private final Logger logger;
+    private final Thread fileMonitorThread;
     public String folderPath = "Data/node/Files";
     public int numberNodes = 0;
     public boolean isReceivedFile = false;
@@ -32,13 +37,8 @@ public class Client implements I_Client {
     public Socket clientSocket;
     public boolean isReplicatedFile;
     int currentID, nextID, prevID;
-    private final Config config;
-    private final String currentIP;
     private String namingServerIP;
     private Integer namingServerPort;
-    private final String hostname;
-    private final Logger logger;
-    private final Thread fileMonitorThread;
     private SyncAgent syncAgent;
     private List<NodeFileEntry> fileList;
 
@@ -343,11 +343,29 @@ public class Client implements I_Client {
         int nextID = linkIds[1];
 
         // Remove from the naming server
+        System.out.println("^^^^Removing itself from NS");
         removeFromNS();
 
+
+        // Get IP of previous node
+        RestTemplate restTemplate = new RestTemplate();
+        String getUrl = "http://" + namingServerIP + ":8080/ns/getIp/" + getPrevID();
+        ResponseEntity<String> response2 = restTemplate.getForEntity(getUrl, String.class);
+        String newIP = response2.getBody();
+
+        // Send file to previous node
+        String url = "http://" + newIP + ":8080/shutdown/sendFiles";
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("originalIP", getCurrentIP());
+        requestBody.put("files", logger.getFileArray().toString());
+        restTemplate.postForEntity(url, requestBody, Void.class);
+
+        // Sending new IDs to the prev and next node
+        System.out.println("^^^^Passing on the ids");
         sendLinkID(nextID);
         sendLinkID(prevID);
 
+        // Exiting application
         ClientApplication.exitApplication();
     }
 
@@ -398,18 +416,6 @@ public class Client implements I_Client {
     public void removeFromNS() {
         // Remove itself from the naming server
         removeFromNS(currentID);
-
-        // Files replicated on this node should be moved to  the previous node,
-        // that will become the owner of the files
-        // We first remove the current entry with the original IP
-        logger.load();
-        String postUrl = "http://" + namingServerIP + ":8080/ns/shutdown";
-        RestTemplate restTemplate = new RestTemplate();
-        Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("PrevID", prevID);
-        requestBody.put("nodeMap", logger.getFileArray());
-        requestBody.put("originalIP", currentIP);
-        restTemplate.postForEntity(postUrl, requestBody, Void.class);
     }
 
 
@@ -417,7 +423,7 @@ public class Client implements I_Client {
     public void removeFromNS(int removeID) {
         String postUrl = "http://" + namingServerIP + ":" + namingServerPort + "/ns/removeNode";
 
-        System.out.println(">> Sending REST Post (removeFromNS)");
+        System.out.println("^^^^Sending REST Post (removeFromNS)");
         System.out.println("* Post URL: " + postUrl);
         System.out.println("* Node ID: " + removeID);
 
@@ -537,7 +543,7 @@ public class Client implements I_Client {
         // Create the request entity with headers and body
         HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
 
-        try{
+        try {
             // Send the POST request with the replicated IP --> it becomes the new 'original' IP
             requestBody.put("filename", filename);
             requestBody.put("filepath", filePath);
@@ -591,7 +597,7 @@ public class Client implements I_Client {
 
             System.out.println("^^^^Putting new owner in logger");
             System.out.println("ID: " + locationString[0] + ", IP: " + locationString[1]);
-            logger.putOwner(computeHash(filename), Integer.parseInt(locationString[0]),locationString[1]);
+            logger.putOwner(computeHash(filename), Integer.parseInt(locationString[0]), locationString[1]);
 
             if (statusCode == HttpStatus.OK) {
                 System.out.println("Successfully replicated file (" + filename + ") to " + replicatedIP);

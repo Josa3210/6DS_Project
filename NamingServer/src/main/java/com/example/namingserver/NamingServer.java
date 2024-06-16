@@ -31,8 +31,7 @@ import static java.util.Collections.max;
 
 @Component
 
-public class NamingServer implements I_NamingServer
-{
+public class NamingServer implements I_NamingServer {
     private static String multicast_address = "224.2.2.5";
     private static Config config;
     private static HazelcastInstance hazelcastInstance;
@@ -42,12 +41,12 @@ public class NamingServer implements I_NamingServer
      * Database containing the IP's of the different nodes {@see I_NamingserverDB}
      */
     private static I_NamingserverDB database;
+    public String folderPath = "Data/node/Files";
     private String ip;
 
-    public String folderPath = "Data/node/Files";
 
-
-    public NamingServer() {}
+    public NamingServer() {
+    }
 
     /**
      * this method sets up a Hazelcast instance with clustering enabled, specific network configurations including
@@ -81,10 +80,8 @@ public class NamingServer implements I_NamingServer
      * Creating a new database
      */
     @PostConstruct
-    public void init()
-    {
-        try
-        {
+    public void init() {
+        try {
             System.out.println(">> Initializing NamingServer");
             this.ip = Inet4Address.getByName(Inet4Address.getLocalHost().getHostAddress()).getHostAddress();
             this.database = new NamingserverDB();
@@ -169,8 +166,6 @@ public class NamingServer implements I_NamingServer
     @Override
     public void removeNodeIP(int nodeID) {
         database.remove(nodeID);
-
-        // Reallocate resources
     }
 
     /**
@@ -188,8 +183,7 @@ public class NamingServer implements I_NamingServer
         int hash_value = 0;
         int p_pow = 1;
 
-        for (char c : s.toCharArray())
-        {
+        for (char c : s.toCharArray()) {
             if (Character.isDigit(c)) hash_value = (hash_value + Integer.parseInt(String.valueOf(c)) * p_pow) % m;
             else hash_value = (hash_value + (c - 'a' + 1) * p_pow) % m;
 
@@ -307,104 +301,6 @@ public class NamingServer implements I_NamingServer
             s = s.substring(s.indexOf("/") + 1, s.indexOf(":"));
 
         }
-    }
-
-
-    /**
-     * Calculates the node to which the file needs to be send for replication and starts this progress.
-     * Saves this change in the logger.
-     * @param filename
-     * @param originalIP
-     * @param nextID
-     */
-    public void replicate(String filename, String filePath, Inet4Address originalIP, int nextID){
-        // Calculate the IP of the node to send the file to
-        Inet4Address replicatedIP = getIP(getFileOwner(filename));
-
-        // Set up POST
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        // Create the request body
-        Map<String, Object> requestBody = new HashMap<>();
-
-        // Create the request entity with headers and body
-        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
-
-        // Check if the node itself is not the replication node
-        if(originalIP.getHostAddress().equals(replicatedIP.getHostAddress())){
-            System.out.println("^^^^Replicated ip = original IP. next ID: " + nextID);
-            replicatedIP = getIP(nextID);}
-
-
-
-    }
-
-    public void deleteReplicatedFile(String filename, String filePath, Inet4Address originalIP, int nextID) {
-        // Calculate the IP of the node to send the file to
-        Inet4Address replicatedIP = getIP(getFileOwner(filename));
-
-        // Set up POST
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        System.out.println("\nNode with IP " + replicatedIP.getHostAddress() + " will delete the replicated file: " + filename);
-
-        System.out.println("Replicated IP: " + replicatedIP.getHostAddress() + " original IP: " + originalIP.getHostAddress());
-
-        if (replicatedIP.getHostAddress().equals(originalIP.getHostAddress())){
-
-            replicatedIP = getIP(nextID); // if the replicated ip == original ip, then the replicated file is store on the node with nextID!
-            System.out.println("Replicated file is stored on the node with nextID, deleting it there ..");
-        }
-
-        String postUrl = "http://" + replicatedIP.getHostAddress() + ":8080/deleteReplicatedFile";
-
-        // Create the request body
-        Map<String, Object> requestBody = new HashMap<>();
-
-        // Create the request entity with headers and body
-        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
-
-        System.out.println("original IP: " + originalIP + "; replicated IP: " + replicatedIP);
-
-        try{
-            // Send the POST request with the replicated IP --> it becomes the new 'original' IP
-            requestBody.put("filename", filename);
-            requestBody.put("filepath", filePath);
-
-            ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
-            HttpStatusCode statusCode = responseEntity.getStatusCode();
-
-            if (statusCode == HttpStatus.OK) {
-                System.out.println("Succesfully removed file: " + filePath + "\\" + filename + " from " + replicatedIP.getHostAddress());
-            } else {
-                System.err.println("Sending node list failed with status code: " + statusCode);
-            }
-        } catch (RestClientException e) {
-            System.err.println("Failed to send node list to " + replicatedIP + ": " + e.getMessage());
-        }
-    }
-
-
-    /**
-     * Send the files to the previous ID of the node that is shutting down
-     * @param PrevID The ID of the previous node.
-     * @param nodeMap JSONArray containing all the information about the files
-     * @param originalIP The IP of the node that is shutting down
-     */
-    public void shutdown_node(int PrevID, JSONArray nodeMap, Inet4Address originalIP){
-        Inet4Address newReplicatedIP = database.get(PrevID);
-
-        System.out.println("sending the replicated files to node " + newReplicatedIP.getHostAddress() + " from IP "+ originalIP.getHostAddress());
-        RestTemplate restTemplate = new RestTemplate();
-        String url = "http://" + newReplicatedIP.getHostAddress() +":8080/shutdown/sendFiles";
-        Map<String, Object> requestbody = new HashMap<>();
-        requestbody.put("originalIP", originalIP.getHostAddress());
-        requestbody.put("nodeMap", nodeMap);
-        restTemplate.postForEntity(url, requestbody, Void.class);
     }
 }
 

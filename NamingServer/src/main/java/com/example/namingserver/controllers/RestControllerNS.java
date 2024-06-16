@@ -68,13 +68,4 @@ public class RestControllerNS
         }
         return response;
     }
-
-    @PostMapping("ns/shutdown")
-    public void shutdown(@RequestBody Map<String, Object> request) throws UnknownHostException{
-        int PrevID = (Integer) request.get("PrevID");
-        JSONArray nodeMap = (JSONArray) request.get("nodeMap");
-        String originalIPString = (String) request.get("originalIP");
-        Inet4Address originalIP = (Inet4Address) InetAddress.getByName(originalIPString);
-        namingServer.shutdown_node(PrevID, nodeMap, originalIP);
-    }
 }

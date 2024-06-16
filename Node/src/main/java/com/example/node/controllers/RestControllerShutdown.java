@@ -36,20 +36,23 @@ public class RestControllerShutdown {
 
     @PostMapping("/shutdown/sendFiles")
     public void sendFiles(@RequestBody Map<String, Object> requestbody) throws IOException {
+        // Get logger of this file
         Logger logger = client.getLogger();
-        JSONArray nodeMap = (JSONArray) requestbody.get("nodeMap");
+
+        // Get all the files present on the leaving node
+        String strArray = (String) requestbody.get("files");
+        JSONArray files = new JSONArray(strArray);
 
         // For every file in the logger
-
-        for (int i = 0; i < nodeMap.length(); i++) {
-            JSONObject obj = nodeMap.getJSONObject(i);
+        for (int i = 0; i < files.length(); i++) {
+            JSONObject obj = files.getJSONObject(i);
             JSONObject owner = (JSONObject) obj.get("owner");
             String filename = obj.get("filename").toString();
 
             // Check if this node is the replicated node of the file
             String newReplicatedIP;
             if (client.getCurrentIP().equals(owner.get("IP"))) {
-                // If yes, the file should be send to the prevID of this node
+                // If yes, the file should be sent to the prevID of this node
                 newReplicatedIP = client.requestIP(client.getPrevID());
 
                 // Send file from this node to the new replicated node (prevID)
