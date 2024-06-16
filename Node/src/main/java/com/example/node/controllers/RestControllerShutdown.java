@@ -74,6 +74,9 @@ public class RestControllerShutdown {
                 // If the node is not the replicated, it will become the new original
                 logger.put((int) obj.get("hash"),(String) obj.get("filename"));
 
+                // Set the owner of this file to the owner from the other logger
+                logger.putOwner((int) obj.get("hash"), (int) owner.get("ID"), (String) owner.get("IP"));
+
                 // Update the logger that this node is the new original
                 logger.putOriginal((int) obj.get("hash"), client.getCurrentID(), client.getCurrentIP());
             }
