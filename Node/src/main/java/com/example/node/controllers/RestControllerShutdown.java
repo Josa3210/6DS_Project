@@ -51,7 +51,9 @@ public class RestControllerShutdown {
 
             // Check if this node is the replicated node of the file
             String newReplicatedIP;
-            if (client.getCurrentIP().equals(owner.get("IP"))) {
+            String ownerIP = (String) owner.get("IP");
+            int fileID = (int) obj.get("hash");
+            if (client.getCurrentIP().equals(ownerIP)) {
                 // If yes, the file should be sent to the prevID of this node
                 newReplicatedIP = client.requestIP(client.getPrevID());
 
@@ -65,20 +67,29 @@ public class RestControllerShutdown {
                 restTemplate.postForEntity(url, bodyNewReplicated, Void.class);
 
                 // Update the logger on the fact that new owner the prevID is.
-                logger.putOwner((int) obj.get("hash"), client.getPrevID(), newReplicatedIP);
+                logger.putOwner(fileID, client.getPrevID(), newReplicatedIP);
 
                 // Update the logger that this node is the new original
-                logger.putOriginal((int) obj.get("hash"), client.getCurrentID(), client.getCurrentIP());
+                logger.putOriginal(fileID, client.getCurrentID(), client.getCurrentIP());
 
             } else {
                 // If the node is not the replicated, it will become the new original
-                logger.put((int) obj.get("hash"),(String) obj.get("filename"));
+                logger.put(fileID,(String) obj.get("filename"));
 
                 // Set the owner of this file to the owner from the other logger
-                logger.putOwner((int) obj.get("hash"), (int) owner.get("ID"), (String) owner.get("IP"));
+                logger.putOwner(fileID, (int) owner.get("ID"), ownerIP);
 
                 // Update the logger that this node is the new original
-                logger.putOriginal((int) obj.get("hash"), client.getCurrentID(), client.getCurrentIP());
+                logger.putOriginal(fileID, client.getCurrentID(), client.getCurrentIP());
+
+                // Notify the replicated node that this node is the new original
+                RestTemplate restTemplate = new RestTemplate();
+                String url = "http://" + ownerIP + ":8080/changeLoggerOriginal";
+                Map<String, Object> bodyNewReplicated = new HashMap<>();
+                bodyNewReplicated.put("original ip", client.getCurrentIP());
+                bodyNewReplicated.put("original id", client.getCurrentID());
+                bodyNewReplicated.put("file id", fileID);
+                restTemplate.postForEntity(url, bodyNewReplicated, Void.class);
             }
         }
     }

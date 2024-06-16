@@ -78,6 +78,15 @@ public class RestControllerDiscAndBoot {
         client.receiveReplicatedFile(ip, id, filepath);
     }
 
+    @PostMapping("/changeLoggerOriginal")
+    public void changeLoggerOriginal(@RequestBody Map<String, Object> request){
+        String originalIP = (String) request.get("original ip");
+        int originalID = (int) request.get("original id");
+        int fileID = (int) request.get("file id");
+
+        client.getLogger().putOriginal(fileID,originalID,originalIP);
+    }
+
     @PostMapping("/deleteReplicatedFile")
     public void deleteReplicatedFile(@RequestBody Map<String, Object> request) throws UnknownHostException {
 
