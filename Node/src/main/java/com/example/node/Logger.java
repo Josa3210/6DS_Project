@@ -66,12 +66,12 @@ public class Logger {
                 String jsonContent = new String(Files.readAllBytes(Paths.get(this.filePath)));
                 this.nodeMap = new JSONArray(jsonContent);
 
-                System.out.println("Map loaded from file: " + filePath);
+                System.out.println("^^^^Map loaded successfully");
 
             } else {
                 // Create a new file if it doesn't exist
                 if (file.createNewFile()) {
-                    System.out.println("File does not exist. Initializing an empty file: " + fileName);
+                    System.out.println("^^^^File does not exist. Initializing an empty file: " + fileName);
                     nodeMap = new JSONArray();
 
                     // Save the empty hashmap
@@ -79,7 +79,7 @@ public class Logger {
                 }
             }
         } catch (IOException e) {
-            System.err.println("Error loading hashmap from file: " + e.getMessage());
+            System.err.println("^^^^Error loading hashmap from file: " + e.getMessage());
             nodeMap = new JSONArray();
         }
     }
@@ -106,9 +106,9 @@ public class Logger {
             // Rename temp file
             tempFile.renameTo(loggerFile);
 
-            System.out.println("Map saved to file: " + filePath);
+            System.out.println("^^^^Map saved");
         } catch (IOException e) {
-            System.err.println("Error saving map to file: " + e.getMessage());
+            System.err.println("^^^^Error saving map: " + e.getMessage());
         }
     }
 

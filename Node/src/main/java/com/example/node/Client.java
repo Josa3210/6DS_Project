@@ -114,7 +114,7 @@ public class Client implements I_Client {
                 size -= bytes; // read upto file size
             }
             // Here we received file
-            System.out.println("File is Received");
+            System.out.println("^^^^File is Received");
             fileOutputStream.close();
             this.serverSocket.close();
         } catch (IOException e1) {
@@ -141,7 +141,7 @@ public class Client implements I_Client {
                 dataOutputStream.flush();
             }
             // close the file here
-            System.out.println("File was sent");
+            System.out.println("^^^^File was sent");
             fileInputStream.close();
             clientSocket.close();
         } catch (IOException e1) {
@@ -546,13 +546,12 @@ public class Client implements I_Client {
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("filename", filename);
         requestBody.put("filepath", filePath);
-        System.out.println(filePath);
         requestBody.put("ip", currentIP);
         requestBody.put("ID", nextID);
-        System.out.println("prev: " + prevID + ", current ID: " + currentID + "next ID " + nextID);
 
         // Make an HTTP POST request to report the hash value
         RestTemplate restTemplate = new RestTemplate();
+        System.out.println("^^^^Sending request to: " + postUrl);
         ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestBody, Void.class);
 
         if (responseEntity.getStatusCode().is2xxSuccessful()) System.out.println("Hash value reported to naming server for file: " + filename);
@@ -560,21 +559,37 @@ public class Client implements I_Client {
     }
 
     public void sendReplicatedFile(Inet4Address originalIP, String filepath) throws IOException {
+        // Create socket for TCP
         this.serverSocket = new ServerSocket(5000);
+
+        // Prepare Post
         String url = "http://" + originalIP.getHostAddress() + ":8080/OpenTCPConnection";
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         Map<String, Object> requestBody = new HashMap<>();
+
+        // Set IP to which the node needs to send
         requestBody.put("replicated ip", InetAddress.getLocalHost().getHostAddress());
-        String completed = String.valueOf(restTemplate.postForEntity(url, requestBody, String.class));
-        System.out.println(completed);
+
+        // Sending request
+        System.out.println("^^^^Sending request to: " + url);
+        restTemplate.postForEntity(url, requestBody, String.class);
+
+        // Accept connection with other node
         this.clientSocket = this.serverSocket.accept();
         DataInputStream dataInputStream = new DataInputStream(this.clientSocket.getInputStream());
+
+        // Prepare request
         url = "http://" + originalIP.getHostAddress() + ":8080/StartFileTransfer";
         requestBody.clear();
         requestBody.put("filepath", filepath);
+
+        // Send request
+        System.out.println("^^^^Sending request to: " + url);
         restTemplate.postForEntity(url, requestBody, Void.class);
+
+        // Get ready to receive file
         this.ReceiveFile(filepath, dataInputStream);
     }
 

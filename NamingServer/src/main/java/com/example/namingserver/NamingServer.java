@@ -332,12 +332,9 @@ public class NamingServer implements I_NamingServer
         // Create the request entity with headers and body
         HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
 
-        System.out.println("original IP: " + originalIP + "; replicated IP: " + replicatedIP);
-
         // Check if the node itself is not the replication node
         if(originalIP.getHostAddress().equals(replicatedIP.getHostAddress())){
-            System.out.println("Replicated ip = original IP");
-            System.out.println("next ID: " + nextID);
+            System.out.println("^^^^Replicated ip = original IP. next ID: " + nextID);
             replicatedIP = getIP(nextID);}
 
         String postUrl = "http://" + replicatedIP.getHostAddress() + ":8080/isReplicatedNode";
@@ -346,11 +343,8 @@ public class NamingServer implements I_NamingServer
             // Send the POST request
             requestBody.put("original ip", originalIP);
             requestBody.put("filepath", filePath);
-            System.out.println("filepath: " + filePath);
 
-            System.out.println("ID of the replicated node: " + replicatedIP.getHostAddress());
-            System.out.println(originalIP.getHostAddress());
-
+            System.out.println("^^^^Sending request to: " + postUrl);
             ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
             HttpStatusCode statusCode = responseEntity.getStatusCode();
 

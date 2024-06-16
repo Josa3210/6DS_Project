@@ -80,10 +80,8 @@ public class RestControllerDiscAndBoot {
     @PostMapping("/isReplicatedNode")
     public void isReplicatedNode(@RequestBody Map<String, Object> request) throws IOException {
 
-        Integer fileHash = Integer.parseInt(request.get("hashValue").toString());
-        String filepath = (String) request.get("filepath");
+       String filepath = (String) request.get("filepath");
         Inet4Address ip = (Inet4Address) InetAddress.getByName((String) request.get("original ip"));
-        System.out.println("This is the replicated node for file: " + fileHash);
         client.sendReplicatedFile(ip, filepath);
     }
 

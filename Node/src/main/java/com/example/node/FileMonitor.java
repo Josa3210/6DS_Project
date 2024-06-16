@@ -58,17 +58,13 @@ public class FileMonitor implements Runnable {
                 String filepath = file.getPath();
 
                 if (!filename.endsWith(".swp")) {
-                    System.out.println("\nFile created: " + filename);
+                    System.out.println("^^^^File created: " + filename);
                     int hash = client.computeHash(filename);
-
-                    System.out.println("hash: " + hash + " current IP: " + client.getCurrentIP());
 
                     // Add file to the client logger
                     System.out.println("^^^^Putting file in logger");
                     logger.put(hash, filename);
-                    System.out.println("^^^^Putting Original in logger");
                     logger.putOriginal(hash,client.currentID, client.getCurrentIP());
-                    System.out.println("^^^^Save logger");
                     logger.save();
 
                     // Add file to the file list
