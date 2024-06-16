@@ -598,6 +598,8 @@ public class Client implements I_Client {
             ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
             HttpStatusCode statusCode = responseEntity.getStatusCode();
 
+            System.out.println("^^^^Putting new owner in logger");
+            System.out.println("ID: " + locationString[0] + ", IP: " + locationString[1]);
             logger.putOwner(computeHash(filename), Integer.parseInt(locationString[0]),locationString[1]);
 
             if (statusCode == HttpStatus.OK) {

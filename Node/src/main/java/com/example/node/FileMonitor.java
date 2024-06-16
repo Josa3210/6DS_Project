@@ -66,7 +66,7 @@ public class FileMonitor implements Runnable {
 
                     if (!client.isReceivedFile) { // if the file is locally made, we let the namingserver know
                         // Add file to the client logger
-                        System.out.println("^^^^Putting file in logger");
+                        System.out.println("^^^^Putting file and original in logger");
                         logger.put(hash, filename);
                         logger.putOriginal(hash,client.currentID, client.getCurrentIP());
                         client.createReplicatedFile(file.getName(), filepath);
