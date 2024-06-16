@@ -521,22 +521,47 @@ public class Client implements I_Client {
 
     @Override
     public void deleteReplicatedFile(String filename, String filePath) {
-        // Prepare the URL for reporting the hash value to the naming server
-        String postUrl = "http://" + namingServerIP + ":8080/ns/deleteReplicatedFile";
-        Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("filename", filename);
-        requestBody.put("filepath", filePath);
-        System.out.println(filePath);
-        requestBody.put("ip", currentIP);
-        requestBody.put("ID", nextID);
-        System.out.println("prev: " + prevID + ", current ID: " + currentID + "next ID " + nextID);
+        // Prepare url
+        String getUrl = "http://" + namingServerIP + ":8080/ns/getLocation/" + filename;
 
-        // Make an HTTP POST request to report the hash value
+        // Get the ip of replicated node
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestBody, Void.class);
+        ResponseEntity<String[]> response = restTemplate.getForEntity(getUrl, String[].class);
+        String[] locationString = response.getBody();
+        String replicatedIP = locationString[1];
 
-        if (responseEntity.getStatusCode().is2xxSuccessful()) System.out.println("Hash value reported to naming server for file: " + filename);
-        else System.err.println("Failed to report hash value to naming server for file: " + filename);
+        if (Objects.equals(getCurrentIP(), replicatedIP)) {
+            getUrl = "http://" + namingServerIP + ":8080/ns/getIp/" + getNextID();
+            ResponseEntity<String> response2 = restTemplate.getForEntity(getUrl, String.class);
+            replicatedIP = response2.getBody();
+        }
+        String postUrl = "http://" + replicatedIP + ":8080/deleteReplicatedFile";
+
+        // Create the request body
+        Map<String, Object> requestBody = new HashMap<>();
+        HttpHeaders headers = new HttpHeaders();
+
+        // Create the request entity with headers and body
+        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
+
+        try{
+            // Send the POST request with the replicated IP --> it becomes the new 'original' IP
+            requestBody.put("filename", filename);
+            requestBody.put("filepath", filePath);
+
+            ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
+            HttpStatusCode statusCode = responseEntity.getStatusCode();
+
+            if (statusCode == HttpStatus.OK) {
+                System.out.println("Succesfully removed file: " + filePath + "\\" + filename + " from " + replicatedIP);
+            } else {
+                System.err.println("Sending node list failed with status code: " + statusCode);
+            }
+        } catch (RestClientException e) {
+            System.err.println("Failed to send node list to " + replicatedIP + ": " + e.getMessage());
+        }
+
+
     }
 
     @Override

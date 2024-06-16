@@ -54,30 +54,6 @@ public class RestControllerNS
     public int[] GiveLinkID(@PathVariable("id") int id) {
         return namingServer.giveLinkIds(id);
     }
-
-
-    /**
-     * Reports the hash of a newly created file on the node and calculates if there are replicated nodes
-     *
-     * @param requestBody the JSON request body with "ip" as ip address
-     */
-
-    @PostMapping("/ns/deleteReplicatedFile")
-    public void deleteReplicatedFile(@RequestBody Map<String, Object> requestBody) throws UnknownHostException {
-
-        // Check if the file name does not end with .swp --> temporary files!
-        String filename = (String) requestBody.get("filename");
-        if (!filename.endsWith(".swp")) {
-            String filepath = (String) requestBody.get("filepath");
-            String ipAddressString = (String) requestBody.get("ip");
-            Inet4Address originalIP = (Inet4Address) InetAddress.getByName(ipAddressString);
-            Integer nextID = (Integer) requestBody.get("ID");
-
-            System.out.println("filepath received: " + filepath);
-
-            namingServer.deleteReplicatedFile(filename, filepath, originalIP, nextID);
-        }
-    }
     
     @GetMapping("/ns/getLocation/{filename}")
     public String[] getLocation(@PathVariable("filename") String filename) {
@@ -91,21 +67,6 @@ public class RestControllerNS
             return response;
         }
         return response;
-    }
-
-    @PostMapping("/ns/createReplicatedFile")
-    public void createReplicatedFile(@RequestBody Map<String, Object> requestBody) throws UnknownHostException {
-
-        // Check if the file name does not end with .swp --> temporary files!
-        String filename = (String) requestBody.get("filename");
-        if (!filename.endsWith(".swp")) {
-            String filepath = (String) requestBody.get("filepath");
-            Inet4Address originalIP  = (Inet4Address) InetAddress.getByName((String) requestBody.get("ip"));
-            Integer nextID = (Integer) requestBody.get("id");
-
-            System.out.println("^^^^Received file: " + filepath);
-            namingServer.replicate(filename, filepath, originalIP, nextID);
-        }
     }
 
     @PostMapping("ns/shutdown")
