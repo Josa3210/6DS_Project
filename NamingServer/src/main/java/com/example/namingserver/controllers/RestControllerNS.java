@@ -78,6 +78,20 @@ public class RestControllerNS
             namingServer.deleteReplicatedFile(filename, filepath, originalIP, nextID);
         }
     }
+    
+    @GetMapping("/ns/getLocation/{filename}")
+    public String[] getLocation(@PathVariable("filename") String filename) {
+        String[] response = new String[2];
+        // Check if the file name does not end with .swp --> temporary files!
+        if (!filename.endsWith(".swp")) {
+            int replicatedID = namingServer.getFileOwner(filename);
+            Inet4Address replicatedIP = namingServer.getIP(replicatedID);
+            
+            response = new String[]{String.valueOf(replicatedID), replicatedIP.getHostAddress()};
+            return response;
+        }
+        return response;
+    }
 
     @PostMapping("/ns/createReplicatedFile")
     public void createReplicatedFile(@RequestBody Map<String, Object> requestBody) throws UnknownHostException {

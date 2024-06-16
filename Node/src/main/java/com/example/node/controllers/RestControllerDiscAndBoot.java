@@ -76,7 +76,8 @@ public class RestControllerDiscAndBoot {
 
        String filepath = (String) request.get("filepath");
         Inet4Address ip = (Inet4Address) InetAddress.getByName((String) request.get("original ip"));
-        client.sendReplicatedFile(ip, filepath);
+        int id = (int) request.get("original id");
+        client.sendReplicatedFile(ip, id, filepath);
     }
 
     @PostMapping("/deleteReplicatedFile")

@@ -337,25 +337,7 @@ public class NamingServer implements I_NamingServer
             System.out.println("^^^^Replicated ip = original IP. next ID: " + nextID);
             replicatedIP = getIP(nextID);}
 
-        String postUrl = "http://" + replicatedIP.getHostAddress() + ":8080/isReplicatedNode";
 
-        try {
-            // Send the POST request
-            requestBody.put("original ip", originalIP);
-            requestBody.put("filepath", filePath);
-
-            System.out.println("^^^^Sending request to: " + postUrl);
-            ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
-            HttpStatusCode statusCode = responseEntity.getStatusCode();
-
-            if (statusCode == HttpStatus.OK) {
-                System.out.println("Successfully replicated file ("+filename+") to " + replicatedIP);
-            } else {
-                System.err.println("Sending node list failed with status code: " + statusCode);
-            }
-        } catch (RestClientException e) {
-            System.err.println("Failed to send node list to " + replicatedIP + ": " + e.getMessage());
-        }
 
     }
 

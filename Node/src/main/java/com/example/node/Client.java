@@ -6,8 +6,10 @@ import com.hazelcast.cluster.MembershipListener;
 import com.hazelcast.config.*;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.spi.exception.RestClientException;
 import jakarta.annotation.PostConstruct;
 import org.springframework.http.*;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestTemplate;
 
@@ -16,10 +18,7 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.io.*;
 import java.net.*;
 
@@ -543,23 +542,49 @@ public class Client implements I_Client {
     @Override
     public void createReplicatedFile(String filename, String filePath) {
         // Prepare the URL for reporting the hash value to the naming server
-        String postUrl = "http://" + namingServerIP + ":8080/ns/createReplicatedFile";
-        Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("filename", filename);
-        requestBody.put("filepath", filePath);
-        requestBody.put("ip", currentIP);
-        requestBody.put("id", nextID);
+        String getUrl = "http://" + namingServerIP + ":8080/ns/getLocation/" + filename;
 
-        // Make an HTTP POST request to report the hash value
+        // Get the ip of replicated node
         RestTemplate restTemplate = new RestTemplate();
-        System.out.println("^^^^Sending request to: " + postUrl);
-        ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestBody, Void.class);
+        ResponseEntity<String[]> response = restTemplate.getForEntity(getUrl, String[].class);
+        String[] locationString = response.getBody();
+        String replicatedIP = locationString[1];
 
-        if (responseEntity.getStatusCode().is2xxSuccessful()) System.out.println("Hash value reported to naming server for file: " + filename);
-        else System.err.println("Failed to report hash value to naming server for file: " + filename);
+        if (Objects.equals(getCurrentIP(), replicatedIP)) {
+            getUrl = "http://" + namingServerIP + ":8080/ns/getIp/" + getNextID();
+            ResponseEntity<String> response2 = restTemplate.getForEntity(getUrl, String.class);
+            replicatedIP = response2.getBody();
+        }
+
+        String postUrl = "http://" + replicatedIP + ":8080/isReplicatedNode";
+        HttpHeaders headers = new HttpHeaders();
+        // Create the request body
+        Map<String, Object> requestBody = new HashMap<>();
+        // Create the request entity with headers and body
+        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
+
+        try {
+            // Send the POST request
+            requestBody.put("original ip", getCurrentIP());
+            requestBody.put("original id", getCurrentID());
+            requestBody.put("filepath", filePath);
+
+            System.out.println("^^^^Sending request to: " + postUrl);
+            ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
+            HttpStatusCode statusCode = responseEntity.getStatusCode();
+
+            if (statusCode == HttpStatus.OK) {
+                System.out.println("Successfully replicated file (" + filename + ") to " + replicatedIP);
+                logger.putOwner(computeHash(filename), Integer.parseInt(locationString[0]),locationString[1]);
+            } else {
+                System.err.println("Sending node list failed with status code: " + statusCode);
+            }
+        } catch (RestClientException e) {
+            System.err.println("Failed to send node list to " + replicatedIP + ": " + e.getMessage());
+        }
     }
 
-    public void sendReplicatedFile(Inet4Address originalIP, String filepath) throws IOException {
+    public void sendReplicatedFile(Inet4Address originalIP, int originalId, String filepath) throws IOException {
         // Create socket for TCP
         this.serverSocket = new ServerSocket(5000);
 
@@ -596,9 +621,9 @@ public class Client implements I_Client {
         // Put in logger
         String filename = String.valueOf(Paths.get(filepath).getFileName());
         int hash = computeHash(filename);
-        logger.put(hash,filename);
-        logger.putOwner(hash,getCurrentID(),getCurrentIP());
-        logger.putOriginal(hash,-1,originalIP.getHostAddress());
+        logger.put(hash, filename);
+        logger.putOwner(hash, getCurrentID(), getCurrentIP());
+        logger.putOriginal(hash, originalId, originalIP.getHostAddress());
     }
 
     @Override
