@@ -548,7 +548,7 @@ public class Client implements I_Client {
         requestBody.put("filename", filename);
         requestBody.put("filepath", filePath);
         requestBody.put("ip", currentIP);
-        requestBody.put("Id", nextID);
+        requestBody.put("id", nextID);
 
         // Make an HTTP POST request to report the hash value
         RestTemplate restTemplate = new RestTemplate();

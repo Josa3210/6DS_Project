@@ -86,9 +86,8 @@ public class RestControllerNS
         String filename = (String) requestBody.get("filename");
         if (!filename.endsWith(".swp")) {
             String filepath = (String) requestBody.get("filepath");
-            String ipAddressString = (String) requestBody.get("ip");
-            Inet4Address originalIP = (Inet4Address) InetAddress.getByName(ipAddressString);
-            Integer nextID = (Integer) requestBody.get("Id");
+            Inet4Address originalIP  = (Inet4Address) InetAddress.getByName((String) requestBody.get("ip"));
+            Integer nextID = (Integer) requestBody.get("id");
 
             System.out.println("^^^^Received file: " + filepath);
             namingServer.replicate(filename, filepath, originalIP, nextID);
