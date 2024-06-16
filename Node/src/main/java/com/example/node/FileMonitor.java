@@ -69,7 +69,6 @@ public class FileMonitor implements Runnable {
                         System.out.println("^^^^Putting file in logger");
                         logger.put(hash, filename);
                         logger.putOriginal(hash,client.currentID, client.getCurrentIP());
-                        logger.save();
                         client.createReplicatedFile(file.getName(), filepath);
                     }
                 }

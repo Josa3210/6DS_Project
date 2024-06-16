@@ -598,9 +598,11 @@ public class Client implements I_Client {
             ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
             HttpStatusCode statusCode = responseEntity.getStatusCode();
 
+            logger.putOwner(computeHash(filename), Integer.parseInt(locationString[0]),locationString[1]);
+
             if (statusCode == HttpStatus.OK) {
                 System.out.println("Successfully replicated file (" + filename + ") to " + replicatedIP);
-                logger.putOwner(computeHash(filename), Integer.parseInt(locationString[0]),locationString[1]);
+
             } else {
                 System.err.println("Sending node list failed with status code: " + statusCode);
             }
