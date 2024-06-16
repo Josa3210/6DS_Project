@@ -1,7 +1,6 @@
 package com.example.node.controllers;
 
 import com.example.node.Client;
-import com.example.node.Logger;
 import com.hazelcast.config.Config;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
@@ -17,7 +16,6 @@ import java.net.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 @RestController
 public class RestControllerDiscAndBoot {
@@ -77,7 +75,7 @@ public class RestControllerDiscAndBoot {
        String filepath = (String) request.get("filepath");
         Inet4Address ip = (Inet4Address) InetAddress.getByName((String) request.get("original ip"));
         int id = (int) request.get("original id");
-        client.sendReplicatedFile(ip, id, filepath);
+        client.receiveReplicatedFile(ip, id, filepath);
     }
 
     @PostMapping("/deleteReplicatedFile")
@@ -90,8 +88,9 @@ public class RestControllerDiscAndBoot {
         try {
             client.isReplicatedFile = true;
             Files.delete(Path.of(filepath));
-            client.getLogger().remove(filename);
-            System.out.println("File entry deleted successfully");
+            if(client.getLogger().remove(filename)){
+                System.out.println("File entry deleted successfully");
+            }
 
         } catch (IOException e) {
             System.out.println("File entry cannot be deleted successfully .");

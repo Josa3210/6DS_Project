@@ -2,6 +2,7 @@ package com.example.node;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.bouncycastle.pqc.jcajce.provider.Falcon;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -196,7 +197,7 @@ public class Logger {
     /**
      * Removes an entry from the logger
      */
-    public void remove(int hash) {
+    public boolean remove(int hash) {
         if (nodeMap != null) {
             for (int i = 0; i < nodeMap.length(); i++) {
                 JSONObject obj = nodeMap.getJSONObject(i);
@@ -204,19 +205,20 @@ public class Logger {
                 if (id == hash) {
                     nodeMap.remove(i);
                     save();
-                    return;
+                    return true;
                 }
             }
             System.err.println("Node not in nodeMap");
         } else {
             System.err.println("Hashmap is not initialized. Please load the hashmap first.");
         }
+        return false;
     }
 
     /**
      * Removes an entry from the logger
      */
-    public void remove(String filename) {
+    public boolean remove(String filename) {
         if (nodeMap != null) {
             for (int i = 0; i < nodeMap.length(); i++) {
                 JSONObject obj = nodeMap.getJSONObject(i);
@@ -224,13 +226,14 @@ public class Logger {
                 if (Objects.equals(id, filename)) {
                     nodeMap.remove(i);
                     save();
-                    return;
+                    return true;
                 }
             }
             System.err.println("Node not in nodeMap");
         } else {
             System.err.println("Hashmap is not initialized. Please load the hashmap first.");
         }
+        return false;
     }
 
     public JSONArray getNodeMap() {

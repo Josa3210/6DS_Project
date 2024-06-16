@@ -560,8 +560,6 @@ public class Client implements I_Client {
         } catch (RestClientException e) {
             System.err.println("Failed to send node list to " + replicatedIP + ": " + e.getMessage());
         }
-
-
     }
 
     @Override
@@ -613,7 +611,7 @@ public class Client implements I_Client {
         }
     }
 
-    public void sendReplicatedFile(Inet4Address originalIP, int originalId, String filepath) throws IOException {
+    public void receiveReplicatedFile(Inet4Address originalIP, int originalId, String filepath) throws IOException {
         // Create socket for TCP
         this.serverSocket = new ServerSocket(5000);
 

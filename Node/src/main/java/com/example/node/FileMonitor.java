@@ -1,5 +1,3 @@
-
-
 package com.example.node;
 
 import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
@@ -19,10 +17,9 @@ import java.util.Arrays;
 
 /**
  * This class represents a task for monitoring file system changes in the specified Files directory.
- *
+ * <p>
  * It implements the Runnable interface to be executed in a separate thread.
-
-**/
+ **/
 
 public class FileMonitor implements Runnable {
 
@@ -68,7 +65,7 @@ public class FileMonitor implements Runnable {
                         // Add file to the client logger
                         System.out.println("^^^^Putting file and original in logger");
                         logger.put(hash, filename);
-                        logger.putOriginal(hash,client.currentID, client.getCurrentIP());
+                        logger.putOriginal(hash, client.currentID, client.getCurrentIP());
                         client.createReplicatedFile(file.getName(), filepath);
                     }
                 }
@@ -92,16 +89,19 @@ public class FileMonitor implements Runnable {
                     String originalIP = String.valueOf(originalJSON.get("IP"));
                     String currentIP = client.getCurrentIP();
 
-                    if (originalIP.equals(currentIP) & !client.isReplicatedFile) // we check if the original IP of the file = current IP
+                    if (originalIP.equals(currentIP) & !client.isReplicatedFile) { // we check if the original IP of the file = current IP
 
                         // if this is the case, the current IP is the IP where the file got downloaded, so we need to make
                         // sure that the naming server gets noted about this so it can remove the replicated files too.
-                        client.deleteReplicatedFile(filename, filepath); // Operation 2 --> file DELETE on replicated node
+                        client.deleteReplicatedFile(filename, filepath);
 
-                    client.getFileList().removeIf(entry -> filename.equals(entry.getFilename()));
-                    // Remove the hash from the logger.
-                    client.getLogger().removeOriginal(hash);
-                    client.getLogger().save();
+                        if(client.getLogger().remove(hash)){
+                            System.out.println("^^^^Succesfully deleted file from logger");
+                        }
+                        // Remove the hash from the logger.
+                        client.getFileList().removeIf(entry -> filename.equals(entry.getFilename()));
+                    }
+
                 }
                 client.isReplicatedFile = false;
             }

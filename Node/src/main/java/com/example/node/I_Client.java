@@ -110,7 +110,7 @@ public interface I_Client {
 
     void createReplicatedFile(String filename, String filePath);
 
-    void sendReplicatedFile(Inet4Address originalIP, int originalId, String filepath) throws IOException;
+    void receiveReplicatedFile(Inet4Address originalIP, int originalId, String filepath) throws IOException;
 
     int getCurrentID();
 }
