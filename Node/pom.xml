@@ -92,13 +92,7 @@
             <artifactId>commons-io</artifactId>
             <version>2.16.1</version>
         </dependency>
-
-        <dependency>
-            <groupId>com.gitlab.jade-project</groupId>
-            <artifactId>jade</artifactId>
-            <version>master-m4.5.3-g165fec3-1</version>
-        </dependency>
-
+        
     </dependencies>
 
     <build>
