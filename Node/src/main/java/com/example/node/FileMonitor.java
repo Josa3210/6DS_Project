@@ -61,16 +61,15 @@ public class FileMonitor implements Runnable {
                     System.out.println("^^^^File created: " + filename);
                     int hash = client.computeHash(filename);
 
-                    // Add file to the client logger
-                    System.out.println("^^^^Putting file in logger");
-                    logger.put(hash, filename);
-                    logger.putOriginal(hash,client.currentID, client.getCurrentIP());
-                    logger.save();
-
                     // Add file to the file list
                     client.getFileList().add(new NodeFileEntry(filename));
 
                     if (!client.isReceivedFile) { // if the file is locally made, we let the namingserver know
+                        // Add file to the client logger
+                        System.out.println("^^^^Putting file in logger");
+                        logger.put(hash, filename);
+                        logger.putOriginal(hash,client.currentID, client.getCurrentIP());
+                        logger.save();
                         client.createReplicatedFile(file.getName(), filepath);
                     }
                 }
