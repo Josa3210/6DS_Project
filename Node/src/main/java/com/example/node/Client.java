@@ -548,7 +548,7 @@ public class Client implements I_Client {
         requestBody.put("filename", filename);
         requestBody.put("filepath", filePath);
         requestBody.put("ip", currentIP);
-        requestBody.put("ID", nextID);
+        requestBody.put("Id", nextID);
 
         // Make an HTTP POST request to report the hash value
         RestTemplate restTemplate = new RestTemplate();
@@ -596,7 +596,9 @@ public class Client implements I_Client {
         // Put in logger
         String filename = String.valueOf(Paths.get(filepath).getFileName());
         int hash = computeHash(filename);
+        logger.put(hash,filename);
         logger.putOwner(hash,getCurrentID(),getCurrentIP());
+        logger.putOriginal(hash,-1,originalIP.getHostAddress());
     }
 
     @Override
