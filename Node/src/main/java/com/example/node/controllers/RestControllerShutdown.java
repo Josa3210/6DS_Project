@@ -59,7 +59,8 @@ public class RestControllerShutdown {
                 RestTemplate restTemplate = new RestTemplate();
                 String url = "http://" + newReplicatedIP + ":8080/isReplicatedNode";
                 Map<String, Object> bodyNewReplicated = new HashMap<>();
-                bodyNewReplicated.put("originalIP", client.getCurrentIP());
+                bodyNewReplicated.put("original ip", client.getCurrentIP());
+                bodyNewReplicated.put("original id", client.getCurrentID());
                 bodyNewReplicated.put("filepath", client.folderPath+"/"+filename);
                 restTemplate.postForEntity(url, bodyNewReplicated, Void.class);
 
