@@ -19,7 +19,7 @@ public class FailureAgent implements Runnable {
     private final int failedID;
     private final int callingID;
     private final String namingServerIP;
-    private final Agent failureAgent;
+    private JSONArray fileList;
     private String fileDirectory;
     private Logger logger;
 
@@ -30,12 +30,12 @@ public class FailureAgent implements Runnable {
         this.callingID = callingID;
         this.namingServerIP = namingServerIP;
         this.fileDirectory = null;
-        this.failureAgent = new Agent();
     }
 
     public boolean activateAgent(int currentID, Logger logger, String fileDirectory) {
         this.logger = logger;
         this.fileDirectory = fileDirectory;
+        this.fileList = logger.getFileArray();
         Thread agentThread = new Thread(this);
         agentThread.start();
         return currentID != callingID;
@@ -44,101 +44,80 @@ public class FailureAgent implements Runnable {
     @Override
     public void run() {
         System.out.println(">> Trying to start behaviour");
-        FailureAgentBehaviour behaviour = new FailureAgentBehaviour( this.failedID, this.logger, this.namingServerIP, this.fileDirectory);
-        this.failureAgent.addBehaviour(behaviour);
-    }
+        RestTemplate restTemplate = new RestTemplate();
+        System.out.println("=> FailureAgent: starting action");
+        // Check for all files if the failed node is the owner
+        for (int i = 0; i < fileList.length(); i++) {
+            // Get filename and file owner
+            JSONObject obj = fileList.getJSONObject(i);
+            String filename = (String) obj.get("filename");
+            int ownerID = getOwnerID(filename);
 
-    public static class FailureAgentBehaviour extends OneShotBehaviour {
-        private final JSONArray fileList;
-        private final int failedID;
-        private final String namingServerIP;
-        private final Logger logger;
-        private final String fileDirectory;
+            System.out.println("- Owner of file " + filename + " : " + ownerID);
+            if (ownerID == this.failedID) {
+                // Extract information from logger
+                int fileHash = obj.getInt("hash");
+                JSONObject original = obj.getJSONObject("original");
+                String originalIP = original.getString("IP");
+                int originalID = original.getInt("ID");
 
+                // Search new owner
+                String[] replicatedLocation = requestNewOwner(filename);
+                String replicationIP = replicatedLocation[1];
+                int replicatedID = Integer.parseInt(replicatedLocation[0]);
 
-        public FailureAgentBehaviour(int failedID, Logger logger, String namingServerIP, String fileDirectory) {
-            this.fileList = logger.getFileArray();
-            this.failedID = failedID;
-            this.namingServerIP = namingServerIP;
-            this.logger = logger;
-            this.fileDirectory = fileDirectory;
-        }
+                // Send that it is the new replicated node
+                String postUrl = "http://" + replicationIP + ":8080/isReplicatedNode";
+                HttpHeaders headers = new HttpHeaders();
+                Map<String, Object> requestBody = new HashMap<>();
+                HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
 
-        @Override
-        public void action() {
-            RestTemplate restTemplate = new RestTemplate();
-            System.out.println("=> FailureAgent: starting action");
-            // Check for all files if the failed node is the owner
-            for (int i = 0; i < fileList.length(); i++) {
-                // Get filename and file owner
-                JSONObject obj = fileList.getJSONObject(i);
-                String filename = (String) obj.get("filename");
-                int ownerID = getOwnerID(filename);
+                try {
+                    // Send the POST request
+                    requestBody.put("original ip", originalIP);
+                    requestBody.put("original id", originalID);
+                    requestBody.put("filepath", this.fileDirectory + "/" + filename);
 
-                System.out.println("- Owner of file " + filename + " : " + ownerID);
-                if (ownerID == this.failedID) {
-                    // Extract information from logger
-                    int fileHash = obj.getInt("hash");
-                    JSONObject original = obj.getJSONObject("original");
-                    String originalIP = original.getString("IP");
-                    int originalID = original.getInt("ID");
+                    System.out.println("- Sending request to: " + postUrl);
+                    ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
+                    HttpStatusCode statusCode = responseEntity.getStatusCode();
 
-                    // Search new owner
-                    String[] replicatedLocation = requestNewOwner(filename);
-                    String replicationIP = replicatedLocation[1];
-                    int replicatedID = Integer.parseInt(replicatedLocation[0]);
+                    System.out.println("- Putting new owner in logger");
+                    logger.putOwner(fileHash, replicatedID, replicationIP);
 
-                    // Send that it is the new replicated node
-                    String postUrl = "http://" + replicationIP + ":8080/isReplicatedNode";
-                    HttpHeaders headers = new HttpHeaders();
-                    Map<String, Object> requestBody = new HashMap<>();
-                    HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
+                    if (statusCode == HttpStatus.OK) {
+                        System.out.println("!!Successfully replicated file (" + filename + ") to " + replicationIP);
 
-                    try {
-                        // Send the POST request
-                        requestBody.put("original ip", originalIP);
-                        requestBody.put("original id", originalID);
-                        requestBody.put("filepath", this.fileDirectory + "/" + filename);
-
-                        System.out.println("- Sending request to: " + postUrl);
-                        ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
-                        HttpStatusCode statusCode = responseEntity.getStatusCode();
-
-                        System.out.println("- Putting new owner in logger");
-                        logger.putOwner(fileHash, replicatedID, replicationIP);
-
-                        if (statusCode == HttpStatus.OK) {
-                            System.out.println("!!Successfully replicated file (" + filename + ") to " + replicationIP);
-
-                        } else {
-                            System.err.println("!!Sending node list failed with status code: " + statusCode);
-                        }
-                    } catch (NumberFormatException e) {
-                        throw new RuntimeException(e);
+                    } else {
+                        System.err.println("!!Sending node list failed with status code: " + statusCode);
                     }
-
+                } catch (NumberFormatException e) {
+                    throw new RuntimeException(e);
                 }
+
             }
         }
+    }
 
-        private int getOwnerID(String fileName) {
-            JSONObject obj = this.logger.get(fileName);
-            JSONObject owner = (JSONObject) obj.get("owner");
-            return (int) owner.get("ID");
-        }
 
-        private String[] requestNewOwner(String filename) {
-            // Get ip of the new replicated node
-            String getURL = "http://" + namingServerIP + ":8080/ns/getLocation/" + filename;
+    private int getOwnerID(String fileName) {
+        JSONObject obj = this.logger.get(fileName);
+        JSONObject owner = (JSONObject) obj.get("owner");
+        return (int) owner.get("ID");
+    }
 
-            // Make an HTTP GET request to report the hash value
-            RestTemplate restTemplate = new RestTemplate();
-            ResponseEntity<String[]> responseEntity = restTemplate.getForEntity(getURL, String[].class);
+    private String[] requestNewOwner(String filename) {
+        // Get ip of the new replicated node
+        String getURL = "http://" + namingServerIP + ":8080/ns/getLocation/" + filename;
 
-            return new String[]{responseEntity.getBody()[0], responseEntity.getBody()[1]};
-        }
+        // Make an HTTP GET request to report the hash value
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String[]> responseEntity = restTemplate.getForEntity(getURL, String[].class);
+
+        return new String[]{responseEntity.getBody()[0], responseEntity.getBody()[1]};
     }
 }
+
 
 
 
