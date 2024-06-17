@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.net.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Map;
 
 @RestController
@@ -97,14 +98,12 @@ public class RestControllerDiscAndBoot {
     public String OpenTCPConnection(@RequestBody Map<String, Object> request) throws IOException {
         String response;
         String ip = (String) request.get("replicated ip");
-        client.clientSocket = new Socket(ip, 5000);
-        if (client.clientSocket.isConnected()) {
-            response = "* Socket (" + ip + ", 5000) still connected";
-            System.out.println("* "+ response);
-        } else {
-            response = "TCP connection is established, ready for file transfer";
-            System.out.println("* "+ response);
+        try{
+            client.clientSocket = new Socket(ip, 5000);
+        } catch (ConnectException e){
+            System.err.println(Arrays.toString(e.getStackTrace()));
         }
+        response = "* Socket (" + ip + ", 5000) still connected";
         return response;
     }
 
