@@ -14,7 +14,7 @@ import java.util.Map;
 import static java.lang.Math.abs;
 import static java.util.Collections.max;
 
-public class FailureAgent implements Runnable{
+public class FailureAgent implements Runnable {
 
     private final int failedID;
     private final int callingID;
@@ -46,7 +46,6 @@ public class FailureAgent implements Runnable{
         System.out.println(">> Trying to start behaviour");
         FailureAgentBehaviour behaviour = new FailureAgentBehaviour( this.failedID, this.logger, this.namingServerIP, this.fileDirectory);
         this.failureAgent.addBehaviour(behaviour);
-        this.failureAgent.doActivate();
     }
 
     public static class FailureAgentBehaviour extends OneShotBehaviour {
