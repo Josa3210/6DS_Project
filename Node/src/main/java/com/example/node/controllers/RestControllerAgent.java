@@ -61,7 +61,8 @@ public class RestControllerAgent
 
                 System.out.println("Sending agent to " + newUrl);
                 Map<String, Object> requestBody = new HashMap<>();
-                requestBody.put("agent", agent);
+                requestBody.put("failedID", failedID);
+                requestBody.put("callingID", callingID);
 
                 RestTemplate restTemplate = new RestTemplate();
                 restTemplate.postForEntity(newUrl, requestBody, Void.class);
