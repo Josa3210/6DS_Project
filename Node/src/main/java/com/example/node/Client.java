@@ -605,7 +605,7 @@ public class Client implements I_Client {
     public void receiveFile(Inet4Address originalIP, String filepath) throws IOException {
         // Create socket for TCP
         this.serverSocket = new ServerSocket(5000);
-        
+
         // Prepare Post
         String url = "http://" + originalIP.getHostAddress() + ":8080/OpenTCPConnection";
         RestTemplate restTemplate = new RestTemplate();
@@ -652,10 +652,11 @@ public class Client implements I_Client {
             // Here we received file
             System.out.println("^^^^File is Received");
             fileOutputStream.close();
-            this.serverSocket.close();
+
         } catch (IOException e1) {
             System.err.println(e1.getMessage());
         }
+        this.serverSocket.close();
     }
 
     public void receiveReplicatedFile(Inet4Address originalIP, int originalId, String filepath) throws IOException {
