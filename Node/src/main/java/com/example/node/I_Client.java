@@ -113,4 +113,10 @@ public interface I_Client {
     void receiveReplicatedFile(Inet4Address originalIP, int originalId, String filepath) throws IOException;
 
     int getCurrentID();
+
+    void createFile(String arg);
+    
+    void deleteFile(String arg);
+
+    void printLogger();
 }

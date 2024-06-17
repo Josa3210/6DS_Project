@@ -34,7 +34,7 @@ public class Logger {
             load();
 
         } catch (IOException e) {
-            System.out.println("^^^^Error");
+            System.out.println(">> Error");
             System.err.println(e);
         }
     }
@@ -51,7 +51,7 @@ public class Logger {
      */
 
     public void load() {
-        System.out.println("^^^^Trying to load from: " + filePath);
+        System.out.println(">> Trying to load from: " + filePath);
         try {
             // Define a file from where the file should be
             File file = new File(filePath);
@@ -65,13 +65,13 @@ public class Logger {
             } else {
                 // Create a new file if it doesn't exist
                 if (file.createNewFile()) {
-                    System.out.println("^^^^File does not exist. Initializing an empty file: " + fileName);
+                    System.out.println(">> File does not exist. Initializing an empty file: " + fileName);
                     fileArray = new JSONArray();
                     save();
                 }
             }
         } catch (IOException e) {
-            System.err.println("^^^^Error loading hashmap from file: " + e.getMessage());
+            System.err.println(">> Error loading hashmap from file: " + e.getMessage());
             fileArray = new JSONArray();
         }
     }
@@ -106,7 +106,7 @@ public class Logger {
             // Rename temp file
             tempFile.renameTo(loggerFile);
         } catch (IOException e) {
-            System.err.println("^^^^Error saving map: " + e.getMessage());
+            System.err.println(">> Error saving map: " + e.getMessage());
         }
     }
 
@@ -173,7 +173,8 @@ public class Logger {
 
     /**
      * Adds the information of the owner (aka replicated node) of the file.
-     * @param id of the file that is replicated
+     *
+     * @param id      of the file that is replicated
      * @param ownerID ID of the owner
      * @param ownerIP IP of the owner
      */
@@ -186,7 +187,8 @@ public class Logger {
 
     /**
      * Adds the information of the original creator of the file.
-     * @param id of the file that is replicated
+     *
+     * @param id         of the file that is replicated
      * @param originalID ID of the original creator
      * @param originalIP IP of the original creator
      */
@@ -200,6 +202,7 @@ public class Logger {
     /**
      * Removes the file with the given hash from the JSONArray.
      * This method is used when a file is deleted.
+     *
      * @param hash of the file to be deleted
      * @return if the deletion has happened or not
      */
@@ -224,6 +227,7 @@ public class Logger {
     /**
      * Removes the file with the given hash from the JSONArray.
      * This method is used when a file is deleted.
+     *
      * @param filename of the file to be deleted
      * @return if the deletion has happened or not
      */
@@ -247,12 +251,41 @@ public class Logger {
 
     /**
      * Returns the JSONArray containing all the files
+     *
      * @return
      */
     public JSONArray getFileArray() {
         return fileArray;
     }
+
+    public String printLogger() {
+        StringBuilder str = new StringBuilder("""
+                Logger
+                ======================================
+                """);
+        for (int i = 0; i < fileArray.length(); i++) {
+            JSONObject obj = fileArray.getJSONObject(i);
+            String filename = (String) obj.get("filename");
+            int id = (int) obj.get("hash");
+            JSONObject owner = obj.getJSONObject("owner");
+            String ownerIP = owner.getString("IP");
+            int ownerID = (int) owner.getInt("ID");
+            JSONObject original = obj.getJSONObject("original");
+            String originalIP = original.getString("IP");
+            int originalID = (int) original.getInt("ID");
+            str.append("File: ").append(filename).append(", Hash: ").append(id).append("\n");
+            str.append("- Owner: ").append(ownerID).append(" (/").append(ownerIP).append(")\n");
+            str.append("- Original: ").append(originalID).append(" (/").append(originalIP).append(")\n");
+            str.append("--------------------------------------\n");
+        }
+        return str.toString();
+    }
 }
+
+
+
+
+
 
 
 

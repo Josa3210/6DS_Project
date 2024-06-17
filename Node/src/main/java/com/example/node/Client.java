@@ -11,6 +11,7 @@ import com.hazelcast.config.NetworkConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.spi.exception.RestClientException;
 import jakarta.annotation.PostConstruct;
+import org.json.JSONArray;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -452,7 +453,7 @@ public class Client implements I_Client {
 
         // Get ip from new next node
         int newNextID = nextID;
-        if (nextID == failedID){
+        if (nextID == failedID) {
             System.out.println(">> Getting new next node IP");
             int[] linkIds = requestLinkIds();
             newNextID = linkIds[1];
@@ -529,11 +530,13 @@ public class Client implements I_Client {
         ResponseEntity<String[]> response = restTemplate.getForEntity(getUrl, String[].class);
         String[] locationString = response.getBody();
         String replicatedIP = locationString[1];
+        int replicatedID = Integer.parseInt(locationString[0]);
 
         if (Objects.equals(getCurrentIP(), replicatedIP)) {
             getUrl = "http://" + namingServerIP + ":8080/ns/getIp/" + getNextID();
             ResponseEntity<String> response2 = restTemplate.getForEntity(getUrl, String.class);
             replicatedIP = response2.getBody();
+            replicatedID = getNextID();
         }
         String postUrl = "http://" + replicatedIP + ":8080/deleteReplicatedFile";
 
@@ -574,11 +577,14 @@ public class Client implements I_Client {
         ResponseEntity<String[]> response = restTemplate.getForEntity(getUrl, String[].class);
         String[] locationString = response.getBody();
         String replicatedIP = locationString[1];
+        int replicatedID = Integer.parseInt(locationString[0]);
 
+        System.out.println("* Current IP: " + getCurrentIP() +"= Replication IP: " + replicatedIP + "?");
         if (Objects.equals(getCurrentIP(), replicatedIP)) {
             getUrl = "http://" + namingServerIP + ":8080/ns/getIp/" + getNextID();
             ResponseEntity<String> response2 = restTemplate.getForEntity(getUrl, String.class);
             replicatedIP = response2.getBody();
+            replicatedID = getNextID();
         }
         System.out.println("* Replicated IP: " + replicatedIP);
 
@@ -598,8 +604,8 @@ public class Client implements I_Client {
             HttpStatusCode statusCode = responseEntity.getStatusCode();
 
             System.out.println(">> Putting new owner in logger");
-            System.out.println("ID: " + locationString[0] + ", IP: " + locationString[1]);
-            logger.putOwner(computeHash(filename), Integer.parseInt(locationString[0]), locationString[1]);
+            System.out.println("ID: " + replicatedID + ", IP: " + replicatedIP);
+            logger.putOwner(computeHash(filename), replicatedID, replicatedIP);
 
             if (statusCode == HttpStatus.OK) {
                 System.out.println("Successfully replicated file (" + filename + ") to " + replicatedIP);
@@ -693,6 +699,40 @@ public class Client implements I_Client {
     @Override
     public int getCurrentID() {
         return currentID;
+    }
+
+    @Override
+    public void createFile(String filename) {
+        System.out.println(">> Creating file: " + filename);
+        String filepath = folderPath + "/" + filename;
+        File file = new File(filepath);
+
+        try {
+            if (!file.exists()) {
+                file.createNewFile();
+                System.out.println(">> File created");
+            } else {
+                System.out.println(">> File already exists");
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void deleteFile(String filename) {
+        System.out.println(">> Deleting file: " + filename);
+        String filepath = folderPath + "/" + filename;
+        File file = new File(filepath);
+
+        if (file.exists()) {
+            file.delete();
+        }
+    }
+
+    @Override
+    public void printLogger(){
+        System.out.println(logger.printLogger());
     }
 
     public int getPrevID() {
