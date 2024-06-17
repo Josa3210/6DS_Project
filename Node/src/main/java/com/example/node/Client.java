@@ -603,6 +603,9 @@ public class Client implements I_Client {
     }
 
     public void receiveFile(Inet4Address originalIP, String filepath) throws IOException {
+        // Create socket for TCP
+        this.serverSocket = new ServerSocket(5000);
+        
         // Prepare Post
         String url = "http://" + originalIP.getHostAddress() + ":8080/OpenTCPConnection";
         RestTemplate restTemplate = new RestTemplate();
@@ -656,9 +659,6 @@ public class Client implements I_Client {
     }
 
     public void receiveReplicatedFile(Inet4Address originalIP, int originalId, String filepath) throws IOException {
-        // Create socket for TCP
-        this.serverSocket = new ServerSocket(5000);
-
         System.out.println("^^^Receiving replica of file " + filepath + "from " + originalId);
         // Check if the file is not already present
         File replica = new File(filepath);
