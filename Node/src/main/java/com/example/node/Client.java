@@ -90,29 +90,6 @@ public class Client implements I_Client {
         return config;
     }
 
-    public void ReceiveFile(String filepath, DataInputStream dataInputStream) {
-        try {
-            isReceivedFile = true;
-            int bytes = 0;
-            FileOutputStream fileOutputStream = new FileOutputStream(filepath);
-            long size = dataInputStream.readLong(); // read file size
-            byte[] buffer = new byte[4 * 1024];
-            while (size > 0 && (bytes = dataInputStream.read(buffer, 0, (int) Math.min(buffer.length, size))) != -1) {
-                // Here we write the file using write method
-                fileOutputStream.write(buffer, 0, bytes);
-                size -= bytes; // read upto file size
-            }
-            // Here we received file
-            System.out.println("^^^^File is Received");
-            fileOutputStream.close();
-            this.serverSocket.close();
-        } catch (IOException e1) {
-            System.err.println(e1.getMessage());
-        }
-
-    }
-
-
     public void SendFile(String filepath) {
         try {
             DataOutputStream dataOutputStream = new DataOutputStream(this.clientSocket.getOutputStream());
@@ -611,7 +588,7 @@ public class Client implements I_Client {
         }
     }
 
-    public void sendFile(Inet4Address originalIP, String filepath) throws IOException {
+    public void receiveFile(Inet4Address originalIP, String filepath) throws IOException {
         // Create socket for TCP
         this.serverSocket = new ServerSocket(5000);
 
@@ -642,13 +619,31 @@ public class Client implements I_Client {
         System.out.println("^^^^Sending request to: " + url);
         restTemplate.postForEntity(url, requestBody, Void.class);
 
+        System.out.println("^^^^Start receiving file");
         // Get ready to receive file
-        this.ReceiveFile(filepath, dataInputStream);
+        try {
+            isReceivedFile = true;
+            int bytes = 0;
+            FileOutputStream fileOutputStream = new FileOutputStream(filepath);
+            long size = dataInputStream.readLong(); // read file size
+            byte[] buffer = new byte[4 * 1024];
+            while (size > 0 && (bytes = dataInputStream.read(buffer, 0, (int) Math.min(buffer.length, size))) != -1) {
+                // Here we write the file using write method
+                fileOutputStream.write(buffer, 0, bytes);
+                size -= bytes; // read upto file size
+            }
+            // Here we received file
+            System.out.println("^^^^File is Received");
+            fileOutputStream.close();
+            this.serverSocket.close();
+        } catch (IOException e1) {
+            System.err.println(e1.getMessage());
+        }
     }
 
     public void receiveReplicatedFile(Inet4Address originalIP, int originalId, String filepath) throws IOException {
         // Download the file
-        sendFile(originalIP,filepath);
+        receiveFile(originalIP,filepath);
 
         // Put in logger
         String filename = String.valueOf(Paths.get(filepath).getFileName());
