@@ -60,8 +60,6 @@ public class Client implements I_Client {
             this.logger = new Logger(hostname); // We create a logger to keep track of the replication
             fileMonitorThread = new Thread(new FileMonitor(this));
             //Sync Agent
-            // Create socket for TCP
-            this.serverSocket = new ServerSocket(5000);
             System.out.println("^^^^Debugging Run Sync Agent in Client");
             //syncAgent = new SyncAgent(this);
             //syncAgent.run();
@@ -660,7 +658,7 @@ public class Client implements I_Client {
     public void receiveReplicatedFile(Inet4Address originalIP, int originalId, String filepath) throws IOException {
         // Create socket for TCP
         this.serverSocket = new ServerSocket(5000);
-        
+
         System.out.println("^^^Receiving replica of file " + filepath + "from " + originalId);
         // Check if the file is not already present
         File replica = new File(filepath);
