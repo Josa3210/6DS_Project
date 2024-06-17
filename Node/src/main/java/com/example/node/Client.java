@@ -57,8 +57,6 @@ public class Client implements I_Client {
             // We make a new logger file that keeps track of changes in the 'Files' map
             this.logger = new Logger(hostname); // We create a logger to keep track of the replication
             fileMonitorThread = new Thread(new FileMonitor(this));
-            fileMonitorThread.start();
-
             //Sync Agent
 
             System.out.println("^^^^Debugging Run Sync Agent in Client");
@@ -169,8 +167,6 @@ public class Client implements I_Client {
         this.currentID = computeHash(hostname);
         this.nextID = Integer.MAX_VALUE;
         this.prevID = Integer.MIN_VALUE;
-
-        //Thread.sleep(2000);  // Wait for the network to stabilize
     }
 
     /**
@@ -217,7 +213,7 @@ public class Client implements I_Client {
     public void habari() {
         // Joins multicast group
         System.out.println("Joining hazelcast instance");
-        HazelcastInstance hazelcastInstance = Hazelcast.newHazelcastInstance(this.config); // Creates a new Hazelcast instance with the provided configuration.
+        Hazelcast.newHazelcastInstance(this.config); // Creates a new Hazelcast instance with the provided configuration.
     }
 
     /**
@@ -240,6 +236,8 @@ public class Client implements I_Client {
 
         sendLinkID(nextID);
         sendLinkID(prevID);
+
+        fileMonitorThread.start();
     }
 
     /**
