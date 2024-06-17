@@ -60,7 +60,7 @@ public class Client implements I_Client {
             this.logger = new Logger(hostname); // We create a logger to keep track of the replication
             fileMonitorThread = new Thread(new FileMonitor(this));
             //Sync Agent
-            System.out.println("^^^^Debugging Run Sync Agent in Client");
+            System.out.println(">> Debugging Run Sync Agent in Client");
             //syncAgent = new SyncAgent(this);
             //syncAgent.run();
         } catch (IOException e) {
@@ -108,7 +108,7 @@ public class Client implements I_Client {
                 dataOutputStream.flush();
             }
             // close the file here
-            System.out.println("^^^^File was sent");
+            System.out.println(">> File was sent");
             fileInputStream.close();
             clientSocket.close();
         } catch (IOException e1) {
@@ -313,7 +313,7 @@ public class Client implements I_Client {
         int nextID = linkIds[1];
 
         // Get IP of previous node
-        System.out.println("^^^^Getting IP from previous node");
+        System.out.println(">> Getting IP from previous node");
         RestTemplate restTemplate = new RestTemplate();
         String getUrl = "http://" + namingServerIP + ":8080/ns/getIp/" + getPrevID();
         ResponseEntity<String> response2 = restTemplate.getForEntity(getUrl, String.class);
@@ -321,7 +321,7 @@ public class Client implements I_Client {
         System.out.println("* IP: " + newIP);
 
         // Send file to previous node
-        System.out.println("^^^^Sending files to previous node");
+        System.out.println(">> Sending files to previous node");
         String url = "http://" + newIP + ":8080/shutdown/sendFiles";
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("originalIP", getCurrentIP());
@@ -331,11 +331,11 @@ public class Client implements I_Client {
         restTemplate.postForEntity(url, requestBody, Void.class);
 
         // Remove from the naming server
-        System.out.println("^^^^Removing itself from NS");
+        System.out.println(">> Removing itself from NS");
         removeFromNS();
 
         // Sending new IDs to the prev and next node
-        System.out.println("^^^^Passing on the ids");
+        System.out.println(">> Passing on the ids");
         sendLinkID(nextID);
         sendLinkID(prevID);
 
@@ -398,7 +398,7 @@ public class Client implements I_Client {
     public void removeFromNS(int removeID) {
         String postUrl = "http://" + namingServerIP + ":" + namingServerPort + "/ns/removeNode";
 
-        System.out.println("^^^^Sending REST Post (removeFromNS)");
+        System.out.println(">> Sending REST Post (removeFromNS)");
         System.out.println("* Post URL: " + postUrl);
         System.out.println("* Node ID: " + removeID);
 
@@ -446,18 +446,23 @@ public class Client implements I_Client {
     public void removeFromNetwork(int failedID) {
         System.out.println(">> Removing client " + failedID + " from network");
         RestTemplate restTemplate = new RestTemplate();
-        int[] ids = requestLinkIds(failedID);
 
         // Remove failed node from network
         removeFromNS(failedID);
 
-        // Get ip from next node
-        String getURL = "http://" + namingServerIP + ":8080/ns/getIp/" + nextID;
+        // Get ip from new next node
+        int newNextID = nextID;
+        if (nextID == failedID){
+            System.out.println(">> Getting new next node IP");
+            int[] linkIds = requestLinkIds();
+            newNextID = linkIds[1];
+        }
+        String getURL = "http://" + namingServerIP + ":8080/ns/getIp/" + newNextID;
         ResponseEntity<String> response = restTemplate.getForEntity(getURL, String.class);
         String nextIP = response.getBody();
 
+        System.out.println(">> Passing on agent to " + nextIP);
         // Send agent to next node --> process wil start
-
         String postURL = "http://" + nextIP + ":8080/agents/passFailureAgent";
         HashMap<String, Object> requestBody = new HashMap<>() {{
             put("callingID", getCurrentID());
@@ -465,6 +470,8 @@ public class Client implements I_Client {
         }};
         restTemplate.postForEntity(postURL, requestBody, void.class);
 
+        System.out.println(">> Assigning new ID's to the next and previous node");
+        int[] ids = requestLinkIds(failedID);
         // Send prevID to nextIP and nextID to prevID
         sendLinkID(ids[0]);
         sendLinkID(ids[1]);
@@ -557,7 +564,7 @@ public class Client implements I_Client {
 
     @Override
     public void createReplicatedFile(String filename, String filePath) {
-        System.out.println("^^^^Creating replication of file " + filename);
+        System.out.println(">> Creating replication of file " + filename);
         // Prepare the URL for reporting the hash value to the naming server
         String getUrl = "http://" + namingServerIP + ":8080/ns/getLocation/" + filename;
 
@@ -586,11 +593,11 @@ public class Client implements I_Client {
             requestBody.put("original id", getCurrentID());
             requestBody.put("filepath", filePath);
 
-            System.out.println("^^^^Sending request to: " + postUrl);
+            System.out.println(">> Sending request to: " + postUrl);
             ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
             HttpStatusCode statusCode = responseEntity.getStatusCode();
 
-            System.out.println("^^^^Putting new owner in logger");
+            System.out.println(">> Putting new owner in logger");
             System.out.println("ID: " + locationString[0] + ", IP: " + locationString[1]);
             logger.putOwner(computeHash(filename), Integer.parseInt(locationString[0]), locationString[1]);
 
@@ -620,7 +627,7 @@ public class Client implements I_Client {
         requestBody.put("replicated ip", InetAddress.getLocalHost().getHostAddress());
 
         // Sending request
-        System.out.println("^^^^Sending request to: " + url);
+        System.out.println(">> Sending request to: " + url);
         ResponseEntity<String> response = restTemplate.postForEntity(url, requestBody, String.class);
         String responseString = response.getBody();
         System.out.println("* " + responseString);
@@ -636,10 +643,10 @@ public class Client implements I_Client {
         requestBody.put("filepath", filepath);
 
         // Send request
-        System.out.println("^^^^Sending request to: " + url);
+        System.out.println(">> Sending request to: " + url);
         restTemplate.postForEntity(url, requestBody, Void.class);
 
-        System.out.println("^^^^Start receiving file");
+        System.out.println(">> Start receiving file");
         // Get ready to receive file
         try {
             isReceivedFile = true;
@@ -653,7 +660,7 @@ public class Client implements I_Client {
                 size -= bytes; // read upto file size
             }
             // Here we received file
-            System.out.println("^^^^File is Received");
+            System.out.println(">> File is Received");
             fileOutputStream.close();
 
         } catch (IOException e1) {
