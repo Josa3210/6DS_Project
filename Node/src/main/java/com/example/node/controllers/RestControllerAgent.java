@@ -57,7 +57,7 @@ public class RestControllerAgent
         if (passOn) {
             try {
                 Inet4Address nextIP = (Inet4Address) InetAddress.getByName(client.requestIP(nextID));
-                String postUrl = "http://" + nextIP + "/agent/passFailureAgent";
+                String postUrl = "http://" + nextIP + "/agents/passFailureAgent";
 
                 System.out.println("Sending agent to " + postUrl);
                 Map<String, Object> requestBody = new HashMap<>();
