@@ -463,12 +463,12 @@ public class Client implements I_Client {
 
         System.out.println(">> Passing on agent to " + nextIP);
         // Send agent to next node --> process wil start
-        String postURL = "http:/" + nextIP + ":8080/agents/passFailureAgent";
+        String newURL = "http://" + nextIP + ":8080/agents/passFailureAgent";
         HashMap<String, Object> requestBody = new HashMap<>() {{
             put("callingID", getCurrentID());
             put("failedID", failedID);
         }};
-        restTemplate.postForEntity(postURL, requestBody, void.class);
+        restTemplate.postForEntity(newURL, requestBody, void.class);
 
         System.out.println(">> Assigning new ID's to the next and previous node");
         int[] ids = requestLinkIds(failedID);
