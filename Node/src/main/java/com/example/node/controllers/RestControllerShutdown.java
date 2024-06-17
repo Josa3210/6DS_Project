@@ -84,7 +84,7 @@ public class RestControllerShutdown {
                 System.out.println("* => NO: notify owner that there is a new original");
                 // Download the file
                 String filepath = client.folderPath + "/" + filename;
-                client.sendFile((Inet4Address) InetAddress.getByName(originalIP),filepath);
+                client.receiveFile((Inet4Address) InetAddress.getByName(originalIP),filepath);
 
                 // If the node is not the replicated, it will become the new original
                 logger.put(fileID,(String) obj.get("filename"));
