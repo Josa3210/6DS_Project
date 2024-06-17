@@ -162,7 +162,7 @@ public class Logger {
      * @param hash the hashed integer key.
      */
     public void put(Integer hash, String fileName) {
-        if (fileArray != null) {
+        if (fileArray != null && this.get(fileName) == null) {
             JSONObject newObj = new JSONObject();
             newObj.put("hash", hash);
             newObj.put("filename", fileName);
