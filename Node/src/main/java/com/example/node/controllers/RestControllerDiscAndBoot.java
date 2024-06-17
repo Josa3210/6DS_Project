@@ -97,13 +97,13 @@ public class RestControllerDiscAndBoot {
     public String OpenTCPConnection(@RequestBody Map<String, Object> request) throws IOException {
         String response;
         String ip = (String) request.get("replicated ip");
+        client.clientSocket = new Socket(ip, 5000);
         if (client.clientSocket.isConnected()) {
             response = "* Socket (" + ip + ", 5000) still connected";
             System.out.println("* "+ response);
         } else {
             response = "TCP connection is established, ready for file transfer";
             System.out.println("* "+ response);
-            client.clientSocket = new Socket(ip, 5000);
         }
         return response;
     }
