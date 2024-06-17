@@ -29,6 +29,25 @@ public class CommandParser {
             case "exit" -> {
                 return Command.SHUTDOWN;
             }
+            case "createFile" -> {
+                command = Command.CREATE;
+                if (args.length - 1 > command.getNrArgs()) {
+                    System.out.println("Too many arguments");
+                }
+                command.setArgs(Arrays.copyOfRange(args, 1, args.length));
+                return command;
+            }
+            case "delete" -> {
+                command = Command.DELETE;
+                if (args.length - 1 > command.getNrArgs()) {
+                    System.out.println("Too many arguments");
+                }
+                command.setArgs(Arrays.copyOfRange(args, 1, args.length));
+                return command;
+            }
+            case "printLogger" -> {
+                return Command.PRINTLOGGER;
+            }
         }
         return command;
     }

@@ -11,6 +11,7 @@ import com.hazelcast.config.NetworkConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.spi.exception.RestClientException;
 import jakarta.annotation.PostConstruct;
+import org.json.JSONArray;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -452,7 +453,7 @@ public class Client implements I_Client {
 
         // Get ip from new next node
         int newNextID = nextID;
-        if (nextID == failedID){
+        if (nextID == failedID) {
             System.out.println(">> Getting new next node IP");
             int[] linkIds = requestLinkIds();
             newNextID = linkIds[1];
@@ -693,6 +694,35 @@ public class Client implements I_Client {
     @Override
     public int getCurrentID() {
         return currentID;
+    }
+
+    @Override
+    public void createFile(String filename) {
+        String filepath = folderPath + "/" + filename;
+        File file = new File(filepath);
+
+        try {
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void deleteFile(String filename) {
+        String filepath = folderPath + "/" + filename;
+        File file = new File(filepath);
+
+        if (file.exists()) {
+            file.delete();
+        }
+    }
+
+    @Override
+    public void printLogger(){
+        System.out.println(logger.printLogger());
     }
 
     public int getPrevID() {
