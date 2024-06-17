@@ -42,6 +42,7 @@ public class FailureAgent implements Runnable {
 
     @Override
     public void run() {
+        System.out.println(">> Trying to start behaviour");
         FailureAgentBehaviour behaviour = new FailureAgentBehaviour( this.failedID, this.logger, this.namingServerIP, this.fileDirectory);
         this.failureAgent.addBehaviour(behaviour);
     }

@@ -57,14 +57,14 @@ public class RestControllerAgent
         if (passOn) {
             try {
                 Inet4Address nextIP = (Inet4Address) InetAddress.getByName(client.requestIP(nextID));
-                String postUrl = "http://" + nextIP + "/agents/passFailureAgent";
+                String newUrl = "http://" + nextIP + ":8080/agents/passFailureAgent/";
 
-                System.out.println("Sending agent to " + postUrl);
+                System.out.println("Sending agent to " + newUrl);
                 Map<String, Object> requestBody = new HashMap<>();
                 requestBody.put("agent", agent);
 
                 RestTemplate restTemplate = new RestTemplate();
-                restTemplate.postForEntity(postUrl, requestBody, Void.class);
+                restTemplate.postForEntity(newUrl, requestBody, Void.class);
             } catch (UnknownHostException e) {
                 throw new RuntimeException(e);
             }
