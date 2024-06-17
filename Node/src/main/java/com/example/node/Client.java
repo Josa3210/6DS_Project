@@ -556,9 +556,11 @@ public class Client implements I_Client {
 
     @Override
     public void createReplicatedFile(String filename, String filePath) {
+        System.out.println("^^^^Creating replication of file " + filename);
         // Prepare the URL for reporting the hash value to the naming server
         String getUrl = "http://" + namingServerIP + ":8080/ns/getLocation/" + filename;
 
+        System.out.println("* Calculating replicated IP");
         // Get the ip of replicated node
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String[]> response = restTemplate.getForEntity(getUrl, String[].class);
@@ -570,15 +572,14 @@ public class Client implements I_Client {
             ResponseEntity<String> response2 = restTemplate.getForEntity(getUrl, String.class);
             replicatedIP = response2.getBody();
         }
-
-        String postUrl = "http://" + replicatedIP + ":8080/isReplicatedNode";
-        HttpHeaders headers = new HttpHeaders();
-        // Create the request body
-        Map<String, Object> requestBody = new HashMap<>();
-        // Create the request entity with headers and body
-        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
+        System.out.println("* Replicated IP: " + replicatedIP);
 
         try {
+            String postUrl = "http://" + replicatedIP + ":8080/isReplicatedNode";
+            HttpHeaders headers = new HttpHeaders();
+            Map<String, Object> requestBody = new HashMap<>();
+            HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
+
             // Send the POST request
             requestBody.put("original ip", getCurrentIP());
             requestBody.put("original id", getCurrentID());
@@ -616,7 +617,10 @@ public class Client implements I_Client {
 
         // Sending request
         System.out.println("^^^^Sending request to: " + url);
-        restTemplate.postForEntity(url, requestBody, String.class);
+        ResponseEntity<String> response = restTemplate.postForEntity(url, requestBody, String.class);
+        String responseString = response.getBody();
+        System.out.println("* " + responseString);
+
 
         // Accept connection with other node
         this.clientSocket = this.serverSocket.accept();
@@ -654,12 +658,16 @@ public class Client implements I_Client {
     }
 
     public void receiveReplicatedFile(Inet4Address originalIP, int originalId, String filepath) throws IOException {
+        System.out.println("^^^Receiving replica of file " + filepath + "from " + originalId);
         // Check if the file is not already present
         File replica = new File(filepath);
 
         if (!replica.exists()) {
+            System.out.println("* File does not exist, downloading file");
             // Download the file
             receiveFile(originalIP, filepath);
+        } else {
+            System.out.println("* File already exists on this node");
         }
 
         // Put in logger

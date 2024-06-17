@@ -25,20 +25,19 @@ public class RestControllerDiscAndBoot {
     private final Client client;
 
     @Autowired
-    public RestControllerDiscAndBoot(Client client)
-    {
+    public RestControllerDiscAndBoot(Client client) {
         hazelcastInstance = Hazelcast.newHazelcastInstance();
         this.client = client;
     }
 
     /**
      * This REST request will set up the client
+     *
      * @param request the IP, Port and nr of nodes of the naming server
      */
     @PostMapping("/welcome")
-    public void welcome(@RequestBody Map<String, Object> request)
-    {
-        int nrNodes =  Integer.parseInt(request.get("nrNodes").toString());
+    public void welcome(@RequestBody Map<String, Object> request) {
+        int nrNodes = Integer.parseInt(request.get("nrNodes").toString());
         String ipNamingServer = request.get("ip").toString();
         int portNamingServer = Integer.parseInt(request.get("port").toString());
 
@@ -51,27 +50,31 @@ public class RestControllerDiscAndBoot {
     }
 
     @GetMapping("/multicastaddress")
-    public String getMulticastAddress() { return multicast_address; }
+    public String getMulticastAddress() {
+        return multicast_address;
+    }
 
     @GetMapping("/createinstance")
-    public Object createHazelcastInstance() { return JSONObject.wrap(Hazelcast.newHazelcastInstance(config)); }
+    public Object createHazelcastInstance() {
+        return JSONObject.wrap(Hazelcast.newHazelcastInstance(config));
+    }
 
     @PostMapping("/isReplicatedNode")
     public void isReplicatedNode(@RequestBody Map<String, Object> request) throws IOException {
 
-       String filepath = (String) request.get("filepath");
+        String filepath = (String) request.get("filepath");
         Inet4Address ip = (Inet4Address) InetAddress.getByName((String) request.get("original ip"));
         int id = (int) request.get("original id");
         client.receiveReplicatedFile(ip, id, filepath);
     }
 
     @PostMapping("/changeLoggerOriginal")
-    public void changeLoggerOriginal(@RequestBody Map<String, Object> request){
+    public void changeLoggerOriginal(@RequestBody Map<String, Object> request) {
         String originalIP = (String) request.get("original ip");
         int originalID = (int) request.get("original id");
         int fileID = (int) request.get("file id");
 
-        client.getLogger().putOriginal(fileID,originalID,originalIP);
+        client.getLogger().putOriginal(fileID, originalID, originalIP);
     }
 
     @PostMapping("/deleteReplicatedFile")
@@ -93,8 +96,12 @@ public class RestControllerDiscAndBoot {
     @PostMapping("/OpenTCPConnection")
     public String OpenTCPConnection(@RequestBody Map<String, Object> request) throws IOException {
         String ip = (String) request.get("replicated ip");
-        client.clientSocket = new Socket(ip,5000);
-        return("TCP connection is established, ready for file transfer");
+        if (client.clientSocket.isConnected()) {
+            return ("* Socket (" + ip + ", 5000) still connected");
+        } else {
+            client.clientSocket = new Socket(ip, 5000);
+            return ("TCP connection is established, ready for file transfer");
+        }
     }
 
     @PostMapping("/StartFileTransfer")
