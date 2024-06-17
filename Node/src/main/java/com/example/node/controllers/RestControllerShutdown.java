@@ -43,19 +43,24 @@ public class RestControllerShutdown {
         String strArray = (String) requestbody.get("files");
         JSONArray files = new JSONArray(strArray);
 
+        System.out.println("^^^^Sending files to the previous ID");
         // For every file in the logger
         for (int i = 0; i < files.length(); i++) {
             JSONObject obj = files.getJSONObject(i);
             JSONObject owner = (JSONObject) obj.get("owner");
             String filename = obj.get("filename").toString();
-
             // Check if this node is the replicated node of the file
             String newReplicatedIP;
             String ownerIP = (String) owner.get("IP");
             int fileID = (int) obj.get("hash");
+
+            System.out.println("* File: " + filename);
+            System.out.println("* " + client.getCurrentID() + " is owner of file?");
             if (client.getCurrentIP().equals(ownerIP)) {
                 // If yes, the file should be sent to the prevID of this node
                 newReplicatedIP = client.requestIP(client.getPrevID());
+
+                System.out.println("* => YES: file sent to previous node: " + client.getPrevID());
 
                 // Send file from this node to the new replicated node (prevID)
                 RestTemplate restTemplate = new RestTemplate();
@@ -73,6 +78,8 @@ public class RestControllerShutdown {
                 logger.putOriginal(fileID, client.getCurrentID(), client.getCurrentIP());
 
             } else {
+                System.out.println("* => NO: notify owner that there is a new original");
+
                 // If the node is not the replicated, it will become the new original
                 logger.put(fileID,(String) obj.get("filename"));
 

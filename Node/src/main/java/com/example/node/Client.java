@@ -91,9 +91,7 @@ public class Client implements I_Client {
     }
 
     public void ReceiveFile(String filepath, DataInputStream dataInputStream) {
-
         try {
-
             isReceivedFile = true;
             int bytes = 0;
             FileOutputStream fileOutputStream = new FileOutputStream(filepath);
@@ -354,6 +352,9 @@ public class Client implements I_Client {
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("originalIP", getCurrentIP());
         requestBody.put("files", logger.getFileArray().toString());
+        System.out.println("* new ip: " + newIP);
+        System.out.println("*Files: " + logger.getFileArray().toString());
+
         restTemplate.postForEntity(url, requestBody, Void.class);
 
         // Remove from the naming server
