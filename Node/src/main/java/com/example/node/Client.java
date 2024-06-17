@@ -58,11 +58,12 @@ public class Client implements I_Client {
             this.logger = new Logger(hostname); // We create a logger to keep track of the replication
             fileMonitorThread = new Thread(new FileMonitor(this));
             //Sync Agent
-
+            // Create socket for TCP
+            this.serverSocket = new ServerSocket(5000);
             System.out.println("^^^^Debugging Run Sync Agent in Client");
             //syncAgent = new SyncAgent(this);
             //syncAgent.run();
-        } catch (FileNotFoundException | UnknownHostException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -589,9 +590,6 @@ public class Client implements I_Client {
     }
 
     public void receiveFile(Inet4Address originalIP, String filepath) throws IOException {
-        // Create socket for TCP
-        this.serverSocket = new ServerSocket(5000);
-
         // Prepare Post
         String url = "http://" + originalIP.getHostAddress() + ":8080/OpenTCPConnection";
         RestTemplate restTemplate = new RestTemplate();
