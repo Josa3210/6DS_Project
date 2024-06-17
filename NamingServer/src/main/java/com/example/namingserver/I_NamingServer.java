@@ -10,7 +10,8 @@ public interface I_NamingServer {
      * @param filename: name of the file to search for
      * @return the ip address of the node that contains the resource {@see Inet4Address}
      */
-    Inet4Address getLocationIP(String filename);
+    int getFileOwner(String filename);
+
 
 
 
@@ -47,7 +48,4 @@ public interface I_NamingServer {
      * Return the nextID and previousID of the given ID
      */
     int[] giveLinkIds(int nodeID);
-
-    void reportLogger(String filename, Inet4Address originalIP, int operation,int nextID);
-    void shutdown_node(int PrevID, HashMap<Integer, Inet4Address> nodeMap, HashMap<Integer, String> fileMap, Inet4Address originalIP);
 }

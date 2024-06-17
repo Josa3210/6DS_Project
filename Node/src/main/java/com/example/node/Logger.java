@@ -1,51 +1,48 @@
 package com.example.node;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class Logger {
 
 
-    private final String fileName = "logger.json";
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private String fileName = "logger.json";
     private String filePath;
-    private HashMap<Integer, Inet4Address> nodeMap;
-    private HashMap<Integer, String> fileMap = new HashMap<>(); // stores the hash of the filename as a key and the filepath as a value
+    private String tempPath;
+    private JSONArray fileArray = new JSONArray();
 
     /**
      * Constructor to initialize the file path for the logger.
      */
     public Logger(String hostname) {
-
         try {
+            // Create directories
+            String directoryPath = new java.io.File("").getCanonicalPath() + "/Data/node";
+            new File(directoryPath).mkdirs();
 
-            String currentPath = new java.io.File("").getCanonicalPath();
-            String filepath = currentPath + "/Data/node/logger_" + hostname; // Append nodeName to differentiate logger directories
-            Path path = Paths.get(filepath);
-            System.out.println(filepath);
-            Files.createDirectories(path);
-
-            this.filePath = filepath;
-            System.out.println("Logger will be saved in: " + filePath);
+            // Create files
+            this.fileName = "logger_" + hostname + ".json";
+            this.filePath = directoryPath + "/" + this.fileName; // Append nodeName to differentiate logger directories;
+            this.tempPath = directoryPath + "/" + "logger_temp.json";
+            load();
 
         } catch (IOException e) {
-
-            System.out.println(e);
+            System.out.println("^^^^Error");
+            System.err.println(e);
         }
+    }
 
+    public static void main(String[] args) {
+        String hostname = "node1";
+        Logger logger = new Logger(hostname);
+        logger.load();
     }
 
     /**
@@ -54,76 +51,65 @@ public class Logger {
      */
 
     public void load() {
-
+        System.out.println("^^^^Trying to load from: " + filePath);
         try {
-            File file = new File(filePath + "/" + fileName);
+            // Define a file from where the file should be
+            File file = new File(filePath);
 
+            // If there is a file, read it and convert to a JSONArray
             if (file.exists()) {
+                String jsonContent = new String(Files.readAllBytes(Paths.get(this.filePath)));
+                this.fileArray = new JSONArray(jsonContent);
+                System.out.println("^^^^Map loaded successfully");
 
-                // Read the JSON file and convert it to HashMap
-                HashMap<String, String> stringKeyMap = objectMapper.readValue(file, new TypeReference<HashMap<String, String>>() {
-                });
-
-                // Convert keys from String to Integer and values from String to Inet4Address
-                nodeMap = new HashMap<>();
-
-                for (Map.Entry<String, String> entry : stringKeyMap.entrySet()) {
-
-                    try {
-
-                        Integer key = Integer.parseInt(entry.getKey());
-                        InetAddress inetAddress = InetAddress.getByName(entry.getValue());
-
-                        if (inetAddress instanceof Inet4Address) {
-
-                            nodeMap.put(key, (Inet4Address) inetAddress);
-
-                        } else {
-
-                            System.err.println("Error: " + entry.getValue() + " is not a valid IPv4 address.");
-                        }
-                    } catch (NumberFormatException | UnknownHostException e) {
-
-                        System.err.println("Error parsing key-value pair: " + entry.getKey() + " - " + entry.getValue());
-                    }
-                }
-
-                System.out.println("Map loaded from file: " + filePath);
-
+                // If there is no file, create one.
             } else {
-
                 // Create a new file if it doesn't exist
                 if (file.createNewFile()) {
-
-                    System.out.println("File does not exist. Initializing an empty hashmap: " + fileName);
-                    nodeMap = new HashMap<>();
-                    // Save the empty hashmap
+                    System.out.println("^^^^File does not exist. Initializing an empty file: " + fileName);
+                    fileArray = new JSONArray();
                     save();
                 }
             }
         } catch (IOException e) {
-            System.err.println("Error loading hashmap from file: " + e.getMessage());
-            nodeMap = new HashMap<>();
+            System.err.println("^^^^Error loading hashmap from file: " + e.getMessage());
+            fileArray = new JSONArray();
         }
     }
 
-
     /**
-     * Saves the mapping from the logger to the JSON file.
+     * Saves the mapping from the logger to the JSON file. This is done in 4 steps:
+     * 1) Create a temporary file
+     * 2) Write to that temporary file
+     * 3) Remove the original file
+     * 4) Rename the temporary file to the original file
+     * <p>
+     * This is because the writer holds a buffer and when calling .flush() or .close(), the content of this buffer gets written in the file.
+     * The existing information is not overwritten.
      */
     public void save() {
-
         try {
+            // Define the two files
+            File tempFile = new File(this.tempPath);
+            File loggerFile = new File(this.filePath);
 
-            // Write the JSON string to the file
-            File file = new File(filePath + "/" + fileName);
-            objectMapper.writeValue(file, nodeMap);
+            // Create temp file
+            tempFile.createNewFile();
 
-            System.out.println("Map saved to file: " + filePath + "/" + fileName);
+            // Write in temp file
+            FileWriter JSONWriter = new FileWriter(this.tempPath);
+            this.fileArray.write(JSONWriter);
+            JSONWriter.close();
 
+            // Delete old file
+            loggerFile.delete();
+
+            // Rename temp file
+            tempFile.renameTo(loggerFile);
+
+            System.out.println("^^^^Map saved");
         } catch (IOException e) {
-
-            System.err.println("Error saving map to file: " + e.getMessage());
+            System.err.println("^^^^Error saving map: " + e.getMessage());
         }
     }
 
@@ -133,127 +119,145 @@ public class Logger {
      * @param hash the hashed integer key.
      * @return the IPv4 address associated with the given hash, or null if not found.
      */
-
-
-    public Inet4Address get(Integer hash) {
-
-        if (nodeMap != null) {
-            Inet4Address address = nodeMap.get(hash);
-
-            if (address == null) {
-                System.err.println("Given key: hash. Result: null");
-                return null;
-
-            } else {
-                return address;
-
+    public JSONObject get(Integer hash) {
+        if (fileArray != null) {
+            // Go through all the indexes and compare against the given key.
+            for (int i = 0; i < fileArray.length(); i++) {
+                JSONObject obj = fileArray.getJSONObject(i);
+                int id = (int) obj.get("hash");
+                if (id == hash) return obj;
             }
-        }
-
-        else {
-
+            System.err.println("No value with " + hash + " found.");
+        } else {
             System.err.println("Hashmap is not initialized. Please load the hashmap first.");
-
-            return null;
         }
+        return null;
     }
 
-
     /**
-     * Retrieves the set of keys from the nodeMap.
+     * Retrieves the IPv4 address corresponding to the given hash from the logger.
      *
-     * @return A Set of Integer keys from the nodeMap, or an empty Set if nodeMap is not initialized.
+     * @param filename the filename.
+     * @return the IPv4 address associated with the given hash, or null if not found.
      */
-    public Set<Integer> getKeys() {
-
-        if (nodeMap != null) {
-
-            return nodeMap.keySet(); // Assuming nodeMap is a Map<Integer, Something>
+    public JSONObject get(String filename) {
+        if (fileArray != null) {
+            // Go through all the indexes and compare against the given key.
+            for (int i = 0; i < fileArray.length(); i++) {
+                JSONObject obj = fileArray.getJSONObject(i);
+                String objFilename = (String) obj.get("filename");
+                if (Objects.equals(objFilename, filename)) return obj;
+            }
+            System.err.println("No value with " + filename + " found.");
+        } else {
+            System.err.println("Hashmap is not initialized. Please load the hashmap first.");
         }
-
-        else {
-            System.err.println("Hashmap is not initialized. Please load the map first.");
-            return Collections.emptySet(); // Or return null if appropriate
-        }
+        return null;
     }
 
-
     /**
-     * Adds a new entry to the logger with the given hash and IPv4 address.
+     * Adds a new file to the logger with the given hash and IPv4 address.
+     * The owner and original are still left blank. These can be set using the .putOwner() and .putOriginal() methods
      *
      * @param hash the hashed integer key.
-     * @param ip4  the IPv4 address to be associated with the hash.
      */
-    public void put(Integer hash, Inet4Address ip4) {
-        if (nodeMap != null) {
-            nodeMap.put(hash, ip4);
-            this.save();
+    public void put(Integer hash, String fileName) {
+        if (fileArray != null) {
+            JSONObject newObj = new JSONObject();
+            newObj.put("hash", hash);
+            newObj.put("filename", fileName);
+            newObj.put("owner", new JSONObject());
+            newObj.put("original", new JSONObject());
+            fileArray.put(newObj);
+            save();
         } else {
             System.err.println("Map is not initialized. Please load the map first.");
         }
     }
 
-
-    public String getFile(Integer hash) {
-            String filepath = fileMap.get(hash);
-            if (filepath == null) {
-                System.err.println("Given key: hash. Result: null");
-                return null;
-            } else {
-                return filepath;
-            }
-        }
-
-    public void putFile(Integer hash, String filepath){
-            fileMap.put(hash, filepath);
-            System.out.println("Entry with key " + hash + " added to the fileMap.");
-        }
-    public void removeFile(int hash) {
-            if (fileMap.containsKey(hash)) {
-                fileMap.remove(hash);
-                System.out.println("Entry with key " + hash + " removed from the fileMap.");
-            } else {
-                System.out.println("Entry has already been removed");
-            }
-        }
+    /**
+     * Adds the information of the owner (aka replicated node) of the file.
+     * @param id of the file that is replicated
+     * @param ownerID ID of the owner
+     * @param ownerIP IP of the owner
+     */
+    public void putOwner(int id, int ownerID, String ownerIP) {
+        JSONObject obj = get(id);
+        JSONObject ownerObj = new JSONObject().put("ID", ownerID).put("IP", ownerIP);
+        obj.put("owner", ownerObj);
+        save();
+    }
 
     /**
-     * Removes an entry from the logger
-     *
+     * Adds the information of the original creator of the file.
+     * @param id of the file that is replicated
+     * @param originalID ID of the original creator
+     * @param originalIP IP of the original creator
      */
-    public void remove(int hash) {
-        if (nodeMap != null) {
+    public void putOriginal(int id, int originalID, String originalIP) {
+        JSONObject obj = get(id);
+        JSONObject ownerObj = new JSONObject().put("ID", originalID).put("IP", originalIP);
+        obj.put("original", ownerObj);
+        save();
+    }
 
-            if (nodeMap.containsKey(hash)) {
-                nodeMap.remove(hash);
-                System.out.println("Entry with key " + hash + " removed from the database.");
-                this.save();
-
-            } else {
-                System.out.println("Entry has already been removed");
+    /**
+     * Removes the file with the given hash from the JSONArray.
+     * This method is used when a file is deleted.
+     * @param hash of the file to be deleted
+     * @return if the deletion has happened or not
+     */
+    public boolean remove(int hash) {
+        if (fileArray != null) {
+            for (int i = 0; i < fileArray.length(); i++) {
+                JSONObject obj = fileArray.getJSONObject(i);
+                int id = (int) obj.get("hash");
+                if (id == hash) {
+                    fileArray.remove(i);
+                    save();
+                    return true;
+                }
             }
+            System.err.println("Node not in nodeMap");
         } else {
-            System.err.println("Database is not initialized. Please load the database first.");
+            System.err.println("Hashmap is not initialized. Please load the hashmap first.");
         }
+        return false;
     }
 
-    public HashMap<Integer, Inet4Address> getNodeMap() {
-        return nodeMap;
+    /**
+     * Removes the file with the given hash from the JSONArray.
+     * This method is used when a file is deleted.
+     * @param filename of the file to be deleted
+     * @return if the deletion has happened or not
+     */
+    public boolean remove(String filename) {
+        if (fileArray != null) {
+            for (int i = 0; i < fileArray.length(); i++) {
+                JSONObject obj = fileArray.getJSONObject(i);
+                String id = (String) obj.get("filename");
+                if (Objects.equals(id, filename)) {
+                    fileArray.remove(i);
+                    save();
+                    return true;
+                }
+            }
+            System.err.println("Node not in nodeMap");
+        } else {
+            System.err.println("Hashmap is not initialized. Please load the hashmap first.");
+        }
+        return false;
     }
 
-    public HashMap<Integer, String> getFileMap() {
-        return fileMap;
+    /**
+     * Returns the JSONArray containing all the files
+     * @return
+     */
+    public JSONArray getFileArray() {
+        return fileArray;
     }
-
-    public static void main(String[] args) {
-        String hostname = "node 1";
-        Logger logger = new Logger(hostname);
-        logger.load();
-
-
-    }
-
 }
+
 
 
 

@@ -1,9 +1,8 @@
-
-
 package com.example.node;
 
 import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
 import org.apache.commons.io.monitor.FileAlterationObserver;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,18 +17,18 @@ import java.util.Arrays;
 
 /**
  * This class represents a task for monitoring file system changes in the specified Files directory.
- *
+ * <p>
  * It implements the Runnable interface to be executed in a separate thread.
-
-**/
+ **/
 
 public class FileMonitor implements Runnable {
 
     Client client;
+    Logger logger;
 
     public FileMonitor(Client client) {
         this.client = client;
-
+        this.logger = client.getLogger();
     }
 
     public void run() {
@@ -39,7 +38,6 @@ public class FileMonitor implements Runnable {
             Files.createDirectories(path);
         } catch (IOException e) {
             System.err.println(e.getMessage());
-
             throw new RuntimeException(e);
         }
         System.out.println("folder created: " + client.folderPath);
@@ -57,31 +55,21 @@ public class FileMonitor implements Runnable {
                 String filepath = file.getPath();
 
                 if (!filename.endsWith(".swp")) {
-                    System.out.println("\nFile created: " + filename);
-                    Logger logger = client.getLogger();
-                    logger.load();
+                    System.out.println("^^^^File created: " + filename);
                     int hash = client.computeHash(filename);
 
-                    try {
-                        logger.put(hash, (Inet4Address) InetAddress.getByName(client.getCurrentIP()));
-                    } catch (UnknownHostException e) {
-                        throw new RuntimeException(e);
-                    }
-
-                    System.out.println("hash: " + hash + " current IP: " + client.getCurrentIP());
-
-                    logger.putFile(hash, filepath);
+                    // Add file to the file list
                     client.getFileList().add(new NodeFileEntry(filename));
-                    logger.save();
 
                     if (!client.isReceivedFile) { // if the file is locally made, we let the namingserver know
-                        client.reportFilenameToNamingServer(file.getName(), filepath, 1); // Operation 1 --> file CREATE
+                        // Add file to the client logger
+                        System.out.println("^^^^Putting file and original in logger");
+                        logger.put(hash, filename);
+                        logger.putOriginal(hash, client.currentID, client.getCurrentIP());
+                        client.createReplicatedFile(file.getName(), filepath);
                     }
-
                 }
-
                 client.isReceivedFile = false;  // Reset flag to false after file is received
-
             }
 
             @Override
@@ -95,22 +83,26 @@ public class FileMonitor implements Runnable {
                     System.out.println("filepath: " + filepath);
 
 
-                    // We remove the file from the logger
-                    Logger logger = client.getLogger();
-                    logger.load();
+                    // Remove the file from the logger
                     int hash = client.computeHash(filename);
-                    String originalIP = logger.get(hash).getHostAddress();
-                    System.out.println("original IP" + originalIP);
+                    JSONObject originalJSON = (JSONObject) client.getLogger().get(hash).get("original");
+                    String originalIP = String.valueOf(originalJSON.get("IP"));
                     String currentIP = client.getCurrentIP();
 
-                    if (originalIP.equals(currentIP) & !client.isReplicatedFile) // we check if the original IP of the file = current IP
+
+                    if (originalIP.equals(currentIP) & !client.isReplicatedFile) { // we check if the original IP of the file = current IP
 
                         // if this is the case, the current IP is the IP where the file got downloaded, so we need to make
                         // sure that the naming server gets noted about this so it can remove the replicated files too.
-                        client.reportFilenameToNamingServer(filename, filepath, 2); // Operation 2 --> file DELETE on replicated node
+                        client.deleteReplicatedFile(filename, filepath);
 
+                    }
+
+                    if(client.getLogger().remove(hash)){
+                        System.out.println("^^^^Succesfully deleted file from logger");
+                    }
+                    // Remove the hash from the logger.
                     client.getFileList().removeIf(entry -> filename.equals(entry.getFilename()));
-                    logger.remove(hash); // We remove the hash from the logger.
                 }
                 client.isReplicatedFile = false;
             }

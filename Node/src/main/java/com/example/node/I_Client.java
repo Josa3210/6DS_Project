@@ -104,7 +104,13 @@ public interface I_Client {
     void removeFromNetwork(int failedID);
     void getName();
 
-    public void reportFilenameToNamingServer(String filename, String filePath, int operation);
+    void deleteReplicatedFile(String filename, String filePath);
+
     int getPrevID();
-    void sendReplicatedFile(Inet4Address originalIP, String filepath) throws IOException;
+
+    void createReplicatedFile(String filename, String filePath);
+
+    void receiveReplicatedFile(Inet4Address originalIP, int originalId, String filepath) throws IOException;
+
+    int getCurrentID();
 }

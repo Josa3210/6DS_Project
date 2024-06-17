@@ -1,7 +1,6 @@
 package com.example.node.controllers;
 
 import com.example.node.Client;
-import com.example.node.Logger;
 import com.hazelcast.config.Config;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
@@ -17,7 +16,6 @@ import java.net.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 @RestController
 public class RestControllerDiscAndBoot {
@@ -51,12 +49,6 @@ public class RestControllerDiscAndBoot {
         System.out.println("* IP Naming Server: " + ipNamingServer);
         System.out.println("* Port Naming Server: " + portNamingServer);
 
-        // We start the filemonitorthread from here
-        if (nrNodes > 1) {
-            Thread filemonitorthread = client.getFileMonitorThread();
-            filemonitorthread.start();
-        }
-
         /*if (nrNodes > 1) {
             // the number of clients > 1
             System.out.println("Number of nodes > 1, there are replicated nodes ..");
@@ -80,33 +72,31 @@ public class RestControllerDiscAndBoot {
     @PostMapping("/isReplicatedNode")
     public void isReplicatedNode(@RequestBody Map<String, Object> request) throws IOException {
 
-        Integer fileHash = Integer.parseInt(request.get("hashValue").toString());
-        String filepath = (String) request.get("filepath");
+       String filepath = (String) request.get("filepath");
         Inet4Address ip = (Inet4Address) InetAddress.getByName((String) request.get("original ip"));
-        Logger logger = client.getLogger();
-        System.out.println("This is the replicated node for file: " + fileHash);
-        logger.load();
-        // Puts the filehash and the ip address of the node where the file was created in the logger ..
-        logger.put(fileHash, ip);
-        logger.putFile(fileHash, filepath);
-        logger.save();
-        client.sendReplicatedFile(ip, filepath);
+        int id = (int) request.get("original id");
+        client.receiveReplicatedFile(ip, id, filepath);
+    }
+
+    @PostMapping("/changeLoggerOriginal")
+    public void changeLoggerOriginal(@RequestBody Map<String, Object> request){
+        String originalIP = (String) request.get("original ip");
+        int originalID = (int) request.get("original id");
+        int fileID = (int) request.get("file id");
+
+        client.getLogger().putOriginal(fileID,originalID,originalIP);
     }
 
     @PostMapping("/deleteReplicatedFile")
     public void deleteReplicatedFile(@RequestBody Map<String, Object> request) throws UnknownHostException {
 
-        int fileHash = Integer.parseInt(request.get("hashValue").toString());
         String filename = (String) request.get("filename");
         String filepath = (String) request.get("filepath");
         System.out.println("filepath: " + filepath);
-        System.out.println("Delete file " + filename + " with hash: " + fileHash);
 
         try {
             client.isReplicatedFile = true;
             Files.delete(Path.of(filepath));
-            System.out.println("File entry deleted successfully");
-
         } catch (IOException e) {
             System.out.println("File entry cannot be deleted successfully .");
             throw new RuntimeException(e);
@@ -122,10 +112,8 @@ public class RestControllerDiscAndBoot {
 
     @PostMapping("/StartFileTransfer")
     public void StartFileTransfer(@RequestBody Map<String, Object> request) throws UnknownHostException {
-        System.out.println("start file transfer");
         String filepath = (String) request.get("filepath");
-        System.out.println("Starting file transfer: " + filepath);
-        System.out.println(filepath);
+        System.out.println("^^^^Starting file transfer: " + filepath);
         client.SendFile(filepath);
     }
 }
