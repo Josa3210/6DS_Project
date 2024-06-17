@@ -95,13 +95,15 @@ public class RestControllerDiscAndBoot {
 
     @PostMapping("/OpenTCPConnection")
     public String OpenTCPConnection(@RequestBody Map<String, Object> request) throws IOException {
+        String response;
         String ip = (String) request.get("replicated ip");
         if (client.clientSocket.isConnected()) {
-            return ("* Socket (" + ip + ", 5000) still connected");
+            response = "* Socket (" + ip + ", 5000) still connected";
         } else {
             client.clientSocket = new Socket(ip, 5000);
-            return ("TCP connection is established, ready for file transfer");
+            response = "TCP connection is established, ready for file transfer";
         }
+        return response;
     }
 
     @PostMapping("/StartFileTransfer")
