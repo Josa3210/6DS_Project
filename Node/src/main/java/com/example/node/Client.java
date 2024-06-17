@@ -463,7 +463,7 @@ public class Client implements I_Client {
 
         System.out.println(">> Passing on agent to " + nextIP);
         // Send agent to next node --> process wil start
-        String postURL = "http:/" + nextIP + ":8080/agents/passFailureAgent";
+        String postURL = "http://" + nextIP + ":8080/agents/passFailureAgent";
         HashMap<String, Object> requestBody = new HashMap<>() {{
             put("callingID", getCurrentID());
             put("failedID", failedID);
