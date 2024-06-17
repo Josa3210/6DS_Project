@@ -26,7 +26,7 @@ public class CommandParser {
             case "getName" -> {
                 return Command.GETNAME;
             }
-            case "%%" -> {
+            case "exit" -> {
                 return Command.SHUTDOWN;
             }
         }

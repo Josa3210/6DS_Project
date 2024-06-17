@@ -346,14 +346,16 @@ public class Client implements I_Client {
         System.out.println("^^^^Removing itself from NS");
         removeFromNS();
 
-
         // Get IP of previous node
+        System.out.println("^^^^Getting IP from previous node");
         RestTemplate restTemplate = new RestTemplate();
         String getUrl = "http://" + namingServerIP + ":8080/ns/getIp/" + getPrevID();
         ResponseEntity<String> response2 = restTemplate.getForEntity(getUrl, String.class);
         String newIP = response2.getBody();
+        System.out.println("* IP: " + newIP);
 
         // Send file to previous node
+        System.out.println("^^^^Sending files to previous node");
         String url = "http://" + newIP + ":8080/shutdown/sendFiles";
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("originalIP", getCurrentIP());
