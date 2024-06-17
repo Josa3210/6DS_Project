@@ -37,7 +37,7 @@ public class CommandParser {
                 command.setArgs(Arrays.copyOfRange(args, 1, args.length));
                 return command;
             }
-            case "delete" -> {
+            case "deleteFile" -> {
                 command = Command.DELETE;
                 if (args.length - 1 > command.getNrArgs()) {
                     System.out.println("Too many arguments");

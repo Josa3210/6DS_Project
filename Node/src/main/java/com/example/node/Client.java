@@ -698,12 +698,16 @@ public class Client implements I_Client {
 
     @Override
     public void createFile(String filename) {
+        System.out.println(">> Creating file: " + filename);
         String filepath = folderPath + "/" + filename;
         File file = new File(filepath);
 
         try {
             if (!file.exists()) {
                 file.createNewFile();
+                System.out.println(">> File created");
+            } else {
+                System.out.println(">> File already exists");
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -712,6 +716,7 @@ public class Client implements I_Client {
 
     @Override
     public void deleteFile(String filename) {
+        System.out.println(">> Deleting file: " + filename);
         String filepath = folderPath + "/" + filename;
         File file = new File(filepath);
 

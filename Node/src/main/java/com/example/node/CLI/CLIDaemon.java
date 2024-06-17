@@ -39,8 +39,8 @@ public class CLIDaemon {
                 case SHUTDOWN -> client.shutDown();
                 case GETLINKIDS -> client.printLinkIds();
                 case GETNAME -> client.getName();
-                case CREATE -> client.createFile(args[0]);
-                case DELETE -> client.deleteFile(args[0]);
+                case CREATE -> client.createFile(String.valueOf(args[0]));
+                case DELETE -> client.deleteFile(String.valueOf(args[0]));
                 case PRINTLOGGER -> client.printLogger();
             }
         }

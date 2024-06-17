@@ -67,9 +67,7 @@ public class FileMonitor implements Runnable {
 
     private void processDelete() {
         File file = deletedFilesQueue.poll();
-        while (file == null) {
-
-
+        while (file != null) {
             String filepath = file.getPath();
             String filename = file.getName();
 
