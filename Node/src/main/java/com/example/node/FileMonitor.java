@@ -13,6 +13,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Queue;
 
 
 /**
@@ -25,10 +27,72 @@ public class FileMonitor implements Runnable {
 
     Client client;
     Logger logger;
+    Queue<File> createdFilesQueue;
+    Queue<File> deletedFilesQueue;
+
 
     public FileMonitor(Client client) {
         this.client = client;
         this.logger = client.getLogger();
+        createdFilesQueue = new LinkedList<>();
+        deletedFilesQueue = new LinkedList<>();
+    }
+
+    private void processCreate() {
+        File file = createdFilesQueue.poll();
+        if (file == null) return;
+
+        String filename = file.getName();
+        String filepath = file.getPath();
+
+        System.out.println("^^^^File popped from create queue: " + filename);
+
+        // Add file to the file list
+        client.getFileList().add(new NodeFileEntry(filename));
+        System.out.println("^^^^File created: " + filename);
+        int hash = client.computeHash(filename);
+        if (!client.isReceivedFile) { // if the file is locally made, we let the namingserver know
+            // Add file to the client logger
+            System.out.println("^^^^Putting file and original in logger");
+            logger.put(hash, filename);
+            logger.putOriginal(hash, client.currentID, client.getCurrentIP());
+            client.createReplicatedFile(file.getName(), filepath);
+        }
+
+        client.isReceivedFile = false;  // Reset flag to false after file is received
+    }
+
+    private void processDelete() {
+        File file = deletedFilesQueue.poll();
+        if (file == null) return;
+
+        String filepath = file.getPath();
+        String filename = file.getName();
+
+        System.out.println("^^^^File popped from delete queue: " + filename);
+
+        // Remove the file from the logger
+        int hash = client.computeHash(filename);
+        JSONObject originalJSON = (JSONObject) client.getLogger().get(hash).get("original");
+        String originalIP = String.valueOf(originalJSON.get("IP"));
+        String currentIP = client.getCurrentIP();
+
+
+        if (originalIP.equals(currentIP) & !client.isReplicatedFile) { // we check if the original IP of the file = current IP
+
+            // if this is the case, the current IP is the IP where the file got downloaded, so we need to make
+            // sure that the naming server gets noted about this so it can remove the replicated files too.
+            client.deleteReplicatedFile(filename, filepath);
+
+        }
+
+        if (client.getLogger().remove(hash)) {
+            System.out.println("^^^^Succesfully deleted file from logger");
+        }
+        // Remove the hash from the logger.
+        client.getFileList().removeIf(entry -> filename.equals(entry.getFilename()));
+
+        client.isReplicatedFile = false;
     }
 
     public void run() {
@@ -52,59 +116,22 @@ public class FileMonitor implements Runnable {
             public void onFileCreate(File file) {
 
                 String filename = file.getName();
-                String filepath = file.getPath();
-
                 if (!filename.endsWith(".swp")) {
-                    System.out.println("^^^^File created: " + filename);
-                    int hash = client.computeHash(filename);
-
-                    // Add file to the file list
-                    client.getFileList().add(new NodeFileEntry(filename));
-
-                    if (!client.isReceivedFile) { // if the file is locally made, we let the namingserver know
-                        // Add file to the client logger
-                        System.out.println("^^^^Putting file and original in logger");
-                        logger.put(hash, filename);
-                        logger.putOriginal(hash, client.currentID, client.getCurrentIP());
-                        client.createReplicatedFile(file.getName(), filepath);
-                    }
+                    // Add file to the queue
+                    System.out.println("^^^^File added to create queue: " + filename);
+                    createdFilesQueue.add(file);
                 }
-                client.isReceivedFile = false;  // Reset flag to false after file is received
             }
 
             @Override
             public void onFileDelete(File file) {
 
                 String filename = file.getName();
-
                 if (!filename.endsWith(".swp")) { // we don't look at temporary files
-
-                    String filepath = file.getPath();
-                    System.out.println("filepath: " + filepath);
-
-
-                    // Remove the file from the logger
-                    int hash = client.computeHash(filename);
-                    JSONObject originalJSON = (JSONObject) client.getLogger().get(hash).get("original");
-                    String originalIP = String.valueOf(originalJSON.get("IP"));
-                    String currentIP = client.getCurrentIP();
-
-
-                    if (originalIP.equals(currentIP) & !client.isReplicatedFile) { // we check if the original IP of the file = current IP
-
-                        // if this is the case, the current IP is the IP where the file got downloaded, so we need to make
-                        // sure that the naming server gets noted about this so it can remove the replicated files too.
-                        client.deleteReplicatedFile(filename, filepath);
-
-                    }
-
-                    if(client.getLogger().remove(hash)){
-                        System.out.println("^^^^Succesfully deleted file from logger");
-                    }
-                    // Remove the hash from the logger.
-                    client.getFileList().removeIf(entry -> filename.equals(entry.getFilename()));
+                    // Add file to the queue
+                    System.out.println("^^^^File added to delete queue: " + filename);
+                    deletedFilesQueue.add(file);
                 }
-                client.isReplicatedFile = false;
             }
         });
 
@@ -112,7 +139,9 @@ public class FileMonitor implements Runnable {
 
             try {
                 observer.checkAndNotify();
-                Thread.sleep(1000); // Adjust sleep time as needed
+                processCreate();
+                processDelete();
+                Thread.sleep(500); // Adjust sleep time as needed
 
             } catch (InterruptedException e) {
                 System.err.println(e.getMessage());
