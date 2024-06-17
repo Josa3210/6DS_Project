@@ -99,9 +99,11 @@ public class RestControllerDiscAndBoot {
         String ip = (String) request.get("replicated ip");
         if (client.clientSocket.isConnected()) {
             response = "* Socket (" + ip + ", 5000) still connected";
+            System.out.println("* "+ response);
         } else {
-            client.clientSocket = new Socket(ip, 5000);
             response = "TCP connection is established, ready for file transfer";
+            System.out.println("* "+ response);
+            client.clientSocket = new Socket(ip, 5000);
         }
         return response;
     }
