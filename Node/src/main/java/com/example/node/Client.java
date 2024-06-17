@@ -342,10 +342,6 @@ public class Client implements I_Client {
         int prevID = linkIds[0];
         int nextID = linkIds[1];
 
-        // Remove from the naming server
-        System.out.println("^^^^Removing itself from NS");
-        removeFromNS();
-
         // Get IP of previous node
         System.out.println("^^^^Getting IP from previous node");
         RestTemplate restTemplate = new RestTemplate();
@@ -361,6 +357,10 @@ public class Client implements I_Client {
         requestBody.put("originalIP", getCurrentIP());
         requestBody.put("files", logger.getFileArray().toString());
         restTemplate.postForEntity(url, requestBody, Void.class);
+
+        // Remove from the naming server
+        System.out.println("^^^^Removing itself from NS");
+        removeFromNS();
 
         // Sending new IDs to the prev and next node
         System.out.println("^^^^Passing on the ids");
