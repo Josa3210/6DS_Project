@@ -44,7 +44,7 @@ public class RestControllerAgent
         int callingID = (int) body.get("callingID");
 
         // Get the agent
-        FailureAgent agent = new FailureAgent(failedID, callingID, client.getNamingServerPort(), client.getNamingServerIP();
+        FailureAgent agent = new FailureAgent(failedID, callingID, client.getNamingServerIP());
 
         // Run the agent and wait for thread to finish
         boolean passOn = agent.activateAgent(this.client.getCurrentID(), this.client.getLogger(), client.folderPath);
