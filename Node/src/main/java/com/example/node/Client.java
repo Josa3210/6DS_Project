@@ -576,6 +576,7 @@ public class Client implements I_Client {
         String[] locationString = response.getBody();
         String replicatedIP = locationString[1];
 
+        System.out.println("* Current IP: " + getCurrentIP() +"= Replication IP: " + replicatedIP + "?");
         if (Objects.equals(getCurrentIP(), replicatedIP)) {
             getUrl = "http://" + namingServerIP + ":8080/ns/getIp/" + getNextID();
             ResponseEntity<String> response2 = restTemplate.getForEntity(getUrl, String.class);
@@ -599,7 +600,7 @@ public class Client implements I_Client {
             HttpStatusCode statusCode = responseEntity.getStatusCode();
 
             System.out.println(">> Putting new owner in logger");
-            System.out.println("ID: " + locationString[0] + ", IP: " + locationString[1]);
+            System.out.println("ID: " + locationString[0] + ", IP: " + replicatedIP);
             logger.putOwner(computeHash(filename), Integer.parseInt(locationString[0]), locationString[1]);
 
             if (statusCode == HttpStatus.OK) {
