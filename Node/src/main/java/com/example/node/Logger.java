@@ -60,7 +60,6 @@ public class Logger {
             if (file.exists()) {
                 String jsonContent = new String(Files.readAllBytes(Paths.get(this.filePath)));
                 this.fileArray = new JSONArray(jsonContent);
-                System.out.println("^^^^Map loaded successfully");
 
                 // If there is no file, create one.
             } else {
@@ -106,8 +105,6 @@ public class Logger {
 
             // Rename temp file
             tempFile.renameTo(loggerFile);
-
-            System.out.println("^^^^Map saved");
         } catch (IOException e) {
             System.err.println("^^^^Error saving map: " + e.getMessage());
         }
@@ -127,7 +124,6 @@ public class Logger {
                 int id = (int) obj.get("hash");
                 if (id == hash) return obj;
             }
-            System.err.println("No value with " + hash + " found.");
         } else {
             System.err.println("Hashmap is not initialized. Please load the hashmap first.");
         }

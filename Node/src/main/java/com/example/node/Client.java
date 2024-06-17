@@ -611,7 +611,7 @@ public class Client implements I_Client {
         }
     }
 
-    public void receiveReplicatedFile(Inet4Address originalIP, int originalId, String filepath) throws IOException {
+    public void sendFile(Inet4Address originalIP, String filepath) throws IOException {
         // Create socket for TCP
         this.serverSocket = new ServerSocket(5000);
 
@@ -644,6 +644,11 @@ public class Client implements I_Client {
 
         // Get ready to receive file
         this.ReceiveFile(filepath, dataInputStream);
+    }
+
+    public void receiveReplicatedFile(Inet4Address originalIP, int originalId, String filepath) throws IOException {
+        // Download the file
+        sendFile(originalIP,filepath);
 
         // Put in logger
         String filename = String.valueOf(Paths.get(filepath).getFileName());

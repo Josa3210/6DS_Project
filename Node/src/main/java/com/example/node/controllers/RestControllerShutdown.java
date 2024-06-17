@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
+import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,6 +44,7 @@ public class RestControllerShutdown {
         // Get all the files present on the leaving node
         String strArray = (String) requestbody.get("files");
         JSONArray files = new JSONArray(strArray);
+        String originalIP = (String) requestbody.get("original ip");
 
         System.out.println("^^^^Sending files to the previous ID");
         // For every file in the logger
@@ -79,6 +82,9 @@ public class RestControllerShutdown {
 
             } else {
                 System.out.println("* => NO: notify owner that there is a new original");
+                // Download the file
+                String filepath = client.folderPath + "/" + filename;
+                client.sendFile((Inet4Address) InetAddress.getByName(originalIP),filepath);
 
                 // If the node is not the replicated, it will become the new original
                 logger.put(fileID,(String) obj.get("filename"));
