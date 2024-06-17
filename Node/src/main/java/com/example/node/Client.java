@@ -530,11 +530,13 @@ public class Client implements I_Client {
         ResponseEntity<String[]> response = restTemplate.getForEntity(getUrl, String[].class);
         String[] locationString = response.getBody();
         String replicatedIP = locationString[1];
+        int replicatedID = Integer.parseInt(locationString[0]);
 
         if (Objects.equals(getCurrentIP(), replicatedIP)) {
             getUrl = "http://" + namingServerIP + ":8080/ns/getIp/" + getNextID();
             ResponseEntity<String> response2 = restTemplate.getForEntity(getUrl, String.class);
             replicatedIP = response2.getBody();
+            replicatedID = getNextID();
         }
         String postUrl = "http://" + replicatedIP + ":8080/deleteReplicatedFile";
 
@@ -575,12 +577,14 @@ public class Client implements I_Client {
         ResponseEntity<String[]> response = restTemplate.getForEntity(getUrl, String[].class);
         String[] locationString = response.getBody();
         String replicatedIP = locationString[1];
+        int replicatedID = Integer.parseInt(locationString[0]);
 
         System.out.println("* Current IP: " + getCurrentIP() +"= Replication IP: " + replicatedIP + "?");
         if (Objects.equals(getCurrentIP(), replicatedIP)) {
             getUrl = "http://" + namingServerIP + ":8080/ns/getIp/" + getNextID();
             ResponseEntity<String> response2 = restTemplate.getForEntity(getUrl, String.class);
             replicatedIP = response2.getBody();
+            replicatedID = getNextID();
         }
         System.out.println("* Replicated IP: " + replicatedIP);
 
@@ -600,8 +604,8 @@ public class Client implements I_Client {
             HttpStatusCode statusCode = responseEntity.getStatusCode();
 
             System.out.println(">> Putting new owner in logger");
-            System.out.println("ID: " + locationString[0] + ", IP: " + replicatedIP);
-            logger.putOwner(computeHash(filename), Integer.parseInt(locationString[0]), locationString[1]);
+            System.out.println("ID: " + replicatedID + ", IP: " + replicatedIP);
+            logger.putOwner(computeHash(filename), replicatedID, replicatedIP);
 
             if (statusCode == HttpStatus.OK) {
                 System.out.println("Successfully replicated file (" + filename + ") to " + replicatedIP);
