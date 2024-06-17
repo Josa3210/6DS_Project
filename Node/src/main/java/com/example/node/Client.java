@@ -451,8 +451,6 @@ public class Client implements I_Client {
         // Remove failed node from network
         removeFromNS(failedID);
 
-        // Create Failure agent
-        FailureAgent failureAgent = new FailureAgent(failedID, currentID, namingServerPort, namingServerIP);
         // Get ip from next node
         String getURL = "http://" + namingServerIP + ":8080/ns/getIp/" + nextID;
         ResponseEntity<String> response = restTemplate.getForEntity(getURL, String.class);
@@ -462,7 +460,8 @@ public class Client implements I_Client {
 
         String postURL = "http://" + nextIP + ":8080/agents/passFailureAgent";
         HashMap<String, Object> requestBody = new HashMap<>() {{
-            put("agent", failureAgent);
+            put("callingID", getCurrentID());
+            put("failedID", failedID);
         }};
         restTemplate.postForEntity(postURL, requestBody, void.class);
 
@@ -505,8 +504,12 @@ public class Client implements I_Client {
         return fileList;
     }
 
-    public void setFileList(List<NodeFileEntry> newList) {
-        this.fileList = newList;
+    public String getNamingServerIP() {
+        return namingServerIP;
+    }
+
+    public Integer getNamingServerPort() {
+        return namingServerPort;
     }
 
     @Override

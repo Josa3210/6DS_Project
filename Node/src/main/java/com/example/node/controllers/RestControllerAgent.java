@@ -39,18 +39,21 @@ public class RestControllerAgent
 
     @PostMapping("/agents/passFailureAgent")
     private void activatePassedAgent(@RequestBody Map<Object, Object> body) {
+        // Get parameters
+        int failedID = (int) body.get("failedID");
+        int callingID = (int) body.get("callingID");
+
         // Get the agent
-        FailureAgent agent = (FailureAgent) body.get("agent");
+        FailureAgent agent = new FailureAgent(failedID, callingID, client.getNamingServerPort(), client.getNamingServerIP();
+
+        // Run the agent and wait for thread to finish
+        boolean passOn = agent.activateAgent(this.client.getCurrentID(), this.client.getLogger(), client.folderPath);
 
         // Get next id
         int[] ids = this.client.requestLinkIds();
         int nextID = ids[1];
 
-        // Run the agent and wait for thread to finish
-        boolean passOn = agent.activateAgent(this.client.getCurrentID(), this.client.getLogger(), client.folderPath);
-
         System.out.println("Pass on to next? " + passOn);
-
         if (passOn) {
             try {
                 Inet4Address nextIP = (Inet4Address) InetAddress.getByName(client.requestIP(nextID));

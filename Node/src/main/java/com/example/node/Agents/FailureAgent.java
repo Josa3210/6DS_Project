@@ -18,23 +18,19 @@ public class FailureAgent implements Runnable {
 
     private final int failedID;
     private final int callingID;
-    private final int namingServerPort;
     private final String namingServerIP;
     private final Agent failureAgent;
-    private JSONArray fileList;
     private String fileDirectory;
     private Logger logger;
 
     // Construct agent
 
-    public FailureAgent(int failedID, int callingID, int namingServerPort, String namingServerIP) {
+    public FailureAgent(int failedID, int callingID, String namingServerIP) {
         this.failedID = failedID;
         this.callingID = callingID;
-        this.namingServerPort = namingServerPort;
         this.namingServerIP = namingServerIP;
         this.fileDirectory = null;
         this.failureAgent = new Agent();
-        this.fileList = null;
     }
 
     public boolean activateAgent(int currentID, Logger logger, String fileDirectory) {
