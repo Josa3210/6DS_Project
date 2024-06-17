@@ -48,19 +48,6 @@ public class RestControllerDiscAndBoot {
         System.out.println("* Nr nodes: " + nrNodes);
         System.out.println("* IP Naming Server: " + ipNamingServer);
         System.out.println("* Port Naming Server: " + portNamingServer);
-
-        /*if (nrNodes > 1) {
-            // the number of clients > 1
-            System.out.println("Number of nodes > 1, there are replicated nodes ..");
-            client.startFileMonitor = true;
-            System.out.println("number of nodes is bigger then 1");
-
-        }
-
-        else {
-            System.out.println("Number of nodes < 1, no replicated nodes ..");
-            client.startFileMonitor = false;
-        }*/
     }
 
     @GetMapping("/multicastaddress")

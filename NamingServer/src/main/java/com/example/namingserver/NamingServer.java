@@ -1,19 +1,16 @@
 package com.example.namingserver;
 
-import com.hazelcast.cluster.MembershipEvent;
-import com.hazelcast.cluster.MembershipListener;
-import com.hazelcast.config.*;
-import com.hazelcast.core.Hazelcast;
-import com.hazelcast.core.HazelcastInstance;
-
-
 import com.example.namingserver.database.I_NamingserverDB;
 import com.example.namingserver.database.NamingserverDB;
-import com.hazelcast.map.IMap;
-import com.hazelcast.shaded.org.json.JSONArray;
-import com.hazelcast.spi.exception.RestClientException;
+import com.hazelcast.cluster.MembershipEvent;
+import com.hazelcast.cluster.MembershipListener;
+import com.hazelcast.config.Config;
+import com.hazelcast.config.JoinConfig;
+import com.hazelcast.config.ListenerConfig;
+import com.hazelcast.config.NetworkConfig;
+import com.hazelcast.core.Hazelcast;
+import com.hazelcast.core.HazelcastInstance;
 import jakarta.annotation.PostConstruct;
-import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -32,16 +29,13 @@ import static java.util.Collections.max;
 @Component
 
 public class NamingServer implements I_NamingServer {
-    private static String multicast_address = "224.2.2.5";
-    private static Config config;
+    private static final String multicast_address = "224.2.2.5";
     private static HazelcastInstance hazelcastInstance;
-    private static IMap<String, String> mapIP;
     private static ClusterMemberShipListener event_listener;
     /**
      * Database containing the IP's of the different nodes {@see I_NamingserverDB}
      */
     private static I_NamingserverDB database;
-    public String folderPath = "Data/node/Files";
     private String ip;
 
 
@@ -52,13 +46,11 @@ public class NamingServer implements I_NamingServer {
      * this method sets up a Hazelcast instance with clustering enabled, specific network configurations including
      * port settings and multicast for node discovery, enables the REST API and management center console,
      * and finally creates a Hazelcast instance with these settings.
-     *
-     * @throws FileNotFoundException
      */
 
     private static void CreateConfig() throws FileNotFoundException {
 
-        config = new Config();
+        Config config = new Config();
         config.getJetConfig().setEnabled(true);
         config.setClusterName("testCluster");
         NetworkConfig networkConfig = config.getNetworkConfig();
@@ -84,12 +76,11 @@ public class NamingServer implements I_NamingServer {
         try {
             System.out.println(">> Initializing NamingServer");
             this.ip = Inet4Address.getByName(Inet4Address.getLocalHost().getHostAddress()).getHostAddress();
-            this.database = new NamingserverDB();
-            this.database.load();
-            this.database.print();
-            event_listener = new ClusterMemberShipListener((NamingserverDB) this.database);
+            database = new NamingserverDB();
+            database.load();
+            database.print();
+            event_listener = new ClusterMemberShipListener((NamingserverDB) database);
             NamingServer.CreateConfig();
-            mapIP = hazelcastInstance.getMap("mapIP");
         } catch (UnknownHostException | FileNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -190,10 +181,6 @@ public class NamingServer implements I_NamingServer {
             p_pow = (p_pow * p) % m;
         }
         return hash_value;
-    }
-
-    public Inet4Address getIp(int id) {
-        return database.get(id);
     }
 
 

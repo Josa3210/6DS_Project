@@ -1,14 +1,11 @@
 package com.example.namingserver.controllers;
 
-import com.example.namingserver.I_NamingServer;
 import com.example.namingserver.NamingServer;
-import com.hazelcast.shaded.org.json.JSONArray;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.HashMap;
 import java.util.Map;
 
 @RestController

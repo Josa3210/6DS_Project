@@ -1,24 +1,26 @@
 package com.example.node;
 
+import com.example.node.Agents.FailureAgent;
 import com.example.node.Agents.SyncAgent;
 import com.hazelcast.cluster.MembershipEvent;
 import com.hazelcast.cluster.MembershipListener;
-import com.hazelcast.config.*;
+import com.hazelcast.config.Config;
+import com.hazelcast.config.JoinConfig;
+import com.hazelcast.config.ListenerConfig;
+import com.hazelcast.config.NetworkConfig;
 import com.hazelcast.core.Hazelcast;
-import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.spi.exception.RestClientException;
 import jakarta.annotation.PostConstruct;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.net.Inet4Address;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.nio.file.Paths;
 import java.util.*;
-import java.io.*;
-import java.net.*;
 
 
 public class Client implements I_Client {
@@ -114,10 +116,6 @@ public class Client implements I_Client {
         } catch (IOException e1) {
             System.err.println(e1.getMessage());
         }
-    }
-
-    public Thread getFileMonitorThread() {
-        return fileMonitorThread;
     }
 
     /**
@@ -332,7 +330,6 @@ public class Client implements I_Client {
         requestBody.put("files", logger.getFileArray().toString());
         System.out.println("* new ip: " + newIP);
         System.out.println("*Files: " + logger.getFileArray().toString());
-
         restTemplate.postForEntity(url, requestBody, Void.class);
 
         // Remove from the naming server
@@ -355,14 +352,15 @@ public class Client implements I_Client {
      */
     @Override
     public void sendLinkID(int nodeID) {
-        String nodeIP = requestIP(nodeID);
-        String postUrl = "http://" + nodeIP + ":" + namingServerPort + "/shutdown/updateID";
-        System.out.println(">> Sending REST Post (sendLinkID)");
-
-        RestTemplate restTemplate = new RestTemplate();
-        Map<String, Object> requestBody = new HashMap<>();
-
         try {
+            String nodeIP = requestIP(nodeID);
+            String postUrl = "http://" + nodeIP + ":" + namingServerPort + "/shutdown/updateID";
+            System.out.println(">> Sending REST Post (sendLinkID)");
+
+            RestTemplate restTemplate = new RestTemplate();
+            Map<String, Object> requestBody = new HashMap<>();
+
+
             ResponseEntity<Void> requestEntity = restTemplate.postForEntity(postUrl, requestBody, Void.class);
             if (!requestEntity.getStatusCode().is2xxSuccessful()) removeFromNetwork(nodeID);
         } catch (Exception e) {
@@ -424,12 +422,13 @@ public class Client implements I_Client {
      */
     @Override
     public void ping(int nodeID) {
-        String nodeIP = requestIP(nodeID);
-
-        String uri = "http://" + nodeIP + ":8080/test" + "?testString=test";
-        System.out.println(">> Pinging: " + uri);
-        RestTemplate restTemplate = new RestTemplate();
         try {
+            String nodeIP = requestIP(nodeID);
+
+            String uri = "http://" + nodeIP + ":8080/test" + "?testString=test";
+            System.out.println(">> Pinging: " + uri);
+            RestTemplate restTemplate = new RestTemplate();
+
             ResponseEntity<String> responseEntity = restTemplate.getForEntity(uri, String.class);
             System.out.println("* Response: " + responseEntity.getBody());
 
@@ -447,12 +446,27 @@ public class Client implements I_Client {
      */
     @Override
     public void removeFromNetwork(int failedID) {
-        System.out.println(">> Removing client from network");
-
+        System.out.println(">> Removing client " + failedID + " from network");
+        RestTemplate restTemplate = new RestTemplate();
         int[] ids = requestLinkIds(failedID);
 
-        // remove failed node from network
+        // Remove failed node from network
         removeFromNS(failedID);
+
+        // Create Failure agent
+        FailureAgent failureAgent = new FailureAgent(failedID, currentID, namingServerPort, namingServerIP);
+        // Get ip from next node
+        String getURL = "http://" + namingServerIP + ":8080/ns/getIp/" + nextID;
+        ResponseEntity<String> response = restTemplate.getForEntity(getURL, String.class);
+        String nextIP = response.getBody();
+
+        // Send agent to next node --> process wil start
+
+        String postURL = "http://" + nextIP + ":8080/agents/passFailureAgent";
+        HashMap<String, Object> requestBody = new HashMap<>() {{
+            put("agent", failureAgent);
+        }};
+        restTemplate.postForEntity(postURL, requestBody, void.class);
 
         // Send prevID to nextIP and nextID to prevID
         sendLinkID(ids[0]);
@@ -640,8 +654,13 @@ public class Client implements I_Client {
     }
 
     public void receiveReplicatedFile(Inet4Address originalIP, int originalId, String filepath) throws IOException {
-        // Download the file
-        receiveFile(originalIP,filepath);
+        // Check if the file is not already present
+        File replica = new File(filepath);
+
+        if (!replica.exists()) {
+            // Download the file
+            receiveFile(originalIP, filepath);
+        }
 
         // Put in logger
         String filename = String.valueOf(Paths.get(filepath).getFileName());

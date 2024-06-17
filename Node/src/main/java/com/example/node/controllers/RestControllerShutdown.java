@@ -52,6 +52,7 @@ public class RestControllerShutdown {
             JSONObject obj = files.getJSONObject(i);
             JSONObject owner = (JSONObject) obj.get("owner");
             String filename = obj.get("filename").toString();
+
             // Check if this node is the replicated node of the file
             String newReplicatedIP;
             String ownerIP = (String) owner.get("IP");
