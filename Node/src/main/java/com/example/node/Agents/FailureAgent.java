@@ -43,9 +43,8 @@ public class FailureAgent implements Runnable {
 
     @Override
     public void run() {
-        System.out.println(">> Trying to start behaviour");
-        RestTemplate restTemplate = new RestTemplate();
         System.out.println("=> FailureAgent: starting action");
+        RestTemplate restTemplate = new RestTemplate();
         // Check for all files if the failed node is the owner
         for (int i = 0; i < fileList.length(); i++) {
             // Get filename and file owner
@@ -65,13 +64,14 @@ public class FailureAgent implements Runnable {
                 String[] replicatedLocation = requestNewOwner(filename);
                 String replicationIP = replicatedLocation[1];
                 int replicatedID = Integer.parseInt(replicatedLocation[0]);
+                System.out.println("- New owner of file: " + replicatedID);
 
                 // Send that it is the new replicated node
                 String postUrl = "http://" + replicationIP + ":8080/isReplicatedNode";
                 HttpHeaders headers = new HttpHeaders();
                 Map<String, Object> requestBody = new HashMap<>();
                 HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
-
+                
                 try {
                     // Send the POST request
                     requestBody.put("original ip", originalIP);
@@ -94,7 +94,6 @@ public class FailureAgent implements Runnable {
                 } catch (NumberFormatException e) {
                     throw new RuntimeException(e);
                 }
-
             }
         }
     }
