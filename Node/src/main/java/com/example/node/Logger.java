@@ -34,7 +34,7 @@ public class Logger {
             load();
 
         } catch (IOException e) {
-            System.out.println("^^^^Error");
+            System.out.println(">> Error");
             System.err.println(e);
         }
     }
@@ -51,7 +51,7 @@ public class Logger {
      */
 
     public void load() {
-        System.out.println("^^^^Trying to load from: " + filePath);
+        System.out.println(">> Trying to load from: " + filePath);
         try {
             // Define a file from where the file should be
             File file = new File(filePath);
@@ -65,13 +65,13 @@ public class Logger {
             } else {
                 // Create a new file if it doesn't exist
                 if (file.createNewFile()) {
-                    System.out.println("^^^^File does not exist. Initializing an empty file: " + fileName);
+                    System.out.println(">> File does not exist. Initializing an empty file: " + fileName);
                     fileArray = new JSONArray();
                     save();
                 }
             }
         } catch (IOException e) {
-            System.err.println("^^^^Error loading hashmap from file: " + e.getMessage());
+            System.err.println(">> Error loading hashmap from file: " + e.getMessage());
             fileArray = new JSONArray();
         }
     }
@@ -106,7 +106,7 @@ public class Logger {
             // Rename temp file
             tempFile.renameTo(loggerFile);
         } catch (IOException e) {
-            System.err.println("^^^^Error saving map: " + e.getMessage());
+            System.err.println(">> Error saving map: " + e.getMessage());
         }
     }
 
@@ -274,9 +274,9 @@ public class Logger {
             String originalIP = original.getString("IP");
             int originalID = (int) original.getInt("ID");
             str.append("File: ").append(filename).append(", Hash: ").append(id).append("\n");
-            str.append("- Owner: ").append(ownerID).append("(").append(ownerIP).append(")\n");
-            str.append("- Original: ").append(originalID).append("(").append(originalIP).append(")\n");
-            str.append("-------------------------------------------\n");
+            str.append("- Owner: ").append(ownerID).append(" (/").append(ownerIP).append(")\n");
+            str.append("- Original: ").append(originalID).append(" (/").append(originalIP).append(")\n");
+            str.append("--------------------------------------\n");
         }
         return str.toString();
     }
