@@ -29,13 +29,19 @@ public class SyncAgent implements Runnable
     public void run()
     {
         System.out.println("^^^^Debugging Run()");
-        while (isActive) {
+        while (true)
+        {
             try {
-                syncNodes();
+                if(isActive)
+                    syncNodes();
                 Thread.sleep(5000); // Wait for 5 seconds before the next sync
             } catch (InterruptedException e) {
                 System.out.println("Thread interrupted: " + e.getMessage());
                 Thread.currentThread().interrupt(); // Preserve interrupt status
+                break; // Exit the loop if interrupted
+            } catch (Exception e) {
+                System.out.println("Error in syncNodes: " + e.getMessage());
+                e.printStackTrace(); // Optional: print stack trace for debugging
             }
         }
     }
