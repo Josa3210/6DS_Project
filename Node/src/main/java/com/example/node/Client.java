@@ -368,6 +368,11 @@ public class Client implements I_Client {
         }
     }
 
+    public void activateSyncAgent()
+    {
+        syncAgent.setActive(nextID != currentID);
+    }
+
     /**
      * This method will update the client's previous and next ID
      *
@@ -380,7 +385,7 @@ public class Client implements I_Client {
         this.nextID = prevID == currentID ? nextID : this.nextID;
         this.prevID = nextID == currentID ? prevID : this.prevID;
 
-        syncAgent.setActive(nextID != currentID);
+
     }
 
     /**

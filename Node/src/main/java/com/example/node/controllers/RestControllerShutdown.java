@@ -34,6 +34,8 @@ public class RestControllerShutdown {
         int[] ids = client.requestLinkIds();
         client.setPrevID(ids[0]);
         client.setNextID(ids[1]);
+
+        client.activateSyncAgent();
     }
 
     @PostMapping("/shutdown/sendFiles")
