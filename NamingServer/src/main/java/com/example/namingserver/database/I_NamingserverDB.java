@@ -1,6 +1,7 @@
 package com.example.namingserver.database;
 
 import java.net.Inet4Address;
+import java.util.HashMap;
 import java.util.Set;
 
 public interface I_NamingserverDB {
@@ -23,5 +24,7 @@ public interface I_NamingserverDB {
     void remove(int hash);
 
     void print();
+
+    HashMap<Integer, Inet4Address> getNodeMap();
 
 }

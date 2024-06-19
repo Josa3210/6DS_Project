@@ -11,6 +11,7 @@ import com.hazelcast.config.NetworkConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import jakarta.annotation.PostConstruct;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -261,6 +262,29 @@ public class NamingServer implements I_NamingServer {
         }};
 
         restTemplate.postForEntity(postUrl, requestBody, Void.class);
+    }
+
+    public String getHostNameClient(int id)
+    {
+        String clientIP = getIP(id).getHostAddress();
+        String getUrl = "http://" + clientIP + ":8080/host";
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.getForEntity(getUrl, String.class);
+        return response.getBody();
+    }
+
+    public void shutdownClient(int nodeId)
+    {
+        String clientIP = getIP(nodeId).getHostAddress();
+        String postUrl = "http://" + clientIP + ":8080/shutdown/exit";
+        RestTemplate restTemplate = new RestTemplate();
+        Map<String, Object> requestBody = new HashMap<>();
+        restTemplate.postForEntity(postUrl, requestBody, Void.class);
+    }
+
+    public HashMap<Integer, Inet4Address> returnData()
+    {
+        return database.getNodeMap();
     }
 
     public class ClusterMemberShipListener implements MembershipListener {

@@ -113,4 +113,10 @@ public class RestControllerDiscAndBoot {
         System.out.println("^^^^Starting file transfer: " + filepath);
         client.SendFile(filepath);
     }
+
+    @GetMapping("/host")
+    public String GetHostName()
+    {
+        return client.getHostname();
+    }
 }
