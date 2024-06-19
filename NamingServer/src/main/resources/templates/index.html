@@ -1,0 +1,101 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Server Status</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        .node {
+            padding: 10px;
+            background-color: #fafafa;
+            border-radius: 3px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+        .title {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+        }
+        .divider {
+            border-bottom: 1px solid #ddd;
+            margin: 10px 0;
+        }
+        .node-ids {
+            text-align: center;
+        }
+        .node-id-bold {
+            font-weight: bold;
+        }
+        .shutdown-btn {
+            display: block;
+            width: 100%;
+            background-color: #d9534f;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            text-align: center;
+            border-radius: 3px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .shutdown-btn:hover {
+            background-color: #c9302c;
+        }
+        .node-files-title {
+            margin-top: 10px;
+            font-weight: normal;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Server Status</h1>
+    <p>Available Nodes:</p>
+    <div class="grid-container">
+        <div th:each="entry : ${detailedData}" class="node">
+            <div class="title">
+                <span th:text="${entry.value.hostName}">Host Name</span>
+                <span th:text="${entry.value.ipAddress}">IP Address</span>
+            </div>
+            <div class="divider"></div>
+            <div class="node-ids">
+                <span th:text="${entry.value.prevId}"></span>
+                <span> < </span>
+                <span class="node-id-bold" th:text="${entry.value.nodeId}"></span>
+                <span> > </span>
+                <span th:text="${entry.value.nextId}"></span>
+            </div>
+            <div class="divider"></div>
+            <div class="node-files-title">Node Files:</div>
+            <div class="divider"></div>
+            <form th:action="@{/shutdown}" method="post">
+                <input type="hidden" name="nodeId" th:value="${entry.value.nodeId}" />
+                <button type="submit" class="shutdown-btn">Shutdown</button>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>
