@@ -258,7 +258,7 @@ public class NamingServer implements I_NamingServer {
         Map<String, Object> requestBody = new HashMap<>() {{
             put("nrNodes", sendNumNodes());
             put("ip", ip);
-            put("port", 9090);
+            put("port", 8080);
         }};
 
         restTemplate.postForEntity(postUrl, requestBody, Void.class);
