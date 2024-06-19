@@ -352,7 +352,11 @@ public class Client implements I_Client {
      * @param nodeID the requested nodes ID
      */
     @Override
-    public void sendLinkID(int nodeID) {
+    public void sendLinkID(int nodeID)
+    {
+        System.out.println("!! node id: " + nodeID + ", current: " + this.currentID);
+        if(nodeID == currentID) return;
+
         try {
             String nodeIP = requestIP(nodeID);
             String postUrl = "http://" + nodeIP + ":" + namingServerPort + "/shutdown/updateID";
