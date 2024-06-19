@@ -211,6 +211,7 @@ public class Client implements I_Client {
         sendLinkID(nextID);
         sendLinkID(prevID);
 
+        activateSyncAgent();
         fileMonitorThread.start();
     }
 

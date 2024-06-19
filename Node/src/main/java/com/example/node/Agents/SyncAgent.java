@@ -47,7 +47,7 @@ public class SyncAgent implements Runnable
 
     private void syncNodes()
     {
-        System.out.println(">> SYNC AGENT");
+        System.out.println("\n>> SYNC AGENT");
         System.out.println(">> --------------------------");
 
         // REST ask for the sync agent list of the next node
@@ -88,7 +88,7 @@ public class SyncAgent implements Runnable
         for(NodeFileEntry entry : client.getFileList())
             updateLock(entry, getAgentFiles());
 
-        System.out.println(">> --------------------------");
+        System.out.println(">> --------------------------\n");
     }
 
     public List<NodeFileEntry> getAgentFiles() { return agentFiles; }
