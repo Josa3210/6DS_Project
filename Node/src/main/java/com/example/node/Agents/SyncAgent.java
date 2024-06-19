@@ -32,9 +32,8 @@ public class SyncAgent implements Runnable
         while (true)
         {
             try {
-                if(isActive)
-                    syncNodes();
-                Thread.sleep(5000); // Wait for 5 seconds before the next sync
+                if(isActive) syncNodes();
+                Thread.sleep(10000); // Wait for 5 seconds before the next sync
             } catch (InterruptedException e) {
                 System.out.println("Thread interrupted: " + e.getMessage());
                 Thread.currentThread().interrupt(); // Preserve interrupt status
@@ -58,10 +57,9 @@ public class SyncAgent implements Runnable
 
         String getUrl = "http://" + ipNextNode + ":8080/agents/sync"; // Failure Exception?
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<SyncAgent> response = restTemplate.getForEntity(getUrl, SyncAgent.class);
+        ResponseEntity<SyncAgentResponse> response = restTemplate.getForEntity(getUrl, SyncAgentResponse.class);
 
-        SyncAgent nextNodeAgent = response.getBody();
-        List<NodeFileEntry> nextNodeList = nextNodeAgent.getAgentFiles();
+        List<NodeFileEntry> nextNodeList = response.getBody().getAgentFiles();
 
         for(NodeFileEntry nextNodeEntry : nextNodeList)
             System.out.println("* File Name: " + nextNodeEntry.getFilename() + " - Locked: " + nextNodeEntry.isLocked());
