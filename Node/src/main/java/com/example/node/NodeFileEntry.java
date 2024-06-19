@@ -11,6 +11,11 @@ public class NodeFileEntry
         this.isLocked = false;
     }
 
+    // No-argument constructor
+    public NodeFileEntry() {
+        // Default constructor
+    }
+
     public String getFilename() {
         return filename;
     }
