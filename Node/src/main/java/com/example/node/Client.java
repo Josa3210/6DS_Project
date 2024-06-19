@@ -370,6 +370,7 @@ public class Client implements I_Client {
 
     public void activateSyncAgent()
     {
+        System.out.println("Activated Sync Agent: " + nextID + ", " + currentID + " => " + (nextID!= currentID));
         syncAgent.setActive(nextID != currentID);
     }
 
