@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.net.Inet4Address;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -41,7 +42,9 @@ public class ControllerGUI
             Inet4Address ipAddress = entry.getValue();
             int[] linkIds = namingServer.giveLinkIds(nodeId);
             String hostName = namingServer.getHostNameClient(nodeId);
-            detailedData.put(nodeId, new NodeDetails(nodeId, ipAddress, linkIds[0], linkIds[1], hostName));
+            ArrayList<String> ownedFiles = namingServer.getClientFiles(nodeId).get(0);
+            ArrayList<String> createdFiles = namingServer.getClientFiles(nodeId).get(1);
+            detailedData.put(nodeId, new NodeDetails(nodeId, ipAddress, linkIds[0], linkIds[1], hostName, createdFiles, ownedFiles));
         }
 
         model.addAttribute("detailedData", detailedData);
@@ -65,14 +68,18 @@ public class ControllerGUI
         private final int nodeId, prevId, nextId;
         private final Inet4Address ipAddress;
         private final String hostName;
+        private final ArrayList<String> originalFiles;
+        private final ArrayList<String> ownedFiles;
 
-        public NodeDetails(int nodeId, Inet4Address ipAddress, int prevId, int nextId, String hostName)
+        public NodeDetails(int nodeId, Inet4Address ipAddress, int prevId, int nextId, String hostName, ArrayList<String> originalFiles, ArrayList<String> ownedFiles)
         {
             this.nodeId = nodeId;
             this.ipAddress = ipAddress;
             this.prevId = prevId;
             this.nextId = nextId;
             this.hostName = hostName;
+            this.originalFiles = originalFiles;
+            this.ownedFiles = ownedFiles;
         }
 
         public int getNodeId() {return nodeId;}
@@ -80,5 +87,7 @@ public class ControllerGUI
         public int getPrevId() {return prevId;}
         public int getNextId() {return nextId;}
         public String getHostName() {return hostName;}
+        public ArrayList<String> getOriginalFiles() { return originalFiles; }
+        public ArrayList<String> getOwnedFiles() { return ownedFiles; }
     }
 }

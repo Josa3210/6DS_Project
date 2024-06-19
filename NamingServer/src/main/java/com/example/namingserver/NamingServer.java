@@ -18,10 +18,7 @@ import org.springframework.web.client.RestTemplate;
 import java.io.FileNotFoundException;
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static java.lang.Math.abs;
@@ -271,6 +268,15 @@ public class NamingServer implements I_NamingServer {
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> response = restTemplate.getForEntity(getUrl, String.class);
         return response.getBody();
+    }
+
+    public ArrayList<ArrayList<String>> getClientFiles(int id)
+    {
+        String clientIP = getIP(id).getHostAddress();
+        String getUrl = "http://" + clientIP + ":8080/getFiles";
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<ClientFilesResponse> response = restTemplate.getForEntity(getUrl, ClientFilesResponse.class);
+        return response.getBody().getClientFiles();
     }
 
     public void shutdownClient(int nodeId)
