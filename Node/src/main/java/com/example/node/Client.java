@@ -62,7 +62,8 @@ public class Client implements I_Client {
             fileMonitorThread = new Thread(new FileMonitor(this));
             //Sync Agent
             System.out.println(">> Debugging Run Sync Agent in Client");
-            //syncAgent = new SyncAgent(this);
+
+            syncAgent = new SyncAgent(this);
             //syncAgent.run();
         } catch (IOException e) {
             throw new RuntimeException(e);
