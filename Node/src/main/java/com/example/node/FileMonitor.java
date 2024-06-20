@@ -108,7 +108,7 @@ public class FileMonitor implements Runnable {
             System.err.println(e.getMessage());
             throw new RuntimeException(e);
         }
-        System.out.println("folder created: " + client.folderPath);
+        System.out.println(">> Folder created: " + client.folderPath);
 
         // Create a FileAlterationObserver for the specified folder path (specified in the client)
         FileAlterationObserver observer = new FileAlterationObserver(client.folderPath);
