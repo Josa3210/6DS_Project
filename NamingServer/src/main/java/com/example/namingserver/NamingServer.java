@@ -11,16 +11,14 @@ import com.hazelcast.config.NetworkConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import jakarta.annotation.PostConstruct;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.FileNotFoundException;
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static java.lang.Math.abs;
@@ -245,14 +243,11 @@ public class NamingServer implements I_NamingServer {
 
         if (clientIP.getHostAddress().equals(this.ip)) return;
 
-        System.out.println(">> Welcoming client - Sending POST request");
 
         String postUrl = "http://" + clientIP.getHostAddress() + ":8080/welcome";
-
-        System.out.println("* URI : " + postUrl);
-
         RestTemplate restTemplate = new RestTemplate();
 
+        System.out.println(">> Welcoming client - Sending request: " + postUrl);
         // Create the request body
         Map<String, Object> requestBody = new HashMap<>() {{
             put("nrNodes", sendNumNodes());
@@ -261,6 +256,38 @@ public class NamingServer implements I_NamingServer {
         }};
 
         restTemplate.postForEntity(postUrl, requestBody, Void.class);
+    }
+
+    public String getHostNameClient(int id)
+    {
+        String clientIP = getIP(id).getHostAddress();
+        String getUrl = "http://" + clientIP + ":8080/host";
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.getForEntity(getUrl, String.class);
+        return response.getBody();
+    }
+
+    public ArrayList<ArrayList<String>> getClientFiles(int id)
+    {
+        String clientIP = getIP(id).getHostAddress();
+        String getUrl = "http://" + clientIP + ":8080/getFiles";
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<ClientFilesResponse> response = restTemplate.getForEntity(getUrl, ClientFilesResponse.class);
+        return response.getBody().getClientFiles();
+    }
+
+    public void shutdownClient(int nodeId)
+    {
+        String clientIP = getIP(nodeId).getHostAddress();
+        String postUrl = "http://" + clientIP + ":8080/shutdown/exit";
+        RestTemplate restTemplate = new RestTemplate();
+        Map<String, Object> requestBody = new HashMap<>();
+        restTemplate.postForEntity(postUrl, requestBody, Void.class);
+    }
+
+    public HashMap<Integer, Inet4Address> returnData()
+    {
+        return database.getNodeMap();
     }
 
     public class ClusterMemberShipListener implements MembershipListener {

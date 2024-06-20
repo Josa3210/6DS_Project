@@ -37,14 +37,11 @@ public class NamingserverDB implements I_NamingserverDB {
             String currentPath = new java.io.File("").getCanonicalPath();
             String filepath = currentPath + "/Data/DB/namingServer";
             Path path = Paths.get(filepath);
-
-            System.out.println(filepath);
-
             Files.createDirectories(path);
 
             this.filePath = filepath;
 
-            System.out.println("Database will be saved in: " + filePath);
+            System.out.println(">> Creating database in: " + filePath);
 
         } catch (IOException e) {
             System.out.println(e);
@@ -78,8 +75,6 @@ public class NamingserverDB implements I_NamingserverDB {
                         System.err.println("Error parsing key-value pair: " + entry.getKey() + " - " + entry.getValue());
                     }
                 }
-
-                System.out.println("Map loaded from file: " + filePath);
             } else {
                 // Create a new file if it doesn't exist
                 if (file.createNewFile()) {
@@ -105,10 +100,10 @@ public class NamingserverDB implements I_NamingserverDB {
             File file = new File(filePath + "/" + fileName);
             objectMapper.writeValue(file, nodeMap);
 
-            System.out.println("Map saved to file: " + filePath + "/" + fileName);
+            System.out.println(">> Map saved");
 
         } catch (IOException e) {
-            System.err.println("Error saving map to file: " + e.getMessage());
+            System.err.println(">> Error saving map to file: " + e.getMessage());
         }
     }
 
@@ -121,17 +116,16 @@ public class NamingserverDB implements I_NamingserverDB {
 
 
     public Inet4Address get(Integer hash) {
-        System.out.println("Map: " + nodeMap);
         if (nodeMap != null) {
             Inet4Address address = nodeMap.get(hash);
             if (address == null) {
-                System.err.println("Given key: hash. Result: null");
+                System.err.println(">> Given key:" + hash + " => not found");
                 return null;
             } else {
                 return address;
             }
         } else {
-            System.err.println("Hashmap is not initialized. Please load the hashmap first.");
+            System.err.println(">> Hashmap is not initialized. Please load the hashmap first.");
             return null;
         }
     }
@@ -146,7 +140,7 @@ public class NamingserverDB implements I_NamingserverDB {
         if (nodeMap != null) {
             return nodeMap.keySet(); // Assuming nodeMap is a Map<Integer, Something>
         } else {
-            System.err.println("Hashmap is not initialized. Please load the map first.");
+            System.err.println(">> Hashmap is not initialized. Please load the map first.");
             return Collections.emptySet(); // Or return null if appropriate
         }
     }
@@ -163,7 +157,7 @@ public class NamingserverDB implements I_NamingserverDB {
             nodeMap.put(hash, ip4);
             this.save();
         } else {
-            System.err.println("Map is not initialized. Please load the map first.");
+            System.err.println(">> Map is not initialized. Please load the map first.");
         }
     }
 
@@ -174,13 +168,13 @@ public class NamingserverDB implements I_NamingserverDB {
         if (nodeMap != null) {
             if (nodeMap.containsKey(hash)) {
                 nodeMap.remove(hash);
-                System.out.println("Entry with key " + hash + " removed from the database.");
+                System.out.println(">> Entry with key " + hash + " removed from the database.");
                 this.save();
             } else {
-                System.out.println("Entry has already been removed");
+                System.out.println(">> Entry has already been removed");
             }
         } else {
-            System.err.println("Database is not initialized. Please load the database first.");
+            System.err.println(">> Database is not initialized. Please load the database first.");
         }
     }
 
@@ -189,6 +183,9 @@ public class NamingserverDB implements I_NamingserverDB {
         System.out.println(this.nodeMap);
     }
 
+    public HashMap<Integer, Inet4Address> getNodeMap() {
+        return nodeMap;
+    }
 }
 
 

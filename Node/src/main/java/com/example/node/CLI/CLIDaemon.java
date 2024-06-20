@@ -42,6 +42,7 @@ public class CLIDaemon {
                 case CREATE -> client.createFile(String.valueOf(args[0]));
                 case DELETE -> client.deleteFile(String.valueOf(args[0]));
                 case PRINTLOGGER -> client.printLogger();
+                case GETFILE -> client.lookupFile(String.valueOf(args[0]));
             }
         }
     }

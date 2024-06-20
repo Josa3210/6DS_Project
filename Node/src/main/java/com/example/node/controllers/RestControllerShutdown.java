@@ -5,6 +5,7 @@ import com.example.node.Logger;
 import com.hazelcast.shaded.org.json.JSONArray;
 import com.hazelcast.shaded.org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,6 +35,8 @@ public class RestControllerShutdown {
         int[] ids = client.requestLinkIds();
         client.setPrevID(ids[0]);
         client.setNextID(ids[1]);
+
+        client.activateSyncAgent();
     }
 
     @PostMapping("/shutdown/sendFiles")
@@ -106,6 +109,12 @@ public class RestControllerShutdown {
                 restTemplate.postForEntity(url, bodyNewReplicated, Void.class);
             }
         }
+    }
+
+    @PostMapping("/shutdown/exit") // problem is that the connection will be interrupted when shutting down between naming server and client
+    public void exit()
+    {
+        client.shutDown();
     }
 }
 

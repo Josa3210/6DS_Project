@@ -119,4 +119,6 @@ public interface I_Client {
     void deleteFile(String arg);
 
     void printLogger();
+
+    void lookupFile(String valueOf);
 }

@@ -1,6 +1,7 @@
 package com.example.node.controllers;
 
 import com.example.node.Client;
+import com.example.node.ClientFilesResponse;
 import com.hazelcast.config.Config;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
@@ -15,6 +16,7 @@ import java.io.IOException;
 import java.net.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -112,5 +114,19 @@ public class RestControllerDiscAndBoot {
         String filepath = (String) request.get("filepath");
         System.out.println("^^^^Starting file transfer: " + filepath);
         client.SendFile(filepath);
+    }
+
+    @GetMapping("/host")
+    public String GetHostName()
+    {
+        return client.getHostname();
+    }
+
+    @GetMapping("/getFiles")
+    public ClientFilesResponse GetClientFiles()
+    {
+        ClientFilesResponse response = new ClientFilesResponse();
+        response.setClientFiles(client.getLogger().getDifferentFiles(client.getCurrentID()));
+        return response;
     }
 }

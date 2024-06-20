@@ -1,6 +1,7 @@
 package com.example.node.controllers;
 
 import com.example.node.Agents.FailureAgent;
+import com.example.node.Agents.SyncAgentResponse;
 import com.example.node.Client;
 import com.example.node.Agents.SyncAgent;
 import com.example.node.NodeFileEntry;
@@ -31,10 +32,12 @@ public class RestControllerAgent
     }
 
     @GetMapping("/agents/sync")
-    private SyncAgent Sync()
+    private SyncAgentResponse Sync()
     {
         System.out.println(">> Answering Agent Sync request");
-        return client.getSyncAgent();
+        SyncAgentResponse response = new SyncAgentResponse();
+        response.setAgentFiles(client.getFileList());
+        return response;
     }
 
     @PostMapping("/agents/passFailureAgent")

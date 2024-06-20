@@ -280,6 +280,74 @@ public class Logger {
         }
         return str.toString();
     }
+
+    public int getOwnerID(JSONObject obj){
+        JSONObject original = obj.getJSONObject("owner");
+        return original.getInt("ID");
+    }
+
+
+    public int getOriginalID(JSONObject obj){
+        JSONObject original = obj.getJSONObject("original");
+        return original.getInt("ID");
+    }
+
+    /**
+     * Checks for a certain file if the given node is the owner (aka replicated node)
+     * @param fileID ID of the file to search for
+     * @param requestID ID of the node to see if is the owner
+     */
+    public boolean isOwner(int fileID, int requestID) {
+        if (fileArray != null) {
+            for (int i = 0; i < fileArray.length(); i++) {
+                JSONObject obj = fileArray.getJSONObject(i);
+                int hash = obj.getInt("hash");
+                if (Objects.equals(hash, fileID)) {
+                    return getOwnerID(obj) == requestID;
+                }
+            }
+        }
+        return false;
+    }
+
+
+    /**
+     * Checks for a certain file if the given node is the original (aka replicated node)
+     * @param fileID ID of the file to search for
+     * @param requestID ID of the node to see if is the original
+     */
+    public boolean isOriginal(int fileID, int requestID) {
+        if (fileArray != null) {
+            for (int i = 0; i < fileArray.length(); i++) {
+                JSONObject obj = fileArray.getJSONObject(i);
+                int hash = obj.getInt("hash");
+                if (Objects.equals(hash, fileID)) {
+                    return getOriginalID(obj) == requestID;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns a list of lists containing the owned file and created files respectively
+     * @param nodeID the id to check against
+     */
+    public ArrayList<ArrayList<String>> getDifferentFiles(int nodeID){
+        ArrayList<ArrayList<String>> returnList = new ArrayList<>();
+        ArrayList<String> ownedFiles = new ArrayList<>();
+        ArrayList<String> createdFiles = new ArrayList<>();
+        if (fileArray != null) {
+            for (int i = 0; i < fileArray.length(); i++) {
+                JSONObject obj = fileArray.getJSONObject(i);
+                if (getOriginalID(obj) == nodeID) createdFiles.add(obj.getString("filename"));
+                if (getOwnerID(obj) == nodeID) ownedFiles.add(obj.getString("filename"));
+            }
+        }
+        returnList.add(ownedFiles);
+        returnList.add(createdFiles);
+        return returnList;
+    }
 }
 
 
