@@ -43,7 +43,7 @@ public class FailureAgent implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("=> FailureAgent: starting action");
+        System.out.println(">> FailureAgent: starting action");
         RestTemplate restTemplate = new RestTemplate();
         // Check for all files if the failed node is the owner
         for (int i = 0; i < fileList.length(); i++) {
@@ -52,7 +52,7 @@ public class FailureAgent implements Runnable {
             String filename = (String) obj.get("filename");
             int ownerID = getOwnerID(filename);
 
-            System.out.println("- Owner of file " + filename + " : " + ownerID);
+            System.out.println("* Owner of file " + filename + " : " + ownerID);
             if (ownerID == this.failedID) {
                 // Extract information from logger
                 int fileHash = obj.getInt("hash");
@@ -64,7 +64,7 @@ public class FailureAgent implements Runnable {
                 String[] replicatedLocation = requestNewOwner(filename);
                 String replicationIP = replicatedLocation[1];
                 int replicatedID = Integer.parseInt(replicatedLocation[0]);
-                System.out.println("- New owner of file: " + replicatedID);
+                System.out.println("* New owner of file: " + replicatedID);
 
                 // Send that it is the new replicated node
                 String postUrl = "http://" + replicationIP + ":8080/isReplicatedNode";
@@ -78,18 +78,18 @@ public class FailureAgent implements Runnable {
                     requestBody.put("original id", originalID);
                     requestBody.put("filepath", this.fileDirectory + "/" + filename);
 
-                    System.out.println("- Sending request to: " + postUrl);
+                    System.out.println(">> Sending request to: " + postUrl);
                     ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
                     HttpStatusCode statusCode = responseEntity.getStatusCode();
 
-                    System.out.println("- Putting new owner in logger");
+                    System.out.println(">> Putting new owner in logger");
                     logger.putOwner(fileHash, replicatedID, replicationIP);
 
                     if (statusCode == HttpStatus.OK) {
-                        System.out.println("!!Successfully replicated file (" + filename + ") to " + replicationIP);
+                        System.out.println(">> Successfully replicated file (" + filename + ") to " + replicationIP);
 
                     } else {
-                        System.err.println("!!Sending node list failed with status code: " + statusCode);
+                        System.err.println(">> Sending node list failed with status code: " + statusCode);
                     }
                 } catch (NumberFormatException e) {
                     throw new RuntimeException(e);

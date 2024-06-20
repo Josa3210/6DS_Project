@@ -48,6 +48,14 @@ public class CommandParser {
             case "printLogger" -> {
                 return Command.PRINTLOGGER;
             }
+            case "getFile" -> {
+                command = Command.GETFILE;
+                if (args.length - 1 > command.getNrArgs()) {
+                    System.out.println("Too many arguments");
+                }
+                command.setArgs(Arrays.copyOfRange(args, 1, args.length));
+                return command;
+            }
         }
         return command;
     }

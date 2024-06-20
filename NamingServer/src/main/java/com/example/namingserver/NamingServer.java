@@ -243,14 +243,11 @@ public class NamingServer implements I_NamingServer {
 
         if (clientIP.getHostAddress().equals(this.ip)) return;
 
-        System.out.println(">> Welcoming client - Sending POST request");
 
         String postUrl = "http://" + clientIP.getHostAddress() + ":8080/welcome";
-
-        System.out.println("* URI : " + postUrl);
-
         RestTemplate restTemplate = new RestTemplate();
 
+        System.out.println(">> Welcoming client - Sending request: " + postUrl);
         // Create the request body
         Map<String, Object> requestBody = new HashMap<>() {{
             put("nrNodes", sendNumNodes());

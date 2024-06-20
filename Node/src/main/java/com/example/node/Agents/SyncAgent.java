@@ -18,7 +18,6 @@ public class SyncAgent implements Runnable
 
     public SyncAgent(Client client)
     {
-        System.out.println("^^^^Debugging created syncAgent");
         this.client = client;
         this.agentFiles = new ArrayList<>();
         Thread agentThread = new Thread(this);
@@ -28,18 +27,17 @@ public class SyncAgent implements Runnable
     @Override
     public void run()
     {
-        System.out.println("^^^^Debugging Run()");
         while (true)
         {
             try {
                 if(isActive) syncNodes();
                 Thread.sleep(10000); // Wait for 5 seconds before the next sync
             } catch (InterruptedException e) {
-                System.out.println("Thread interrupted: " + e.getMessage());
+                System.out.println(">> Thread interrupted: " + e.getMessage());
                 Thread.currentThread().interrupt(); // Preserve interrupt status
                 break; // Exit the loop if interrupted
             } catch (Exception e) {
-                System.out.println("Error in syncNodes: " + e.getMessage());
+                System.out.println(">> Error in syncNodes: " + e.getMessage());
                 e.printStackTrace(); // Optional: print stack trace for debugging
             }
         }
@@ -51,7 +49,7 @@ public class SyncAgent implements Runnable
         System.out.println(">> --------------------------");
 
         // REST ask for the sync agent list of the next node
-        System.out.println("** Requesting Agent Files Next Node");
+        System.out.println(">> Requesting Agent Files Next Node");
 
         String ipNextNode = client.requestIP(client.getNextID());
 
@@ -67,24 +65,24 @@ public class SyncAgent implements Runnable
         setAgentFiles(nextNodeList);
 
         // Listing all files owned by the node at which this agent runs,
-        System.out.println("** All owned files of the client:");
+        System.out.println(">> All owned files of the client:");
         for(NodeFileEntry e : client.getFileList())
             System.out.println("* File Name: " + e.getFilename() + " - Locked: " + e.isLocked());
 
         // If one of the owned files is not added to the list, the list needs to be updated
-        System.out.println("** Updating Agent List");
+        System.out.println(">> Updating Agent List");
         for(NodeFileEntry entry : client.getFileList())
             updateList(entry.getFilename(), getAgentFiles());
 
         // Update the list stored by the node based on the agent’s list
-        System.out.println("** Updating Client List");
+        System.out.println(">> Updating Client List");
         for(NodeFileEntry entry : getAgentFiles())
             updateList(entry.getFilename(), client.getFileList());
 
         // If there is a lock request on the current node, and the file is not locked on the agent’s list, locking should be
         // enabled on the node and the list should be synchronized accordingly
         // Remove the lock when it is not needed anymore, and update local file list accordingly
-        System.out.println("** Update Lock on files agent list");
+        System.out.println(">> Update Lock on files agent list");
         for(NodeFileEntry entry : client.getFileList())
             updateLock(entry, getAgentFiles());
 
