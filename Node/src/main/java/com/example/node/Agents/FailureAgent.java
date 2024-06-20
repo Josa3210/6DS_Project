@@ -78,18 +78,18 @@ public class FailureAgent implements Runnable {
                     requestBody.put("original id", originalID);
                     requestBody.put("filepath", this.fileDirectory + "/" + filename);
 
-                    System.out.println(">> Sending request to: " + postUrl);
+                    System.out.println("* Sending request to: " + postUrl);
                     ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
                     HttpStatusCode statusCode = responseEntity.getStatusCode();
 
-                    System.out.println(">> Putting new owner in logger");
+                    System.out.println("* Putting new owner in logger");
                     logger.putOwner(fileHash, replicatedID, replicationIP);
 
                     if (statusCode == HttpStatus.OK) {
-                        System.out.println(">> Successfully replicated file (" + filename + ") to " + replicationIP);
+                        System.out.println("-> Successfully replicated file (" + filename + ") to " + replicationIP);
 
                     } else {
-                        System.err.println(">> Sending node list failed with status code: " + statusCode);
+                        System.err.println("-> Sending node list failed with status code: " + statusCode);
                     }
                 } catch (NumberFormatException e) {
                     throw new RuntimeException(e);

@@ -85,13 +85,12 @@ public class RestControllerDiscAndBoot {
 
         String filename = (String) request.get("filename");
         String filepath = (String) request.get("filepath");
-        System.out.println("filepath: " + filepath);
 
         try {
             client.isReplicatedFile = true;
             Files.delete(Path.of(filepath));
         } catch (IOException e) {
-            System.out.println("File entry cannot be deleted successfully .");
+            System.out.println("-> File entry cannot be deleted successfully .");
             throw new RuntimeException(e);
         }
     }
@@ -112,7 +111,7 @@ public class RestControllerDiscAndBoot {
     @PostMapping("/StartFileTransfer")
     public void StartFileTransfer(@RequestBody Map<String, Object> request) throws UnknownHostException {
         String filepath = (String) request.get("filepath");
-        System.out.println("^^^^Starting file transfer: " + filepath);
+        System.out.println(">> Starting file transfer: " + filepath);
         client.SendFile(filepath);
     }
 

@@ -78,7 +78,7 @@ public class NamingserverDB implements I_NamingserverDB {
             } else {
                 // Create a new file if it doesn't exist
                 if (file.createNewFile()) {
-                    System.out.println("File does not exist. Initializing an empty hashmap: " + fileName);
+                    System.out.println("* File does not exist. Initializing an empty hashmap: " + fileName);
                     nodeMap = new HashMap<>();
                     // Save the empty hashmap
                     save();

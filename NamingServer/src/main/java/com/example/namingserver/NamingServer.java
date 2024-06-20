@@ -76,7 +76,6 @@ public class NamingServer implements I_NamingServer {
             this.ip = Inet4Address.getByName(Inet4Address.getLocalHost().getHostAddress()).getHostAddress();
             database = new NamingserverDB();
             database.load();
-            database.print();
             event_listener = new ClusterMemberShipListener((NamingserverDB) database);
             NamingServer.CreateConfig();
         } catch (UnknownHostException | FileNotFoundException e) {
@@ -202,7 +201,6 @@ public class NamingServer implements I_NamingServer {
     @Override
     public int[] giveLinkIds(int hash) {
         System.out.println(">> Giving link ids to client");
-        database.print();
         Set<Integer> keys = database.getKeys();
         System.out.println("* Hash: " + hash);
 
@@ -247,7 +245,7 @@ public class NamingServer implements I_NamingServer {
         String postUrl = "http://" + clientIP.getHostAddress() + ":8080/welcome";
         RestTemplate restTemplate = new RestTemplate();
 
-        System.out.println(">> Welcoming client - Sending request: " + postUrl);
+        System.out.println("* Welcoming client - Sending request: " + postUrl);
         // Create the request body
         Map<String, Object> requestBody = new HashMap<>() {{
             put("nrNodes", sendNumNodes());

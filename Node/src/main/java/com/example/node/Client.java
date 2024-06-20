@@ -91,6 +91,7 @@ public class Client implements I_Client {
     }
 
     public void SendFile(String filepath) {
+        System.out.println(">> Sending file " + filepath);
         try {
             DataOutputStream dataOutputStream = new DataOutputStream(this.clientSocket.getOutputStream());
             int bytes = 0;
@@ -107,7 +108,7 @@ public class Client implements I_Client {
                 dataOutputStream.flush();
             }
             // close the file here
-            System.out.println(">> File was sent");
+            System.out.println("!! File was sent");
             fileInputStream.close();
             clientSocket.close();
         } catch (IOException e1) {
@@ -231,7 +232,7 @@ public class Client implements I_Client {
             put("name", hostname);
         }};
 
-        System.out.println("Requesting...");
+        System.out.println("* Requesting...");
 
         // Send the POST request
         restTemplate.postForEntity(postUrl, requestBody, Void.class);
@@ -275,11 +276,11 @@ public class Client implements I_Client {
      */
     @Override
     public int[] requestLinkIds(int requestID) {
+        System.out.println("Requesting link IDs for node " + requestID);
         String getUrl = "http://" + namingServerIP + ":" + namingServerPort + "/ns/giveLinkID/" + requestID;
         RestTemplate restTemplate = new RestTemplate();
 
-        System.out.println(">> Sending REST Get (requestLinkIds)");
-        System.out.println("* Get URL: " + getUrl);
+        System.out.println(">> Sending request: " + getUrl);
 
         ResponseEntity<int[]> response = restTemplate.getForEntity(getUrl, int[].class);
         return response.getBody();
@@ -308,20 +309,21 @@ public class Client implements I_Client {
      */
     @Override
     public void shutDown() {
+        System.out.println(">> SHUTTING DOWN NODE");
         int[] linkIds = requestLinkIds();
         int prevID = linkIds[0];
         int nextID = linkIds[1];
 
         // Get IP of previous node
-        System.out.println(">> Getting IP from previous node");
+        System.out.println("* Getting IP from previous node");
         RestTemplate restTemplate = new RestTemplate();
         String getUrl = "http://" + namingServerIP + ":8080/ns/getIp/" + getPrevID();
         ResponseEntity<String> response2 = restTemplate.getForEntity(getUrl, String.class);
         String newIP = response2.getBody();
-        System.out.println("* IP: " + newIP);
+        System.out.println("-> IP: " + newIP);
 
         // Send file to previous node
-        System.out.println(">> Sending files to previous node");
+        System.out.println("* Sending files to previous node");
         String url = "http://" + newIP + ":8080/shutdown/sendFiles";
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("originalIP", getCurrentIP());
@@ -329,11 +331,11 @@ public class Client implements I_Client {
         restTemplate.postForEntity(url, requestBody, Void.class);
 
         // Remove from the naming server
-        System.out.println(">> Removing itself from NS");
+        System.out.println("* Removing itself from NS");
         removeFromNS();
 
         // Sending new IDs to the prev and next node
-        System.out.println(">> Passing on ID to next and prev Nodes");
+        System.out.println("* Passing on ID to next and prev Nodes");
         sendLinkID(nextID);
         sendLinkID(prevID);
 
@@ -354,7 +356,7 @@ public class Client implements I_Client {
         try {
             String nodeIP = requestIP(nodeID);
             String postUrl = "http://" + nodeIP + ":" + namingServerPort + "/shutdown/updateID";
-            System.out.println(">> Sending request: " + postUrl);
+            System.out.println("* Sending request: " + postUrl);
 
             RestTemplate restTemplate = new RestTemplate();
             Map<String, Object> requestBody = new HashMap<>();
@@ -433,7 +435,7 @@ public class Client implements I_Client {
             RestTemplate restTemplate = new RestTemplate();
 
             ResponseEntity<String> responseEntity = restTemplate.getForEntity(uri, String.class);
-            System.out.println("* Response: " + responseEntity.getBody());
+            System.out.println("-> Response: " + responseEntity.getBody());
 
             if (!responseEntity.getStatusCode().is2xxSuccessful()) removeFromNetwork(nodeID);
         } catch (Exception e) {
@@ -458,7 +460,7 @@ public class Client implements I_Client {
         // Get ip from new next node
         int newNextID = nextID;
         if (nextID == failedID) {
-            System.out.println(">> Getting new next node IP");
+            System.out.println("* Getting new next node IP");
             int[] linkIds = requestLinkIds();
             newNextID = linkIds[1];
         }
@@ -466,7 +468,7 @@ public class Client implements I_Client {
         ResponseEntity<String> response = restTemplate.getForEntity(getURL, String.class);
         String nextIP = response.getBody();
 
-        System.out.println(">> Passing on agent to " + nextIP);
+        System.out.println("* Passing on agent to " + nextIP);
         // Send agent to next node --> process wil start
         String newURL = "http://" + nextIP + ":8080/agents/passFailureAgent";
         HashMap<String, Object> requestBody = new HashMap<>() {{
@@ -475,7 +477,7 @@ public class Client implements I_Client {
         }};
         restTemplate.postForEntity(newURL, requestBody, void.class);
 
-        System.out.println(">> Assigning new ID's to the next and previous node");
+        System.out.println("* Assigning new ID's to the next and previous node");
         int[] ids = requestLinkIds(failedID);
         // Send prevID to nextIP and nextID to prevID
         sendLinkID(ids[0]);
@@ -544,7 +546,7 @@ public class Client implements I_Client {
             replicatedID = getNextID();
         }
         String postUrl = "http://" + replicatedIP + ":8080/deleteReplicatedFile";
-        System.out.println(">> Sending request to delete replica on node " + replicatedID);
+        System.out.println("* Sending request to delete replica on node " + replicatedID);
 
         // Create the request body
         Map<String, Object> requestBody = new HashMap<>();
@@ -562,13 +564,13 @@ public class Client implements I_Client {
             HttpStatusCode statusCode = responseEntity.getStatusCode();
 
             if (statusCode == HttpStatus.OK) {
-                System.out.println("* Succesfully removed file: " + filename + " from " + replicatedIP);
+                System.out.println("-> Succesfully removed file: " + filename + " from " + replicatedIP);
             } else {
-                System.err.println("* Deleting file failed with code: " + statusCode);
+                System.err.println("-> Deleting file failed with code: " + statusCode);
                 removeFromNetwork(replicatedID);
             }
         } catch (RestClientException e) {
-            System.err.println("Deleting replica on " + replicatedIP + "failed: " + e.getMessage());
+            System.err.println("-> Deleting replica on " + replicatedIP + "failed: " + e.getMessage());
         }
     }
 
@@ -578,7 +580,7 @@ public class Client implements I_Client {
         // Prepare the URL for reporting the hash value to the naming server
         String getUrl = "http://" + namingServerIP + ":8080/ns/getLocation/" + filename;
 
-        System.out.println(">> Calculating replicated IP");
+        System.out.println("* Calculating replicated IP");
         // Get the ip of replicated node
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String[]> response = restTemplate.getForEntity(getUrl, String[].class);
@@ -592,7 +594,7 @@ public class Client implements I_Client {
             replicatedIP = response2.getBody();
             replicatedID = getNextID();
         }
-        System.out.println("* Replicated IP: " + replicatedIP);
+        System.out.println("-> Replicated IP: " + replicatedIP);
 
         try {
             String postUrl = "http://" + replicatedIP + ":8080/isReplicatedNode";
@@ -605,28 +607,28 @@ public class Client implements I_Client {
             requestBody.put("original id", getCurrentID());
             requestBody.put("filepath", filePath);
 
-            System.out.println(">> Sending request to: " + postUrl);
+            System.out.println("* Sending request to: " + postUrl);
             ResponseEntity<Void> responseEntity = restTemplate.postForEntity(postUrl, requestEntity, Void.class);
             HttpStatusCode statusCode = responseEntity.getStatusCode();
 
-            System.out.println(">> Putting new owner in logger");
+            System.out.println("* Putting new owner in logger");
             System.out.println("* ID: " + replicatedID + ", IP: " + replicatedIP);
             logger.putOwner(computeHash(filename), replicatedID, replicatedIP);
 
             if (statusCode == HttpStatus.OK) {
-                System.out.println(">> Successfully replicated file " + filename + " to " + replicatedIP);
+                System.out.println("-> Successfully replicated file " + filename + " to " + replicatedIP);
 
             } else {
-                System.err.println("Replicating file on node " + replicatedIP + "failed with code: " + statusCode);
+                System.err.println("-> Replicating file on node " + replicatedIP + "failed with code: " + statusCode);
                 removeFromNetwork(replicatedID);
             }
         } catch (RestClientException e) {
-            System.err.println("Failed to replicate file to " + replicatedIP + ": " + e.getMessage());
+            System.err.println("-> Failed to replicate file to " + replicatedIP + ": " + e.getMessage());
         }
     }
 
     public void receiveFile(Inet4Address originalIP, String filepath) throws IOException {
-        System.out.println("Receiving file " + filepath + "from " + originalIP);
+        System.out.println(">> Receiving file " + filepath + "from " + originalIP);
         // Create socket for TCP
         this.serverSocket = new ServerSocket(5000);
 
@@ -641,11 +643,8 @@ public class Client implements I_Client {
         requestBody.put("replicated ip", InetAddress.getLocalHost().getHostAddress());
 
         // Sending request
-        System.out.println(">> Sending request to: " + url);
+        System.out.println("* Sending request to: " + url);
         ResponseEntity<String> response = restTemplate.postForEntity(url, requestBody, String.class);
-        String responseString = response.getBody();
-        System.out.println("* " + responseString);
-
 
         // Accept connection with other node
         this.clientSocket = this.serverSocket.accept();
@@ -657,10 +656,10 @@ public class Client implements I_Client {
         requestBody.put("filepath", filepath);
 
         // Send request
-        System.out.println(">> Sending request to: " + url);
+        System.out.println("* Sending request to: " + url);
         restTemplate.postForEntity(url, requestBody, Void.class);
 
-        System.out.println(">> Start receiving file");
+        System.out.println("* Start receiving file");
         // Get ready to receive file
         try {
             isReceivedFile = true;
@@ -674,7 +673,7 @@ public class Client implements I_Client {
                 size -= bytes; // read upto file size
             }
             // Here we received file
-            System.out.println(">> File is Received");
+            System.out.println("-> File is Received");
             fileOutputStream.close();
 
         } catch (IOException e1) {
@@ -718,9 +717,9 @@ public class Client implements I_Client {
         try {
             if (!file.exists()) {
                 file.createNewFile();
-                System.out.println(">> File created");
+                System.out.println("-> File created");
             } else {
-                System.out.println(">> File already exists");
+                System.out.println("-> File already exists");
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -748,10 +747,10 @@ public class Client implements I_Client {
         System.out.println(">> Requesting file " + requestedFile);
         RestTemplate restTemplate = new RestTemplate();
         String getUrl = "http://" + namingServerIP + ":8080/ns/getLocation/" + requestedFile;
-        System.out.println(">> Sending request: " + getUrl);
+        System.out.println("* Sending request: " + getUrl);
         ResponseEntity<String[]> response = restTemplate.getForEntity(getUrl, String[].class);
         String[] locationString = response.getBody();
-        System.out.println("* File " + requestedFile + "is located at " + locationString[1] + "(NodeID " + locationString[0] + ")");
+        System.out.println("-> File " + requestedFile + "is located at " + locationString[1] + "(NodeID " + locationString[0] + ")");
     }
 
     public int getPrevID() {

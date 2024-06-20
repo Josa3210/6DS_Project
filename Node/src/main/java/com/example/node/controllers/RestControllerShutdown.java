@@ -49,7 +49,7 @@ public class RestControllerShutdown {
         JSONArray files = new JSONArray(strArray);
         String originalIP = (String) requestbody.get("original ip");
 
-        System.out.println("^^^^Sending files to the previous ID");
+        System.out.println(">> Sending files to the previous ID");
         // For every file in the logger
         for (int i = 0; i < files.length(); i++) {
             JSONObject obj = files.getJSONObject(i);
@@ -67,7 +67,7 @@ public class RestControllerShutdown {
                 // If yes, the file should be sent to the prevID of this node
                 newReplicatedIP = client.requestIP(client.getPrevID());
 
-                System.out.println("* => YES: file sent to previous node: " + client.getPrevID());
+                System.out.println("* YES: file sent to previous node: " + client.getPrevID());
 
                 // Send file from this node to the new replicated node (prevID)
                 RestTemplate restTemplate = new RestTemplate();
@@ -85,7 +85,7 @@ public class RestControllerShutdown {
                 logger.putOriginal(fileID, client.getCurrentID(), client.getCurrentIP());
 
             } else {
-                System.out.println("* => NO: notify owner that there is a new original");
+                System.out.println("* NO: notify owner that there is a new original");
                 // Download the file
                 String filepath = client.folderPath + "/" + filename;
                 client.receiveFile((Inet4Address) InetAddress.getByName(originalIP),filepath);
