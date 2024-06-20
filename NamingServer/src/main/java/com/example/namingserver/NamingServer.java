@@ -72,7 +72,7 @@ public class NamingServer implements I_NamingServer {
     @PostConstruct
     public void init() {
         try {
-            System.out.println(">> Initializing NamingServer");
+            System.out.println("\n>> Initializing NamingServer");
             this.ip = Inet4Address.getByName(Inet4Address.getLocalHost().getHostAddress()).getHostAddress();
             database = new NamingserverDB();
             database.load();
@@ -200,7 +200,7 @@ public class NamingServer implements I_NamingServer {
      */
     @Override
     public int[] giveLinkIds(int hash) {
-        System.out.println(">> Giving link ids to client");
+        System.out.println("\n>> Giving link ids to client");
         Set<Integer> keys = database.getKeys();
         System.out.println("* Hash: " + hash);
 
@@ -234,7 +234,7 @@ public class NamingServer implements I_NamingServer {
      * @param clientIP the IP of the client
      */
     private void welcomeClient(Inet4Address clientIP) {
-        System.out.println(">> Welcoming client");
+        System.out.println("\n>> Welcoming client");
         System.out.println("* ClientIP: " + clientIP.getHostAddress());
         System.out.println("* Naming Server IP: " + this.ip);
         System.out.println("* Is client IP == naming server IP? : " + clientIP.getHostAddress().equals(this.ip));

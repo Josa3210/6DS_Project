@@ -91,7 +91,7 @@ public class Client implements I_Client {
     }
 
     public void SendFile(String filepath) {
-        System.out.println(">> Sending file " + filepath);
+        System.out.println("\n>> Sending file " + filepath);
         try {
             DataOutputStream dataOutputStream = new DataOutputStream(this.clientSocket.getOutputStream());
             int bytes = 0;
@@ -123,7 +123,7 @@ public class Client implements I_Client {
      */
     @Override
     public void printLinkIds() {
-        System.out.println(">> Client ID's");
+        System.out.println("\n>> Client ID's");
         System.out.println("* Current ID: " + this.currentID);
         System.out.println("* Next ID: " + this.nextID);
         System.out.println("* Previous ID: " + this.prevID);
@@ -184,7 +184,7 @@ public class Client implements I_Client {
     @Override
     public void habari() {
         // Joins multicast group
-        System.out.println(">> Joining hazelcast instance");
+        System.out.println("\n>> Joining hazelcast instance");
         Hazelcast.newHazelcastInstance(this.config); // Creates a new Hazelcast instance with the provided configuration.
     }
 
@@ -220,7 +220,7 @@ public class Client implements I_Client {
     private void addNameToNS() {
         String postUrl = "http://" + namingServerIP + ":" + namingServerPort + "/ns/addNode";
 
-        System.out.println(">> Sending REST Post (addNameToNS)");
+        System.out.println("\n>> Sending REST Post (addNameToNS)");
         System.out.println("* Post url: " + postUrl);
         System.out.println("* IP + Name: " + currentIP + " + " + hostname);
 
@@ -276,11 +276,11 @@ public class Client implements I_Client {
      */
     @Override
     public int[] requestLinkIds(int requestID) {
-        System.out.println("Requesting link IDs for node " + requestID);
+        System.out.println("\n>> Requesting link IDs for node " + requestID);
         String getUrl = "http://" + namingServerIP + ":" + namingServerPort + "/ns/giveLinkID/" + requestID;
         RestTemplate restTemplate = new RestTemplate();
 
-        System.out.println(">> Sending request: " + getUrl);
+        System.out.println("* Sending request: " + getUrl);
 
         ResponseEntity<int[]> response = restTemplate.getForEntity(getUrl, int[].class);
         return response.getBody();
@@ -309,7 +309,7 @@ public class Client implements I_Client {
      */
     @Override
     public void shutDown() {
-        System.out.println(">> SHUTTING DOWN NODE");
+        System.out.println("\n>> SHUTTING DOWN NODE");
         int[] linkIds = requestLinkIds();
         int prevID = linkIds[0];
         int nextID = linkIds[1];
@@ -350,7 +350,7 @@ public class Client implements I_Client {
      */
     @Override
     public void sendLinkID(int nodeID) {
-        System.out.println(">> Sending link IDs");
+        System.out.println("\n>> Sending link IDs");
         if (nodeID == currentID) return;
 
         try {
@@ -370,7 +370,7 @@ public class Client implements I_Client {
     }
 
     public void activateSyncAgent() {
-        System.out.println(">> Activated Sync Agent: " + nextID + ", " + currentID + " => " + (nextID != currentID));
+        System.out.println("\n>> Activated Sync Agent: " + nextID + ", " + currentID + " => " + (nextID != currentID));
         syncAgent.setActive(nextID != currentID);
     }
 
@@ -382,7 +382,7 @@ public class Client implements I_Client {
      */
     @Override
     public void receiveLinkID(int prevID, int nextID) {
-        System.out.println(">> Updating prev and next ID : current:" + currentID + ", next ID: " + nextID + ", prev ID: " + prevID);
+        System.out.println("\n>> Updating prev and next ID : current:" + currentID + ", next ID: " + nextID + ", prev ID: " + prevID);
         this.nextID = prevID == currentID ? nextID : this.nextID;
         this.prevID = nextID == currentID ? prevID : this.prevID;
 
@@ -404,7 +404,7 @@ public class Client implements I_Client {
 
     @Override
     public void removeFromNS(int removeID) {
-        System.out.println(">> Removing " + removeID + " from Naming Server");
+        System.out.println("\n>> Removing " + removeID + " from Naming Server");
         String postUrl = "http://" + namingServerIP + ":" + namingServerPort + "/ns/removeNode";
 
         System.out.println("* Sending request: " + postUrl);
@@ -431,7 +431,7 @@ public class Client implements I_Client {
             String nodeIP = requestIP(nodeID);
 
             String uri = "http://" + nodeIP + ":8080/test" + "?testString=test";
-            System.out.println(">> Pinging: " + uri);
+            System.out.println("\n>> Pinging: " + uri);
             RestTemplate restTemplate = new RestTemplate();
 
             ResponseEntity<String> responseEntity = restTemplate.getForEntity(uri, String.class);
@@ -451,7 +451,7 @@ public class Client implements I_Client {
      */
     @Override
     public void removeFromNetwork(int failedID) {
-        System.out.println(">> Removing client " + failedID + " from network");
+        System.out.println("\n>> Removing client " + failedID + " from network");
         RestTemplate restTemplate = new RestTemplate();
 
         // Remove failed node from network
@@ -528,7 +528,7 @@ public class Client implements I_Client {
 
     @Override
     public void deleteReplicatedFile(String filename, String filePath) {
-        System.out.println(">> Deleting file" + filename);
+        System.out.println("\n>> Deleting file" + filename);
         // Prepare url
         String getUrl = "http://" + namingServerIP + ":8080/ns/getLocation/" + filename;
 
@@ -576,7 +576,7 @@ public class Client implements I_Client {
 
     @Override
     public void createReplicatedFile(String filename, String filePath) {
-        System.out.println(">> Creating replica of file " + filename);
+        System.out.println("\n>> Creating replica of file " + filename);
         // Prepare the URL for reporting the hash value to the naming server
         String getUrl = "http://" + namingServerIP + ":8080/ns/getLocation/" + filename;
 
@@ -628,7 +628,7 @@ public class Client implements I_Client {
     }
 
     public void receiveFile(Inet4Address originalIP, String filepath) throws IOException {
-        System.out.println(">> Receiving file " + filepath + "from " + originalIP);
+        System.out.println("\n>> Receiving file " + filepath + "from " + originalIP);
         // Create socket for TCP
         this.serverSocket = new ServerSocket(5000);
 
@@ -683,7 +683,7 @@ public class Client implements I_Client {
     }
 
     public void receiveReplicatedFile(Inet4Address originalIP, int originalId, String filepath) throws IOException {
-        System.out.println(">> Receiving replica of file " + filepath + "from " + originalId);
+        System.out.println("\n>> Receiving replica of file " + filepath + "from " + originalId);
         // Check if the file is not already present
         File replica = new File(filepath);
 
@@ -710,7 +710,7 @@ public class Client implements I_Client {
 
     @Override
     public void createFile(String filename) {
-        System.out.println(">> Creating file: " + filename);
+        System.out.println("\n>> Creating file: " + filename);
         String filepath = folderPath + "/" + filename;
         File file = new File(filepath);
 
@@ -728,7 +728,7 @@ public class Client implements I_Client {
 
     @Override
     public void deleteFile(String filename) {
-        System.out.println(">> Deleting file: " + filename);
+        System.out.println("\n>> Deleting file: " + filename);
         String filepath = folderPath + "/" + filename;
         File file = new File(filepath);
 
@@ -744,7 +744,7 @@ public class Client implements I_Client {
 
     @Override
     public void lookupFile(String requestedFile) {
-        System.out.println(">> Requesting file " + requestedFile);
+        System.out.println("\n>> Requesting file " + requestedFile);
         RestTemplate restTemplate = new RestTemplate();
         String getUrl = "http://" + namingServerIP + ":8080/ns/getLocation/" + requestedFile;
         System.out.println("* Sending request: " + getUrl);

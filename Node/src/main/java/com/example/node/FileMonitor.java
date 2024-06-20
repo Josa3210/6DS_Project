@@ -46,15 +46,15 @@ public class FileMonitor implements Runnable {
             String filename = file.getName();
             String filepath = file.getPath();
 
-            System.out.println(">> File popped from create queue: " + filename);
+            System.out.println("\n>> File popped from create queue: " + filename);
 
             // Add file to the file list
             client.getFileList().add(new NodeFileEntry(filename));
-            System.out.println(">> File created: " + filename);
+            System.out.println("\n>> File created: " + filename);
             int hash = client.computeHash(filename);
             if (!client.isReceivedFile) { // if the file is locally made, we let the namingserver know
                 // Add file to the client logger
-                System.out.println(">> Putting file and original in logger");
+                System.out.println("\n>> Putting file and original in logger");
                 logger.put(hash, filename);
                 logger.putOriginal(hash, client.currentID, client.getCurrentIP());
                 client.createReplicatedFile(file.getName(), filepath);
@@ -71,7 +71,7 @@ public class FileMonitor implements Runnable {
             String filepath = file.getPath();
             String filename = file.getName();
 
-            System.out.println(">> File popped from delete queue: " + filename);
+            System.out.println("\n>> File popped from delete queue: " + filename);
 
             // Remove the file from the logger
             int hash = client.computeHash(filename);
@@ -89,7 +89,7 @@ public class FileMonitor implements Runnable {
             }
 
             if (client.getLogger().remove(hash)) {
-                System.out.println(">> Succesfully deleted file from logger");
+                System.out.println("\n>> Succesfully deleted file from logger");
             }
             // Remove the hash from the logger.
             client.getFileList().removeIf(entry -> filename.equals(entry.getFilename()));
@@ -108,7 +108,7 @@ public class FileMonitor implements Runnable {
             System.err.println(e.getMessage());
             throw new RuntimeException(e);
         }
-        System.out.println(">> Folder created: " + client.folderPath);
+        System.out.println("\n>> Folder created: " + client.folderPath);
 
         // Create a FileAlterationObserver for the specified folder path (specified in the client)
         FileAlterationObserver observer = new FileAlterationObserver(client.folderPath);
@@ -122,7 +122,7 @@ public class FileMonitor implements Runnable {
                 String filename = file.getName();
                 if (!filename.endsWith(".swp")) {
                     // Add file to the queue
-                    System.out.println(">> File added to create queue: " + filename);
+                    System.out.println("\n>> File added to create queue: " + filename);
                     createdFilesQueue.add(file);
                 }
             }
@@ -133,7 +133,7 @@ public class FileMonitor implements Runnable {
                 String filename = file.getName();
                 if (!filename.endsWith(".swp")) { // we don't look at temporary files
                     // Add file to the queue
-                    System.out.println(">> File added to delete queue: " + filename);
+                    System.out.println("\n>> File added to delete queue: " + filename);
                     deletedFilesQueue.add(file);
                 }
             }

@@ -43,7 +43,7 @@ public class FailureAgent implements Runnable {
 
     @Override
     public void run() {
-        System.out.println(">> FailureAgent: starting action");
+        System.out.println("\n>> FailureAgent: starting action");
         RestTemplate restTemplate = new RestTemplate();
         // Check for all files if the failed node is the owner
         for (int i = 0; i < fileList.length(); i++) {

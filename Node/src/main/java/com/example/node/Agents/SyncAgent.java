@@ -31,7 +31,7 @@ public class SyncAgent implements Runnable
         {
             try {
                 if(isActive) syncNodes();
-                Thread.sleep(10000); // Wait for 5 seconds before the next sync
+                Thread.sleep(50000); // Wait for 5 seconds before the next sync
             } catch (InterruptedException e) {
                 System.out.println(">> Thread interrupted: " + e.getMessage());
                 Thread.currentThread().interrupt(); // Preserve interrupt status
