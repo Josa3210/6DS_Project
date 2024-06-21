@@ -34,8 +34,7 @@ public class Logger {
             load();
 
         } catch (IOException e) {
-            System.out.println("\n>> Error");
-            System.err.println(e);
+            System.out.println("\n!! Error: "+ e.getMessage());
         }
     }
 
@@ -51,7 +50,6 @@ public class Logger {
      */
 
     public void load() {
-        System.out.println("\n>> Trying to load from: " + filePath);
         try {
             // Define a file from where the file should be
             File file = new File(filePath);
@@ -65,13 +63,12 @@ public class Logger {
             } else {
                 // Create a new file if it doesn't exist
                 if (file.createNewFile()) {
-                    System.out.println("\n>> File does not exist. Initializing an empty file: " + fileName);
                     fileArray = new JSONArray();
                     save();
                 }
             }
         } catch (IOException e) {
-            System.err.println("\n>> Error loading hashmap from file: " + e.getMessage());
+            System.err.println("\n!! Error loading hashmap from file: " + e.getMessage());
             fileArray = new JSONArray();
         }
     }
@@ -106,7 +103,7 @@ public class Logger {
             // Rename temp file
             tempFile.renameTo(loggerFile);
         } catch (IOException e) {
-            System.err.println("\n>> Error saving map: " + e.getMessage());
+            System.err.println("\n!! Error saving map: " + e.getMessage());
         }
     }
 
@@ -124,8 +121,6 @@ public class Logger {
                 int id = (int) obj.get("hash");
                 if (id == hash) return obj;
             }
-        } else {
-            System.err.println("Hashmap is not initialized. Please load the hashmap first.");
         }
         return null;
     }
@@ -144,9 +139,6 @@ public class Logger {
                 String objFilename = (String) obj.get("filename");
                 if (Objects.equals(objFilename, filename)) return obj;
             }
-            System.err.println("No value with " + filename + " found.");
-        } else {
-            System.err.println("Hashmap is not initialized. Please load the hashmap first.");
         }
         return null;
     }
@@ -166,8 +158,6 @@ public class Logger {
             newObj.put("original", new JSONObject());
             fileArray.put(newObj);
             save();
-        } else {
-            System.err.println("Map is not initialized. Please load the map first.");
         }
     }
 
@@ -217,9 +207,6 @@ public class Logger {
                     return true;
                 }
             }
-            System.err.println("Node not in nodeMap");
-        } else {
-            System.err.println("Hashmap is not initialized. Please load the hashmap first.");
         }
         return false;
     }
@@ -242,9 +229,6 @@ public class Logger {
                     return true;
                 }
             }
-            System.err.println("Node not in nodeMap");
-        } else {
-            System.err.println("Hashmap is not initialized. Please load the hashmap first.");
         }
         return false;
     }

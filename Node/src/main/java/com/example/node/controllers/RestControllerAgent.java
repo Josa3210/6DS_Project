@@ -56,7 +56,7 @@ public class RestControllerAgent
         int[] ids = this.client.requestLinkIds();
         int nextID = ids[1];
 
-        System.out.println("Pass on to next? " + passOn);
+        System.out.println("* Pass on to next? " + passOn);
         if (passOn) {
             try {
                 Inet4Address nextIP = (Inet4Address) InetAddress.getByName(client.requestIP(nextID));

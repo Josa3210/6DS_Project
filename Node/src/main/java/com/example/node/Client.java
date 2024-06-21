@@ -124,6 +124,7 @@ public class Client implements I_Client {
     @Override
     public void printLinkIds() {
         System.out.println("\n>> Client ID's");
+        System.out.println("--------------------------");
         System.out.println("* Current ID: " + this.currentID);
         System.out.println("* Next ID: " + this.nextID);
         System.out.println("* Previous ID: " + this.prevID);
@@ -276,12 +277,9 @@ public class Client implements I_Client {
      */
     @Override
     public int[] requestLinkIds(int requestID) {
-        System.out.println("\n>> Requesting link IDs for node " + requestID);
+        System.out.println("\n* Requesting link IDs for node " + requestID);
         String getUrl = "http://" + namingServerIP + ":" + namingServerPort + "/ns/giveLinkID/" + requestID;
         RestTemplate restTemplate = new RestTemplate();
-
-        System.out.println("* Sending request: " + getUrl);
-
         ResponseEntity<int[]> response = restTemplate.getForEntity(getUrl, int[].class);
         return response.getBody();
     }
@@ -310,6 +308,8 @@ public class Client implements I_Client {
     @Override
     public void shutDown() {
         System.out.println("\n>> SHUTTING DOWN NODE");
+        System.out.println("--------------------------");
+
         int[] linkIds = requestLinkIds();
         int prevID = linkIds[0];
         int nextID = linkIds[1];
@@ -320,7 +320,7 @@ public class Client implements I_Client {
         String getUrl = "http://" + namingServerIP + ":8080/ns/getIp/" + getPrevID();
         ResponseEntity<String> response2 = restTemplate.getForEntity(getUrl, String.class);
         String newIP = response2.getBody();
-        System.out.println("-> IP: " + newIP);
+        System.out.println("* IP: " + newIP);
 
         // Send file to previous node
         System.out.println("* Sending files to previous node");
@@ -331,7 +331,6 @@ public class Client implements I_Client {
         restTemplate.postForEntity(url, requestBody, Void.class);
 
         // Remove from the naming server
-        System.out.println("* Removing itself from NS");
         removeFromNS();
 
         // Sending new IDs to the prev and next node
@@ -350,14 +349,11 @@ public class Client implements I_Client {
      */
     @Override
     public void sendLinkID(int nodeID) {
-        System.out.println("\n>> Sending link IDs");
         if (nodeID == currentID) return;
 
         try {
             String nodeIP = requestIP(nodeID);
             String postUrl = "http://" + nodeIP + ":" + namingServerPort + "/shutdown/updateID";
-            System.out.println("* Sending request: " + postUrl);
-
             RestTemplate restTemplate = new RestTemplate();
             Map<String, Object> requestBody = new HashMap<>();
 
@@ -404,7 +400,7 @@ public class Client implements I_Client {
 
     @Override
     public void removeFromNS(int removeID) {
-        System.out.println("\n>> Removing " + removeID + " from Naming Server");
+        System.out.println("* Removing " + removeID + " from Naming Server");
         String postUrl = "http://" + namingServerIP + ":" + namingServerPort + "/ns/removeNode";
 
         System.out.println("* Sending request: " + postUrl);
@@ -431,7 +427,9 @@ public class Client implements I_Client {
             String nodeIP = requestIP(nodeID);
 
             String uri = "http://" + nodeIP + ":8080/test" + "?testString=test";
-            System.out.println("\n>> Pinging: " + uri);
+            System.out.println("\n>> Pinging: " + nodeID);
+            System.out.println("--------------------------");
+            System.out.println(">> Sending resuest: " + uri);
             RestTemplate restTemplate = new RestTemplate();
 
             ResponseEntity<String> responseEntity = restTemplate.getForEntity(uri, String.class);
@@ -528,7 +526,7 @@ public class Client implements I_Client {
 
     @Override
     public void deleteReplicatedFile(String filename, String filePath) {
-        System.out.println("\n>> Deleting file" + filename);
+        System.out.println(">> Deleting file " + filename);
         // Prepare url
         String getUrl = "http://" + namingServerIP + ":8080/ns/getLocation/" + filename;
 
@@ -710,16 +708,17 @@ public class Client implements I_Client {
 
     @Override
     public void createFile(String filename) {
-        System.out.println("\n>> Creating file: " + filename);
+        System.out.println("\n>> CREATING FILE: " + filename);
+        System.out.println("--------------------------");
         String filepath = folderPath + "/" + filename;
         File file = new File(filepath);
 
         try {
             if (!file.exists()) {
                 file.createNewFile();
-                System.out.println("-> File created");
+                System.out.println("* File created");
             } else {
-                System.out.println("-> File already exists");
+                System.out.println("* File already exists");
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -729,6 +728,7 @@ public class Client implements I_Client {
     @Override
     public void deleteFile(String filename) {
         System.out.println("\n>> Deleting file: " + filename);
+        System.out.println("--------------------------");
         String filepath = folderPath + "/" + filename;
         File file = new File(filepath);
 
@@ -745,12 +745,13 @@ public class Client implements I_Client {
     @Override
     public void lookupFile(String requestedFile) {
         System.out.println("\n>> Requesting file " + requestedFile);
+        System.out.println("--------------------------");
         RestTemplate restTemplate = new RestTemplate();
         String getUrl = "http://" + namingServerIP + ":8080/ns/getLocation/" + requestedFile;
         System.out.println("* Sending request: " + getUrl);
         ResponseEntity<String[]> response = restTemplate.getForEntity(getUrl, String[].class);
         String[] locationString = response.getBody();
-        System.out.println("-> File " + requestedFile + "is located at " + locationString[1] + "(NodeID " + locationString[0] + ")");
+        System.out.println("* File " + requestedFile + " is located at " + locationString[1] + " (NodeID " + locationString[0] + ")");
     }
 
     public int getPrevID() {

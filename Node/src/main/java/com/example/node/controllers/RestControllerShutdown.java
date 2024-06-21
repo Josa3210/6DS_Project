@@ -49,7 +49,7 @@ public class RestControllerShutdown {
         JSONArray files = new JSONArray(strArray);
         String originalIP = (String) requestbody.get("original ip");
 
-        System.out.println(">> Sending files to the previous ID");
+        System.out.println("* Sending files to the previous ID");
         // For every file in the logger
         for (int i = 0; i < files.length(); i++) {
             JSONObject obj = files.getJSONObject(i);

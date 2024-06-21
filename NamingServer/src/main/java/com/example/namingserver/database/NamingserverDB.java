@@ -100,10 +100,10 @@ public class NamingserverDB implements I_NamingserverDB {
             File file = new File(filePath + "/" + fileName);
             objectMapper.writeValue(file, nodeMap);
 
-            System.out.println("\n>> Map saved");
+            System.out.println("* Map saved");
 
         } catch (IOException e) {
-            System.err.println("\n>> Error saving map to file: " + e.getMessage());
+            System.err.println("\n!! Error saving map to file: " + e.getMessage());
         }
     }
 
@@ -119,13 +119,13 @@ public class NamingserverDB implements I_NamingserverDB {
         if (nodeMap != null) {
             Inet4Address address = nodeMap.get(hash);
             if (address == null) {
-                System.err.println("\n>> Given key:" + hash + " => not found");
+                System.err.println("\n!! Given key:" + hash + " => not found");
                 return null;
             } else {
                 return address;
             }
         } else {
-            System.err.println("\n>> Hashmap is not initialized. Please load the hashmap first.");
+            System.err.println("\n!! Hashmap is not initialized. Please load the hashmap first.");
             return null;
         }
     }
@@ -140,7 +140,7 @@ public class NamingserverDB implements I_NamingserverDB {
         if (nodeMap != null) {
             return nodeMap.keySet(); // Assuming nodeMap is a Map<Integer, Something>
         } else {
-            System.err.println("\n>> Hashmap is not initialized. Please load the map first.");
+            System.err.println("\n!! Hashmap is not initialized. Please load the map first.");
             return Collections.emptySet(); // Or return null if appropriate
         }
     }
@@ -157,7 +157,7 @@ public class NamingserverDB implements I_NamingserverDB {
             nodeMap.put(hash, ip4);
             this.save();
         } else {
-            System.err.println("\n>> Map is not initialized. Please load the map first.");
+            System.err.println("\n!! Map is not initialized. Please load the map first.");
         }
     }
 
@@ -168,13 +168,13 @@ public class NamingserverDB implements I_NamingserverDB {
         if (nodeMap != null) {
             if (nodeMap.containsKey(hash)) {
                 nodeMap.remove(hash);
-                System.out.println("\n>> Entry with key " + hash + " removed from the database.");
+                System.out.println("\n* Entry with key " + hash + " removed from the database.");
                 this.save();
             } else {
-                System.out.println("\n>> Entry has already been removed");
+                System.out.println("\n!! Entry has already been removed");
             }
         } else {
-            System.err.println("\n>> Database is not initialized. Please load the database first.");
+            System.err.println("\n!! Database is not initialized. Please load the database first.");
         }
     }
 

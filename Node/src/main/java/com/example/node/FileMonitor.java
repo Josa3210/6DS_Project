@@ -46,15 +46,15 @@ public class FileMonitor implements Runnable {
             String filename = file.getName();
             String filepath = file.getPath();
 
-            System.out.println("\n>> File popped from create queue: " + filename);
+            System.out.println("* File popped from create queue: " + filename);
 
             // Add file to the file list
             client.getFileList().add(new NodeFileEntry(filename));
-            System.out.println("\n>> File created: " + filename);
+            System.out.println("* File created: " + filename);
             int hash = client.computeHash(filename);
             if (!client.isReceivedFile) { // if the file is locally made, we let the namingserver know
                 // Add file to the client logger
-                System.out.println("\n>> Putting file and original in logger");
+                System.out.println("* Putting file and original in logger");
                 logger.put(hash, filename);
                 logger.putOriginal(hash, client.currentID, client.getCurrentIP());
                 client.createReplicatedFile(file.getName(), filepath);
@@ -122,7 +122,6 @@ public class FileMonitor implements Runnable {
                 String filename = file.getName();
                 if (!filename.endsWith(".swp")) {
                     // Add file to the queue
-                    System.out.println("\n>> File added to create queue: " + filename);
                     createdFilesQueue.add(file);
                 }
             }
@@ -133,7 +132,6 @@ public class FileMonitor implements Runnable {
                 String filename = file.getName();
                 if (!filename.endsWith(".swp")) { // we don't look at temporary files
                     // Add file to the queue
-                    System.out.println("\n>> File added to delete queue: " + filename);
                     deletedFilesQueue.add(file);
                 }
             }
