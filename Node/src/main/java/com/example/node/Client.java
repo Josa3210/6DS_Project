@@ -91,7 +91,6 @@ public class Client implements I_Client {
     }
 
     public void SendFile(String filepath) {
-        System.out.println("\n>> Sending file " + filepath);
         try {
             DataOutputStream dataOutputStream = new DataOutputStream(this.clientSocket.getOutputStream());
             int bytes = 0;
@@ -108,7 +107,7 @@ public class Client implements I_Client {
                 dataOutputStream.flush();
             }
             // close the file here
-            System.out.println("!! File was sent");
+            System.out.println("* File was sent");
             fileInputStream.close();
             clientSocket.close();
         } catch (IOException e1) {
@@ -592,7 +591,7 @@ public class Client implements I_Client {
             replicatedIP = response2.getBody();
             replicatedID = getNextID();
         }
-        System.out.println("-> Replicated IP: " + replicatedIP);
+        System.out.println("* Replicated IP: " + replicatedIP);
 
         try {
             String postUrl = "http://" + replicatedIP + ":8080/isReplicatedNode";
@@ -614,19 +613,18 @@ public class Client implements I_Client {
             logger.putOwner(computeHash(filename), replicatedID, replicatedIP);
 
             if (statusCode == HttpStatus.OK) {
-                System.out.println("-> Successfully replicated file " + filename + " to " + replicatedIP);
+                System.out.println("* Successfully replicated file " + filename + " to " + replicatedIP);
 
             } else {
-                System.err.println("-> Replicating file on node " + replicatedIP + "failed with code: " + statusCode);
+                System.err.println("* Replicating file on node " + replicatedIP + "failed with code: " + statusCode);
                 removeFromNetwork(replicatedID);
             }
         } catch (RestClientException e) {
-            System.err.println("-> Failed to replicate file to " + replicatedIP + ": " + e.getMessage());
+            System.err.println("* Failed to replicate file to " + replicatedIP + ": " + e.getMessage());
         }
     }
 
     public void receiveFile(Inet4Address originalIP, String filepath) throws IOException {
-        System.out.println("\n>> Receiving file " + filepath + "from " + originalIP);
         // Create socket for TCP
         this.serverSocket = new ServerSocket(5000);
 
@@ -638,7 +636,7 @@ public class Client implements I_Client {
         Map<String, Object> requestBody = new HashMap<>();
 
         // Set IP to which the node needs to send
-        requestBody.put("replicated ip", InetAddress.getLocalHost().getHostAddress());
+        requestBody.put("* replicated ip", InetAddress.getLocalHost().getHostAddress());
 
         // Sending request
         System.out.println("* Sending request to: " + url);
@@ -671,7 +669,7 @@ public class Client implements I_Client {
                 size -= bytes; // read upto file size
             }
             // Here we received file
-            System.out.println("-> File is Received");
+            System.out.println("* File is Received");
             fileOutputStream.close();
 
         } catch (IOException e1) {
@@ -681,7 +679,9 @@ public class Client implements I_Client {
     }
 
     public void receiveReplicatedFile(Inet4Address originalIP, int originalId, String filepath) throws IOException {
-        System.out.println("\n>> Receiving replica of file " + filepath + "from " + originalId);
+        System.out.println("\n>> RECEIVING REPLICA: " + filepath);
+        System.out.println("--------------------------");
+        System.out.println("Received file from " + originalId);
         // Check if the file is not already present
         File replica = new File(filepath);
 
@@ -716,7 +716,6 @@ public class Client implements I_Client {
         try {
             if (!file.exists()) {
                 file.createNewFile();
-                System.out.println("* File created");
             } else {
                 System.out.println("* File already exists");
             }
@@ -727,7 +726,7 @@ public class Client implements I_Client {
 
     @Override
     public void deleteFile(String filename) {
-        System.out.println("\n>> Deleting file: " + filename);
+        System.out.println("\n>> DELETING FILE: " + filename);
         System.out.println("--------------------------");
         String filepath = folderPath + "/" + filename;
         File file = new File(filepath);

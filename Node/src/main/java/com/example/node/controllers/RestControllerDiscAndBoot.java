@@ -82,9 +82,10 @@ public class RestControllerDiscAndBoot {
 
     @PostMapping("/deleteReplicatedFile")
     public void deleteReplicatedFile(@RequestBody Map<String, Object> request) throws UnknownHostException {
-
         String filename = (String) request.get("filename");
         String filepath = (String) request.get("filepath");
+        System.out.println(">> DELETING REPLICA: "+ filename);
+        System.out.println("--------------------------");
 
         try {
             client.isReplicatedFile = true;

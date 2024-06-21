@@ -50,7 +50,6 @@ public class FileMonitor implements Runnable {
 
             // Add file to the file list
             client.getFileList().add(new NodeFileEntry(filename));
-            System.out.println("* File created: " + filename);
             int hash = client.computeHash(filename);
             if (!client.isReceivedFile) { // if the file is locally made, we let the namingserver know
                 // Add file to the client logger
@@ -71,7 +70,7 @@ public class FileMonitor implements Runnable {
             String filepath = file.getPath();
             String filename = file.getName();
 
-            System.out.println("\n>> File popped from delete queue: " + filename);
+            System.out.println("* File popped from delete queue: " + filename);
 
             // Remove the file from the logger
             int hash = client.computeHash(filename);
@@ -89,7 +88,7 @@ public class FileMonitor implements Runnable {
             }
 
             if (client.getLogger().remove(hash)) {
-                System.out.println("\n>> Succesfully deleted file from logger");
+                System.out.println("* Succesfully deleted file from logger");
             }
             // Remove the hash from the logger.
             client.getFileList().removeIf(entry -> filename.equals(entry.getFilename()));
