@@ -40,7 +40,13 @@ public class RestControllerNS
     @GetMapping("/ns/getIp/{id}")
     public String getIp(@PathVariable("id") int id) {
         System.out.println("\n>> Returning IP of node " + id);
-        String ip = namingServer.getIP(id).getHostAddress();
+        String ip;
+        System.out.println(namingServer.returnData());
+        try {
+            ip = namingServer.getIP(id).getHostAddress();
+        } catch (Exception e){
+            ip = "null";
+        }
         System.out.println("* IP: " + ip);
         return ip;
     }
