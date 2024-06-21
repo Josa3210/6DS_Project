@@ -276,7 +276,7 @@ public class Client implements I_Client {
      */
     @Override
     public int[] requestLinkIds(int requestID) {
-        System.out.println("\n* Requesting link IDs for node " + requestID);
+        System.out.println("* Requesting link IDs for node " + requestID);
         String getUrl = "http://" + namingServerIP + ":" + namingServerPort + "/ns/giveLinkID/" + requestID;
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<int[]> response = restTemplate.getForEntity(getUrl, int[].class);
