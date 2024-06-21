@@ -100,7 +100,6 @@ public class RestControllerDiscAndBoot {
     public String OpenTCPConnection(@RequestBody Map<String, Object> request) throws IOException {
         String response;
         String ip = (String) request.get("replicated ip");
-        System.out.println("Socket is up: " + client.clientSocket.isConnected());
         try{
             client.clientSocket = new Socket(ip, 5000);
         } catch (ConnectException e){
