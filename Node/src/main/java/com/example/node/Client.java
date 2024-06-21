@@ -636,7 +636,7 @@ public class Client implements I_Client {
         Map<String, Object> requestBody = new HashMap<>();
 
         // Set IP to which the node needs to send
-        requestBody.put("* replicated ip", InetAddress.getLocalHost().getHostAddress());
+        requestBody.put("replicated ip", InetAddress.getLocalHost().getHostAddress());
 
         // Sending request
         System.out.println("* Sending request to: " + url);

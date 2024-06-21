@@ -99,7 +99,7 @@ public class RestControllerDiscAndBoot {
     @PostMapping("/OpenTCPConnection")
     public String OpenTCPConnection(@RequestBody Map<String, Object> request) throws IOException {
         String response;
-        String ip = (String) request.get("replicated ip");
+        String ip = request.get("replicated ip").toString();
         System.out.println("* Opening TCP connections: " + ip);
         try{
             client.clientSocket = new Socket(ip, 5000);
