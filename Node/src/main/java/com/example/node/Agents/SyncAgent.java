@@ -53,16 +53,21 @@ public class SyncAgent implements Runnable
 
         String ipNextNode = client.requestIP(client.getNextID());
 
+        try {
         String getUrl = "http://" + ipNextNode + ":8080/agents/sync"; // Failure Exception?
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<SyncAgentResponse> response = restTemplate.getForEntity(getUrl, SyncAgentResponse.class);
 
-        List<NodeFileEntry> nextNodeList = response.getBody().getAgentFiles();
+            List<NodeFileEntry> nextNodeList = response.getBody().getAgentFiles();
+            for(NodeFileEntry nextNodeEntry : nextNodeList)
+                System.out.println("* File Name: " + nextNodeEntry.getFilename() + " - Locked: " + nextNodeEntry.isLocked());
 
-        for(NodeFileEntry nextNodeEntry : nextNodeList)
-            System.out.println("* File Name: " + nextNodeEntry.getFilename() + " - Locked: " + nextNodeEntry.isLocked());
+            setAgentFiles(nextNodeList);
+        } catch (Exception e){
+            System.out.println("!! Sync agent connecting to " + client.getNextID() + " failed");
+            client.removeFromNetwork(client.getNextID());
+        }
 
-        setAgentFiles(nextNodeList);
 
         // Listing all files owned by the node at which this agent runs,
         System.out.println(">> All owned files of the client:");
