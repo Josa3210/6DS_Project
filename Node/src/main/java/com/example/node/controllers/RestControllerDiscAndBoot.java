@@ -104,6 +104,7 @@ public class RestControllerDiscAndBoot {
         try{
             client.clientSocket = new Socket(ip, 5000);
         } catch (ConnectException e){
+            System.out.println("* Is already connected" + client.clientSocket.isConnected());
             System.err.println(e.getMessage());
         }
         response = "* Socket (" + ip + ", 5000) still connected";
